@@ -165,7 +165,7 @@ namespace LimeBean.Tests.Examples {
             Console.WriteLine("Deleting all the beverages...");
             R.Trash(beverages);
 
-            Console.WriteLine("Products remained: {0}", R.Find<Product>().Length);
+            Console.WriteLine("Products remained: {0}", R.Count<Product>());
         }
 
     }

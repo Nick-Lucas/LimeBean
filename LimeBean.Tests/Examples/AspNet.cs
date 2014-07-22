@@ -22,6 +22,9 @@ namespace LimeBean.Tests.Examples.AspNet {
 
         protected void Application_BeginRequest(object sender, EventArgs e) {
             R = new BeanApi("data source=c:/db1; pooling=true", SQLiteFactory.Instance);
+#if DEBUG
+            R.EnterFluidMode();
+#endif
         }
 
         protected void Application_EndRequest(object sender, EventArgs e) {
