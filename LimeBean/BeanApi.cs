@@ -148,32 +148,16 @@ namespace LimeBean {
 
         // IBeanFinder
 
-        public Bean[] Find(string kind, string expr = null, params object[] parameters) {
-            return Finder.Find(kind, expr, parameters);
-        }
-
         public Bean[] Find(bool useCache, string kind, string expr = null, params object[] parameters) {
             return Finder.Find(useCache, kind, expr, parameters);
-        }
-
-        public T[] Find<T>(string expr = null, params object[] parameters) where T : Bean, new() {
-            return Finder.Find<T>(expr, parameters);
         }
 
         public T[] Find<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new() {
             return Finder.Find<T>(useCache, expr, parameters);
         }
 
-        public Bean FindOne(string kind, string expr = null, params object[] parameters) {
-            return Finder.FindOne(kind, expr, parameters);
-        }
-
         public Bean FindOne(bool useCache, string kind, string expr = null, params object[] parameters) {
             return Finder.FindOne(useCache, kind, expr, parameters);
-        }
-
-        public T FindOne<T>(string expr = null, params object[] parameters) where T : Bean, new() {
-            return Finder.FindOne<T>(expr, parameters);
         }
 
         public T FindOne<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new() {
@@ -188,16 +172,8 @@ namespace LimeBean {
             return Finder.FindIterator<T>(expr, parameters);
         }
 
-        public long Count(string kind, string expr = null, params object[] parameters) {
-            return Finder.Count(kind, expr, parameters);
-        }
-
         public long Count(bool useCache, string kind, string expr = null, params object[] parameters) {
             return Finder.Count(useCache, kind, expr, parameters);            
-        }
-
-        public long Count<T>(string expr = null, params object[] parameters) where T : Bean, new() {
-            return Finder.Count<T>(expr, parameters);
         }
 
         public long Count<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new() {
@@ -228,32 +204,16 @@ namespace LimeBean {
             return Db.RowsIterator(sql, parameters);
         }
 
-        public T Cell<T>(string sql, params object[] parameters) where T : IConvertible {
-            return Db.Cell<T>(sql, parameters);
-        }
-
         public T Cell<T>(bool useCache, string sql, params object[] parameters) where T : IConvertible {
             return Db.Cell<T>(useCache, sql, parameters);
-        }
-
-        public T[] Col<T>(string sql, params object[] parameters) where T : IConvertible {
-            return Db.Col<T>(sql, parameters);
         }
 
         public T[] Col<T>(bool useCache, string sql, params object[] parameters) where T : IConvertible {
             return Db.Col<T>(useCache, sql, parameters);
         }
 
-        public IDictionary<string, IConvertible> Row(string sql, params object[] parameters) {
-            return Db.Row(sql, parameters);
-        }
-
         public IDictionary<string, IConvertible> Row(bool useCache, string sql, params object[] parameters) {
             return Db.Row(useCache, sql, parameters);
-        }
-
-        public IDictionary<string, IConvertible>[] Rows(string sql, params object[] parameters) {
-            return Db.Rows(sql, parameters);
         }
 
         public IDictionary<string, IConvertible>[] Rows(bool useCache, string sql, params object[] parameters) {
@@ -264,10 +224,6 @@ namespace LimeBean {
 
         public bool InTransaction {
             get { return Db.InTransaction; }
-        }
-
-        public void Transaction(Action action) {
-            Db.Transaction(action);
         }
 
         public void Transaction(Func<bool> action) {
@@ -284,6 +240,54 @@ namespace LimeBean {
             return Storage.GetLastInsertID();
         }
 
+        // Shortcuts
+
+        public Bean[] Find(string kind, string expr = null, params object[] parameters) {
+            return Find(true, kind, expr, parameters);
+        }
+
+        public T[] Find<T>(string expr = null, params object[] parameters) where T : Bean, new() {
+            return Find<T>(true, expr, parameters);
+        }
+
+        public Bean FindOne(string kind, string expr = null, params object[] parameters) {
+            return FindOne(true, kind, expr, parameters);
+        }
+
+        public T FindOne<T>(string expr = null, params object[] parameters) where T : Bean, new() {
+            return FindOne<T>(true, expr, parameters);
+        }
+
+        public long Count(string kind, string expr = null, params object[] parameters) {
+            return Count(true, kind, expr, parameters);
+        }
+
+        public long Count<T>(string expr = null, params object[] parameters) where T : Bean, new() {
+            return Count<T>(true, expr, parameters);
+        }
+
+        public T Cell<T>(string sql, params object[] parameters) where T : IConvertible {
+            return Cell<T>(true, sql, parameters);
+        }
+
+        public T[] Col<T>(string sql, params object[] parameters) where T : IConvertible {
+            return Col<T>(true, sql, parameters);
+        }
+
+        public IDictionary<string, IConvertible> Row(string sql, params object[] parameters) {
+            return Row(true, sql, parameters);
+        }
+
+        public IDictionary<string, IConvertible>[] Rows(string sql, params object[] parameters) {
+            return Rows(true, sql, parameters);
+        }
+
+        public void Transaction(Action action) {
+            Transaction(delegate() {
+                action();
+                return true;
+            });
+        }
     }
 
 }

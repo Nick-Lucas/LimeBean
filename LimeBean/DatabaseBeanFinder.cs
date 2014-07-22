@@ -18,16 +18,8 @@ namespace LimeBean {
 
         // Find
 
-        public Bean[] Find(string kind, string expr = null, params object[] parameters) {
-            return Find(true, kind, expr, parameters);
-        }
-
         public Bean[] Find(bool useCache, string kind, string expr = null, params object[] parameters) {
             return Rows(useCache, kind, expr, parameters).Select(row => _crud.Load(kind, row)).ToArray();
-        }
-
-        public T[] Find<T>(string expr = null, params object[] parameters) where T : Bean, new() {
-            return Find<T>(true, expr, parameters);
         }
 
         public T[] Find<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new() {
@@ -36,16 +28,8 @@ namespace LimeBean {
 
         // FindOne
 
-        public Bean FindOne(string kind, string expr = null, params object[] parameters) {
-            return FindOne(true, kind, expr, parameters);
-        }
-
         public Bean FindOne(bool useCache, string kind, string expr = null, params object[] parameters) {
             return _crud.Load(kind, Row(useCache, kind, expr, parameters));
-        }
-
-        public T FindOne<T>(string expr = null, params object[] parameters) where T : Bean, new() {
-            return FindOne<T>(true, expr, parameters);
         }
 
         public T FindOne<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new() {
@@ -64,16 +48,8 @@ namespace LimeBean {
 
         // Count
 
-        public long Count(string kind, string expr = null, params object[] parameters) {
-            return Count(true, kind, expr, parameters);
-        }
-
         public long Count(bool useCache, string kind, string expr = null, params object[] parameters) {
             return _db.Cell<long>(useCache, FormatSelectQuery(kind, expr, true), parameters);
-        }
-
-        public long Count<T>(string expr = null, params object[] parameters) where T : Bean, new() {
-            return Count<T>(true, expr, parameters);
         }
 
         public long Count<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new() {

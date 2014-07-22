@@ -29,10 +29,10 @@ namespace LimeBean.Tests {
                 bean["foo"] = "fail";
 
                 try { crud.Store(bean); } catch { }
-                Assert.AreEqual("ok", db.Cell<string>("select foo from test where " + Bean.ID_PROP_NAME + " = ?", id));
+                Assert.AreEqual("ok", db.Cell<string>(true, "select foo from test where " + Bean.ID_PROP_NAME + " = ?", id));
 
                 try { crud.Trash(bean); } catch { }
-                Assert.IsTrue(db.Cell<int>("select count(*) from test") > 0);
+                Assert.IsTrue(db.Cell<int>(true, "select count(*) from test") > 0);
             }
         }
 

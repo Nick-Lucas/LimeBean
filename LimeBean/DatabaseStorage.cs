@@ -66,7 +66,7 @@ namespace LimeBean {
             if(_isFluidMode && !IsKnownKind(kind))
                 return null;
 
-            return Db.Row("select * from " + QuoteName(kind) + " where " + QuoteName(Bean.ID_PROP_NAME) + " = " + id);
+            return Db.Row(true, "select * from " + QuoteName(kind) + " where " + QuoteName(Bean.ID_PROP_NAME) + " = " + id);
         }
 
         public void Trash(string kind, long id) {

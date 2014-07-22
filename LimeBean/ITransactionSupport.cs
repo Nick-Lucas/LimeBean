@@ -7,7 +7,6 @@ namespace LimeBean {
 
     interface ITransactionSupport {
         bool InTransaction { get; }
-        void Transaction(Action action);
         void Transaction(Func<bool> action);
     }
 

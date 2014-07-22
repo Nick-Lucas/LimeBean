@@ -65,6 +65,8 @@ namespace LimeBean {
                 bean.AfterStore();
                 foreach(var observer in _observers)
                     observer.AfterStore(bean);
+
+                return true;
             });
 
             return bean.ID.Value;
@@ -84,6 +86,8 @@ namespace LimeBean {
                 bean.AfterTrash();
                 foreach(var observer in _observers)
                     observer.AfterTrash(bean);
+
+                return true;
             });
         }
 
@@ -109,7 +113,7 @@ namespace LimeBean {
             return bean;
         }
 
-        void ImplicitTransaction(Action action) {
+        void ImplicitTransaction(Func<bool> action) {
             if(_transactionSupport == null || _transactionSupport.InTransaction)
                 action();
             else

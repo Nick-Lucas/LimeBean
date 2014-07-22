@@ -52,7 +52,7 @@ namespace LimeBean.Tests {
                 { "p2", "hello" }
             });
 
-            var row = _db.Row("select * from kind1");
+            var row = _db.Row(true, "select * from kind1");
             Assert.AreEqual(123, row["p1"]);
             Assert.AreEqual("hello", row["p2"]);
             Assert.AreEqual(id, row[Bean.ID_PROP_NAME]);
@@ -63,7 +63,7 @@ namespace LimeBean.Tests {
                 { "p2", "see you" }            
             }));
 
-            row = _db.Row("select * from kind1");
+            row = _db.Row(true, "select * from kind1");
             Assert.AreEqual(-1, row["p1"]);
             Assert.AreEqual("see you", row["p2"]);
         }
@@ -78,7 +78,7 @@ namespace LimeBean.Tests {
                 { "p4", null }
             });
 
-            var row = _db.Row("select * from kind1");
+            var row = _db.Row(true, "select * from kind1");
             Assert.AreEqual(123, row["p1"]);
             Assert.AreEqual(3.14, row["p2"]);
             Assert.AreEqual("hello", row["p3"]);
@@ -112,7 +112,7 @@ namespace LimeBean.Tests {
             Assert.AreEqual(SQLiteStorage.RANK_TEXT, schema["kind1"]["x"]);
             Assert.AreEqual(SQLiteStorage.RANK_NONE, schema["kind1"]["y"]);
 
-            var rows = _db.Rows("select * from kind1 order by " + Bean.ID_PROP_NAME);
+            var rows = _db.Rows(true, "select * from kind1 order by " + Bean.ID_PROP_NAME);
             Assert.AreEqual("1", rows[0]["x"]);
             Assert.AreEqual("hello", rows[1]["x"]);
         }
@@ -129,7 +129,7 @@ namespace LimeBean.Tests {
             _storage.EnterFluidMode();
 
             var id = _storage.Store("kind1", new Dictionary<string, IConvertible>());
-            Assert.AreEqual(1, _db.Cell<int>("select count(*) from kind1"));
+            Assert.AreEqual(1, _db.Cell<int>(true, "select count(*) from kind1"));
 
             Assert.DoesNotThrow(delegate() {
                 _storage.Store("kind1", new Dictionary<string, IConvertible>() { { Bean.ID_PROP_NAME, id } });
@@ -221,7 +221,7 @@ namespace LimeBean.Tests {
             var id2 = _storage.Store("kind1", emptiness);
 
             _storage.Trash("kind1", id1);
-            Assert.AreEqual(1, _db.Cell<int>("select count(*) from kind1"));
+            Assert.AreEqual(1, _db.Cell<int>(true, "select count(*) from kind1"));
         }
 
         [Test]
@@ -243,9 +243,9 @@ namespace LimeBean.Tests {
                 _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", null } })
             };
 
-            CollectionAssert.AreEquivalent(trueKeys, _db.Col<IConvertible>("select " + Bean.ID_PROP_NAME + " from foo where x"));
-            CollectionAssert.AreEquivalent(falseKeys, _db.Col<IConvertible>("select " + Bean.ID_PROP_NAME + " from foo where not x"));
-            CollectionAssert.AreEquivalent(nullKeys, _db.Col<IConvertible>("select " + Bean.ID_PROP_NAME + " from foo where x is null"));
+            CollectionAssert.AreEquivalent(trueKeys, _db.Col<IConvertible>(true, "select " + Bean.ID_PROP_NAME + " from foo where x"));
+            CollectionAssert.AreEquivalent(falseKeys, _db.Col<IConvertible>(true, "select " + Bean.ID_PROP_NAME + " from foo where not x"));
+            CollectionAssert.AreEquivalent(nullKeys, _db.Col<IConvertible>(true, "select " + Bean.ID_PROP_NAME + " from foo where x is null"));
         }
 
         [Test]

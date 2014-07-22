@@ -46,10 +46,6 @@ namespace LimeBean {
 
         // Cell
 
-        public T Cell<T>(string sql, object[] parameters) where T : IConvertible {
-            return Cell<T>(true, sql, parameters);
-        }
-
         public T Cell<T>(bool useCache, string sql, object[] parameters) where T : IConvertible {
             return CacheableRead(true, true, useCache, sql, parameters, Cell<T>);
         }
@@ -61,10 +57,6 @@ namespace LimeBean {
 
         // Col
 
-        public T[] Col<T>(string sql, object[] parameters) where T : IConvertible {
-            return Col<T>(true, sql, parameters);
-        }
-
         public T[] Col<T>(bool useCache, string sql, object[] parameters) where T : IConvertible {
             return CacheableRead(true, false, useCache, sql, parameters, Col<T>);
         }
@@ -74,10 +66,6 @@ namespace LimeBean {
         }
 
         // Row
-
-        public IDictionary<string, IConvertible> Row(string sql, object[] parameters) {
-            return Row(true, sql, parameters);
-        }
 
         public IDictionary<string, IConvertible> Row(bool useCache, string sql, object[] parameters) {
             return CacheableRead(false, true, useCache, sql, parameters, Row);
@@ -89,10 +77,6 @@ namespace LimeBean {
 
         // Rows
 
-        public IDictionary<string, IConvertible>[] Rows(string sql, object[] parameters) {
-            return Rows(true, sql, parameters);
-        }
-
         public IDictionary<string, IConvertible>[] Rows(bool useCache, string sql, object[] parameters) {
             return CacheableRead(false, false, useCache, sql, parameters, Rows);
         }
@@ -102,13 +86,6 @@ namespace LimeBean {
         }
 
         // Transactions
-
-        public void Transaction(Action action) {
-            Transaction(delegate() {
-                action();
-                return true;
-            });
-        }
 
         public void Transaction(Func<bool> action) {
             using(var tx = _connection.BeginTransaction()) {
