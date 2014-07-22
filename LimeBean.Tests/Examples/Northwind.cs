@@ -103,7 +103,7 @@ namespace LimeBean.Tests.Examples {
             // Example of a referenced bean
             // NOTE internal LRU cache is used during loading
             public Category Category {
-                get { return R.Load<Category>(CategoryID.Value); }
+                get { return R.Load<Category>(CategoryID); }
                 set { CategoryID = value.ID; }
             }
 

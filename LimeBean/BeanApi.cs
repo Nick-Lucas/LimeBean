@@ -242,6 +242,20 @@ namespace LimeBean {
 
         // Shortcuts
 
+        public Bean Load(string kind, long? id) {
+            if(id == null)
+                return null;
+
+            return Load(kind, id.Value);
+        }
+
+        public T Load<T>(long? id) where T : Bean, new() {
+            if(id == null)
+                return null;
+
+            return Load<T>(id.Value);
+        }
+
         public Bean[] Find(string kind, string expr = null, params object[] parameters) {
             return Find(true, kind, expr, parameters);
         }
