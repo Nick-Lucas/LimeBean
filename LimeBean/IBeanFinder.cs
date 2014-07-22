@@ -18,6 +18,11 @@ namespace LimeBean {
 
         IEnumerable<Bean> FindIterator(string kind, string expr = null, params object[] parameters);
         IEnumerable<T> FindIterator<T>(string expr = null, params object[] parameters) where T : Bean, new();
+
+        long Count(string kind, string expr = null, params object[] parameters);
+        long Count(bool useCache, string kind, string expr = null, params object[] parameters);
+        long Count<T>(string expr = null, params object[] parameters) where T : Bean, new();
+        long Count<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new();
     }
 
 }

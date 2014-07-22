@@ -62,6 +62,24 @@ namespace LimeBean {
             return RowsIterator(Bean.GetKind<T>(), expr, parameters).Select(_crud.Load<T>);
         }
 
+        // Count
+
+        public long Count(string kind, string expr = null, params object[] parameters) {
+            return Count(true, kind, expr, parameters);
+        }
+
+        public long Count(bool useCache, string kind, string expr = null, params object[] parameters) {
+            return _db.Cell<long>(useCache, FormatSelectQuery(kind, expr, true), parameters);
+        }
+
+        public long Count<T>(string expr = null, params object[] parameters) where T : Bean, new() {
+            return Count<T>(true, expr, parameters);
+        }
+
+        public long Count<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new() {
+            return Count(useCache, Bean.GetKind<T>(), expr, parameters);
+        }
+
 
         // Internals
 
@@ -77,13 +95,12 @@ namespace LimeBean {
             return _db.RowsIterator(FormatSelectQuery(kind, expr), parameters);
         }
 
-        string FormatSelectQuery(string kind, string expr) {
-            var sql = "select * from " + _specifics.QuoteName(kind);
+        string FormatSelectQuery(string kind, string expr, bool countOnly = false) {
+            var sql = "select " + (countOnly ? "count(*)" : "*") + " from " + _specifics.QuoteName(kind);
             if(!String.IsNullOrEmpty(expr))
                 sql += " " + expr;
             return sql;
         }
-
     }
 
 }

@@ -99,6 +99,18 @@ namespace LimeBean.Tests {
             CollectionAssert.AreEquivalent(new[] { 1, 3 }, _finder.FindIterator<Foo>("where x <> ?", 2).Select(b => b["x"]));
         }
 
+        [Test]
+        public void Count() {
+            var queryCount = 0;
+            _db.QueryExecuting += cmd => queryCount++;
+
+            Assert.AreEqual(2, _finder.Count("foo", "where x <> ?", 2));
+            Assert.AreEqual(2, _finder.Count<Foo>("where x <> ?", 2));
+            Assert.AreEqual(2, _finder.Count(false, "foo", "where x <> ?", 2));
+            Assert.AreEqual(2, _finder.Count<Foo>(false, "where x <> ?", 2));
+            Assert.AreEqual(3, queryCount);
+        }
+
         
         class Foo : Bean {
             public Foo()

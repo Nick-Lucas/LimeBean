@@ -188,6 +188,22 @@ namespace LimeBean {
             return Finder.FindIterator<T>(expr, parameters);
         }
 
+        public long Count(string kind, string expr = null, params object[] parameters) {
+            return Finder.Count(kind, expr, parameters);
+        }
+
+        public long Count(bool useCache, string kind, string expr = null, params object[] parameters) {
+            return Finder.Count(useCache, kind, expr, parameters);            
+        }
+
+        public long Count<T>(string expr = null, params object[] parameters) where T : Bean, new() {
+            return Finder.Count<T>(expr, parameters);
+        }
+
+        public long Count<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new() {
+            return Finder.Count<T>(useCache, expr, parameters);            
+        }
+
         // IDatabaseAccess
 
         public event Action<IDbCommand> QueryExecuting {
