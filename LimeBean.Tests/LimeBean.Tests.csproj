@@ -61,6 +61,7 @@
     <Compile Include="CacheTests.cs" />
     <Compile Include="DatabaseAccessTests.cs" />
     <Compile Include="DbCommandDescriptorTests.cs" />
+    <Compile Include="Examples\Crud.cs" />
     <Compile Include="Examples\Northwind.cs" />
     <Compile Include="InMemoryStorage.cs" />
     <Compile Include="BeanCrudTests.cs" />
