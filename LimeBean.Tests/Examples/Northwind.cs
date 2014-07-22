@@ -123,38 +123,33 @@ namespace LimeBean.Tests.Examples {
 
         [Test]
         public void Scenario() {
-            var beverages = new Category { 
-                Name = "Beverages",
-                Description = "Soft drinks, coffees, teas, beers, and ales"
-            };
+            var beverages = R.Dispense<Category>();
+            beverages.Name = "Beverages";
+            beverages.Description = "Soft drinks, coffees, teas, beers, and ales";
 
-            var condiments = new Category {
-                Name = "Condiments",
-                Description = "Sweet and savory sauces, relishes, spreads, and seasonings"
-            };
+            var condiments = R.Dispense<Category>();
+            condiments.Name = "Condiments";
+            condiments.Description = "Sweet and savory sauces, relishes, spreads, and seasonings";
 
             R.Store(beverages);
             R.Store(condiments);
 
 
-            var chai = new Product { 
-                Name = "Chai",
-                UnitPrice = 18,
-                Category = beverages
-            };
+            var chai = R.Dispense<Product>();
+            chai.Name = "Chai";
+            chai.UnitPrice = 18;
+            chai.Category = beverages;
 
-            var chang = new Product {
-                Name = "Chang",
-                UnitPrice = 19,
-                Category = beverages
-            };
+            var chang = R.Dispense<Product>();
+            chang.Name = "Chang";
+            chang.UnitPrice = 19;
+            chang.Category = beverages;
 
-            var syrup = new Product {
-                Name = "Aniseed Syrup",
-                UnitPrice = 9.95M,
-                Category = condiments,
-                Discontinued = true
-            };
+            var syrup = R.Dispense<Product>();
+            syrup.Name = "Aniseed Syrup";
+            syrup.UnitPrice = 9.95M;
+            syrup.Category = condiments;
+            syrup.Discontinued = true;
 
             R.Store(chai);
             R.Store(chang);

@@ -125,6 +125,19 @@ namespace LimeBean.Tests {
             Assert.IsNull(crud.Load("temp", null));
         }
 
+        [Test]
+        public void PreventDirectInstantiation() {
+            var crud = new BeanCrud(null, null);
+            
+            Assert.Throws<InvalidOperationException>(delegate() {
+                crud.Store(new Tracer());    
+            });
+
+            Assert.Throws<InvalidOperationException>(delegate() {
+                crud.Trash(new Tracer());
+            });
+        }
+
 
         class Tracer : Bean {
 

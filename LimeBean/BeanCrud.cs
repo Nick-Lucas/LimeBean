@@ -55,6 +55,8 @@ namespace LimeBean {
         }
 
         public long Store(Bean bean) {
+            EnsureDispensed(bean);
+
             ImplicitTransaction(delegate() {
                 bean.BeforeStore();
                 foreach(var observer in _observers)
@@ -73,6 +75,8 @@ namespace LimeBean {
         }
 
         public void Trash(Bean bean) {
+            EnsureDispensed(bean);
+
             if(bean.ID == null)
                 return;
 
@@ -92,6 +96,8 @@ namespace LimeBean {
         }
 
         T ContinueDispense<T>(T bean) where T : Bean {
+            bean.Dispensed = true;
+
             bean.AfterDispense();
             foreach(var observer in _observers)
                 observer.AfterDispense(bean);
@@ -118,6 +124,11 @@ namespace LimeBean {
                 action();
             else
                 _transactionSupport.Transaction(action);
+        }
+
+        void EnsureDispensed(Bean bean) {
+            if(!bean.Dispensed)
+                throw new InvalidOperationException("Do not instantiate beans directly, use BeanApi.Dispense method instead.");
         }
     }
 

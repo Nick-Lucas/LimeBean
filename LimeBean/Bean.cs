@@ -22,6 +22,8 @@ namespace LimeBean {
         IDictionary<string, IConvertible> _props = new Dictionary<string, IConvertible>();
         string _kind;
 
+        internal bool Dispensed;
+
         internal Bean() {
         }
 
