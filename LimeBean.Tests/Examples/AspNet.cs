@@ -13,7 +13,7 @@ namespace LimeBean.Tests.Examples.AspNet {
         // For each request you use a separate instance of BeanApi
         // (object construction is very lightweight, initialization is lazy: on first usage)
 
-        static readonly string RKey = new Guid().ToString();
+        static readonly string RKey = Guid.NewGuid().ToString();
 
         public static BeanApi R {
             get { return (BeanApi)HttpContext.Current.Items[RKey]; }

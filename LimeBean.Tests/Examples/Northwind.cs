@@ -86,7 +86,7 @@ namespace LimeBean.Tests.Examples {
             }
 
             public long? CategoryID {
-                get { return Get<long>("category_id"); }
+                get { return GetNullable<long>("category_id"); }
                 set { Put("category_id", value); }
             }
 
