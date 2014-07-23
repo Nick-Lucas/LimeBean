@@ -10,10 +10,10 @@ using System.Text;
 namespace LimeBean {
 
     struct DbCommandDescriptor : IEquatable<DbCommandDescriptor> {
-        string _sql;
-        string[] _paramNames;
-        object[] _paramValues;
-        int _tag;
+        readonly string _sql;
+        readonly string[] _paramNames;
+        readonly object[] _paramValues;
+        readonly int _tag;
 
         public DbCommandDescriptor(string sql, params object[] parameters)
             : this(0, sql, parameters) {
