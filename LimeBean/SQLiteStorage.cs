@@ -86,10 +86,10 @@ namespace LimeBean {
 
         protected override Schema LoadSchema() {
             var result = new Schema();
-            var tables = Db.Col<string>(true, "select name from sqlite_master where type = 'table' and name <> 'sqlite_sequence'");
+            var tables = Db.Col<string>(false, "select name from sqlite_master where type = 'table' and name <> 'sqlite_sequence'");
             foreach(var tableName in tables) {
                 var columns = new TableColumns();
-                foreach(var row in Db.Rows(true, "pragma table_info(" + QuoteName(tableName) + ")")) {
+                foreach(var row in Db.Rows(false, "pragma table_info(" + QuoteName(tableName) + ")")) {
                     var isKey = Convert.ToBoolean(row["pk"]);
                     if(isKey)
                         continue;
