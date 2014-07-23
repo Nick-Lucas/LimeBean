@@ -86,29 +86,9 @@ namespace LimeBean.Tests {
         }
 
         [Test]
-        public void PropertyNameFormat() {
-            var bean = new Bean();
-
-            Assert.Throws<FormatException>(delegate() {
-                bean["CamelCase"] = "abc";
-            });
-            Assert.Throws<FormatException>(delegate() {
-                bean.Put("CamelCase", "abc");
-            });
-        }
-
-        [Test]
         public void Kind() { 
-            Assert.Throws<ArgumentException>(delegate() {
-                new Bean(" ");
-            });
-
             var bean = new Bean("kind1");
             Assert.AreEqual("kind1", bean.GetKind());
-
-            Assert.Throws<FormatException>(delegate() {
-                new Bean("CamelCase");
-            });
         }
 
         [Test]

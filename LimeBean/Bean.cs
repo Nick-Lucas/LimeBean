@@ -12,7 +12,6 @@ namespace LimeBean {
     public class Bean {
         public const string ID_PROP_NAME = "id";
 
-        static readonly Regex VALID_NAME_RE = new Regex("^[a-z\\d_]+$", RegexOptions.Compiled);
         static readonly ConcurrentDictionary<Type, string> _kindCache = new ConcurrentDictionary<Type, string>();
 
         internal static string GetKind<T>() where T : Bean, new() {
@@ -28,7 +27,6 @@ namespace LimeBean {
         }
 
         protected internal Bean(string kind) {
-            ValidateNameFormat(kind);
             _kind = kind;
         }
 
@@ -61,12 +59,10 @@ namespace LimeBean {
                 return null;
             }
             set {
-                if(value == null) {
+                if(value == null)
                     _props.Remove(name);
-                } else {
-                    ValidateNameFormat(name);
+                else
                     _props[name] = value;
-                }
             }
         }
 
@@ -109,14 +105,6 @@ namespace LimeBean {
             else
                 this[name] = null;
             return this;
-        }
-
-        static void ValidateNameFormat(string name) {
-            if(String.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Name cannot be empty");
-
-            if(!VALID_NAME_RE.IsMatch(name))
-                throw new FormatException("Invalid name format: " + name + ". Names must be in snake_case.");
         }
 
         // Import / Export

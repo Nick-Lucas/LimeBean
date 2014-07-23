@@ -275,6 +275,13 @@ namespace LimeBean.Tests {
             Assert.IsInstanceOf<long>(row["long"]);
             Assert.AreEqual(Int64.MaxValue, row["long"]);
         }
+
+        [Test]
+        public void BacktickInName() {
+            Assert.Throws<ArgumentException>(delegate() {
+                _storage.QuoteName("`"); 
+            });
+        }
     }
 
 }

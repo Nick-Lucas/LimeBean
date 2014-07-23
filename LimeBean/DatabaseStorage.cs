@@ -201,6 +201,9 @@ namespace LimeBean {
         }
 
         public virtual string QuoteName(string name) {
+            if(name.Contains("`"))
+                throw new ArgumentException();
+
             return "`" + name + "`";
         }
 

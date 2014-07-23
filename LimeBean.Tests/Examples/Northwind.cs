@@ -27,19 +27,19 @@ namespace LimeBean.Tests.Examples {
         class Category : Bean {
 
             public Category()
-                : base("category") {
+                : base("Category") {
             }
 
             // Typed property accessors
 
             public string Name {
-                get { return Get<string>("name"); }
-                set { Put("name", value); }
+                get { return Get<string>("Name"); }
+                set { Put("Name", value); }
             }
 
             public string Description {
-                get { return Get<string>("description"); }
-                set { Put("description", value); }
+                get { return Get<string>("Description"); }
+                set { Put("Description", value); }
             }
 
             bool HasName { get { return !String.IsNullOrWhiteSpace(Name); } }
@@ -47,7 +47,7 @@ namespace LimeBean.Tests.Examples {
             // Helper method to find all products in this category
             // NOTE internal LRU cache is used, so DB is not hit every time
             public Product[] GetProducts() {
-                return R.Find<Product>("where category_id = ?", ID);
+                return R.Find<Product>("where CategoryID = ?", ID);
             }
 
             // Validation rules prevent storing of unnamed categories
@@ -75,29 +75,29 @@ namespace LimeBean.Tests.Examples {
         class Product : Bean {
 
             public Product()
-                : base("product") {
+                : base("Product") {
             }
 
             // Typed accessors
 
             public string Name {
-                get { return Get<string>("name"); }
-                set { Put("name", value); }
+                get { return Get<string>("Name"); }
+                set { Put("Name", value); }
             }
 
             public long? CategoryID {
-                get { return GetNullable<long>("category_id"); }
-                set { Put("category_id", value); }
+                get { return GetNullable<long>("CategoryID"); }
+                set { Put("CategoryID", value); }
             }
 
             public decimal UnitPrice {
-                get { return Get<decimal>("unit_price"); }
-                set { Put("unit_price", value); }
+                get { return Get<decimal>("UnitPrice"); }
+                set { Put("UnitPrice", value); }
             }
 
             public bool Discontinued {
-                get { return Get<bool>("discontinued"); }
-                set { Put("discontinued", value); }
+                get { return Get<bool>("Discontinued"); }
+                set { Put("Discontinued", value); }
             }
 
             // Example of a referenced bean
