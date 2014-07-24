@@ -41,7 +41,7 @@ namespace LimeBean {
                     return value.ToDouble(CultureInfo.InvariantCulture);
             }
 
-            return value.ToString(CultureInfo.InvariantCulture);
+            return TryRepresentAsLong(value.ToString(CultureInfo.InvariantCulture));
         }
 
         protected override int GetRankFromValue(IConvertible value) {
@@ -54,6 +54,9 @@ namespace LimeBean {
                     return RANK_NONE;
 
                 case TypeCode.String:
+                    if("".Equals(value))
+                        return RANK_NONE;
+
                     return RANK_TEXT;
             }
 
@@ -129,6 +132,17 @@ namespace LimeBean {
 
         public override long GetLastInsertID() {
             return Db.Cell<long>(false, "select last_insert_rowid()");
+        }
+        
+        static IConvertible TryRepresentAsLong(string text) {
+            if(text.Length < 1 || text.Length > 20)
+                return text;
+
+            long longValue;
+            if(Int64.TryParse(text, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out longValue) && longValue.ToString(CultureInfo.InvariantCulture) == text)
+                return longValue;
+
+            return text;
         }
 
     }

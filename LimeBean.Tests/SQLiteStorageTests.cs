@@ -31,8 +31,8 @@ namespace LimeBean.Tests {
         public void Schema() {
             _db.Exec(@"create table t (
                 " + Bean.ID_PROP_NAME + @" integer primary key, 
-                n none, 
-                t text, 
+                n None, 
+                t TEXT, 
                 o            
             )");
 
@@ -75,7 +75,8 @@ namespace LimeBean.Tests {
                 { "p1", 123 },
                 { "p2", 3.14 },
                 { "p3", "hello" },
-                { "p4", null }
+                { "p4", null },
+                { "p5", "" }
             });
 
             var row = _db.Row(true, "select * from kind1");
@@ -83,12 +84,14 @@ namespace LimeBean.Tests {
             Assert.AreEqual(3.14, row["p2"]);
             Assert.AreEqual("hello", row["p3"]);
             Assert.AreEqual(null, row["p4"]);
+            Assert.AreEqual("", row["p5"]);
 
             var table = _storage.GetSchema()["kind1"];
             Assert.AreEqual(SQLiteStorage.RANK_NONE, table["p1"]);
             Assert.AreEqual(SQLiteStorage.RANK_NONE, table["p2"]);
             Assert.AreEqual(SQLiteStorage.RANK_TEXT, table["p3"]);
             Assert.AreEqual(SQLiteStorage.RANK_NONE, table["p4"]);
+            Assert.AreEqual(SQLiteStorage.RANK_NONE, table["p5"]);
         }
 
         [Test]
@@ -171,11 +174,11 @@ namespace LimeBean.Tests {
 
         [Test, SetCulture("ru")]
         public void Roundtrip() {
+            _storage.EnterFluidMode();
 
             Action<IConvertible, IConvertible> check = (before, after) => {
                 _db.Exec("drop table if exists kind1");
-                _storage.InvalidateSchema();
-                _storage.EnterFluidMode();
+                _storage.InvalidateSchema();                
 
                 var id = _storage.Store("kind1", new Dictionary<string, IConvertible> { 
                     { "p", before }
@@ -183,21 +186,50 @@ namespace LimeBean.Tests {
 
                 var loaded = _storage.Load("kind1", id);
                 Assert.AreEqual(after, loaded["p"]);
+
+                if(after != null)
+                    Assert.AreEqual(after.GetType(), loaded["p"].GetType());
             };
 
+            // native SQLite types
             check(null, null);
-            check("", "");
-            check(0, 0);
-            check(1, 1);
-            check(3.14, 3.14);
-            check("3.0e+5", "3.0e+5");
-            check(" ", " ");
-            check("hello", "hello");
-            check(true, 1);
-            check(false, 0);
-            check(-15.90M, "-15.90");
+            check("hello", "hello");            
+            check(Int64.MinValue, Int64.MinValue);
+            check(Int64.MaxValue, Int64.MaxValue);
+            check(Double.Epsilon, Double.Epsilon);
+            check(Double.MinValue, Double.MinValue);
+            check(Double.MaxValue, Double.MaxValue);
+
+            // conversion to string
             check(9223372036854775808, "9223372036854775808");
+            check(9223372036854775808M, "9223372036854775808");
             check(new DateTime(1984, 6, 14, 13, 14, 15), "06/14/1984 13:14:15");
+
+            // upscale to long
+            check(0, 0L);
+            check(1, 1L);
+            check(true, 1L);
+            check(false, 0L);
+
+            // downscale to long
+            check("123", 123L);
+            check(123.0, 123L);
+            check(123uL, 123L);
+            check(123M, 123L);
+            check(TypeCode.DateTime, 16L);
+
+            // safety
+            check("", "");
+            check(" ", " ");
+            check("-0", "-0");
+            check("00", "00");
+            check("+123", "+123");
+            check("123 ", "123 ");
+            check(" 123", " 123");
+            check("0123", "0123");
+            check("0x123", "0x123");            
+            check(-1.00M, "-1.00");
+            check("3.0e+5", "3.0e+5");            
         }
 
         [Test]
