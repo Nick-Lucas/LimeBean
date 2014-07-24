@@ -54,9 +54,6 @@ namespace LimeBean {
                     return RANK_NONE;
 
                 case TypeCode.String:
-                    if("".Equals(value))
-                        return RANK_NONE;
-
                     return RANK_TEXT;
             }
 

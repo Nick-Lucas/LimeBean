@@ -18,7 +18,12 @@ namespace LimeBean {
 
         public DatabaseStorage(IDatabaseAccess db) {
             Db = db;
+            TrimStrings = true;
+            ConvertEmptyStringToNull = true;
         }
+
+        public bool TrimStrings { get; set; }
+        public bool ConvertEmptyStringToNull { get; set; }
 
         protected IDatabaseAccess Db { get; private set; }
 
@@ -89,7 +94,7 @@ namespace LimeBean {
                 var paramName = "p" + index++;
                 propNames.Add(QuoteName(propName));
                 paramNames.Add(FormatParam(paramName));
-                paramValues[paramName] = ConvertPropertyValue(data[propName]);
+                paramValues[paramName] = ConvertPropertyValue(PreprocessPropertyValue(data[propName]));
             }
 
             var sql = "insert into " + QuoteName(kind) + " ("
@@ -114,7 +119,7 @@ namespace LimeBean {
                     pairs.Append(", ");
 
                 var paramName = "p" + index++;                
-                paramValues[paramName] = ConvertPropertyValue(data[propName]);
+                paramValues[paramName] = ConvertPropertyValue(PreprocessPropertyValue(data[propName]));
 
                 pairs
                     .Append(QuoteName(propName))
@@ -133,7 +138,7 @@ namespace LimeBean {
         TableColumns GetColumnsFromData(IDictionary<string, IConvertible> data) {
             var result = new TableColumns(data.Count);
             foreach(var entry in data)
-                result[entry.Key] = GetRankFromValue(ConvertPropertyValue(entry.Value));
+                result[entry.Key] = GetRankFromValue(ConvertPropertyValue(PreprocessPropertyValue(entry.Value)));
             return result;
         }
 
@@ -212,7 +217,21 @@ namespace LimeBean {
         protected virtual string FormatParam(string name) {
             return "@" + name;
         }
-        
+
+        IConvertible PreprocessPropertyValue(IConvertible value) {
+            var text = value as String;
+            if(text != null) {
+                if(TrimStrings)
+                    text = text.Trim();
+                if(ConvertEmptyStringToNull && text.Length < 1)
+                    text = null;
+
+                return text;
+            }
+
+            return value;
+        }
+
     }
 
 }

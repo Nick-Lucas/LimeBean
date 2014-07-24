@@ -75,8 +75,7 @@ namespace LimeBean.Tests {
                 { "p1", 123 },
                 { "p2", 3.14 },
                 { "p3", "hello" },
-                { "p4", null },
-                { "p5", "" }
+                { "p4", null }
             });
 
             var row = _db.Row(true, "select * from kind1");
@@ -84,14 +83,12 @@ namespace LimeBean.Tests {
             Assert.AreEqual(3.14, row["p2"]);
             Assert.AreEqual("hello", row["p3"]);
             Assert.AreEqual(null, row["p4"]);
-            Assert.AreEqual("", row["p5"]);
 
             var table = _storage.GetSchema()["kind1"];
             Assert.AreEqual(SQLiteStorage.RANK_NONE, table["p1"]);
             Assert.AreEqual(SQLiteStorage.RANK_NONE, table["p2"]);
             Assert.AreEqual(SQLiteStorage.RANK_TEXT, table["p3"]);
             Assert.AreEqual(SQLiteStorage.RANK_NONE, table["p4"]);
-            Assert.AreEqual(SQLiteStorage.RANK_NONE, table["p5"]);
         }
 
         [Test]
@@ -218,18 +215,28 @@ namespace LimeBean.Tests {
             check(123M, 123L);
             check(TypeCode.DateTime, 16L);
 
-            // safety
-            check("", "");
-            check(" ", " ");
+            // prevented downscale to long
             check("-0", "-0");
             check("00", "00");
             check("+123", "+123");
+            check("0123", "0123");
+            check("0x123", "0x123");
+            check(-1.00M, "-1.00");
+            check("3.0e+5", "3.0e+5");
+
+            // string relaxations
+            check("", null);
+            check(" ", null);
+            check("123 ", 123L);
+            check(" 123", 123L);
+
+            _storage.TrimStrings = false;
+            _storage.ConvertEmptyStringToNull = false;
+
+            check("", "");
+            check(" ", " ");
             check("123 ", "123 ");
             check(" 123", " 123");
-            check("0123", "0123");
-            check("0x123", "0x123");            
-            check(-1.00M, "-1.00");
-            check("3.0e+5", "3.0e+5");            
         }
 
         [Test]
@@ -262,17 +269,19 @@ namespace LimeBean.Tests {
 
             var trueKeys = new[] { 
                 _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", true } }),
+                _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", 1 } }),
                 _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", "1" } })
             };
 
             var falseKeys = new[] {
                 _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", false } }),
-                _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", "" } }),
+                _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", 0 } }),
                 _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", "0" } })
             };
 
             var nullKeys = new[] { 
-                _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", null } })
+                _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", null } }),
+                _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", "" } })
             };
 
             CollectionAssert.AreEquivalent(trueKeys, _db.Col<IConvertible>(true, "select " + Bean.ID_PROP_NAME + " from foo where x"));

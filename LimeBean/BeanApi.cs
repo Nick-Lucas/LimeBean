@@ -232,6 +232,17 @@ namespace LimeBean {
 
         // IDatabaseSpecifics
 
+        public bool TrimStrings {
+            get { return Storage.TrimStrings; }
+            set { Storage.TrimStrings = value; }
+        }
+
+        public bool ConvertEmptyStringToNull {
+            get { return Storage.ConvertEmptyStringToNull; }
+            set { Storage.ConvertEmptyStringToNull = value; }
+        }
+
+
         public string QuoteName(string name) {
             return Storage.QuoteName(name);
         }
@@ -302,6 +313,7 @@ namespace LimeBean {
                 return true;
             });
         }
+
     }
 
 }
