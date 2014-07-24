@@ -11,6 +11,7 @@ namespace LimeBean.Tests.Examples {
     public class Stress {
         const string DB_PATH = "c:/temp/lime-stress.db";
         BeanApi R;
+        Random _rand = new Random();
 
         [SetUp]
         public void SetUp() {
@@ -50,7 +51,8 @@ namespace LimeBean.Tests.Examples {
 
         string GenerateLongString() {
             var builder = new StringBuilder();
-            for(var i = 0; i < 128; i++)
+            var n = _rand.Next(1, 255);
+            for(var i = 0; i < n; i++)
                 builder.Append(Guid.NewGuid().ToString("N"));
             return builder.ToString();
         }
