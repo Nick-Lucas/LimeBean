@@ -20,10 +20,12 @@ namespace LimeBean {
             Db = db;
             TrimStrings = true;
             ConvertEmptyStringToNull = true;
+            RecognizeIntegers = true;
         }
 
         public bool TrimStrings { get; set; }
         public bool ConvertEmptyStringToNull { get; set; }
+        public bool RecognizeIntegers { get; set; }
 
         protected IDatabaseAccess Db { get; private set; }
 
@@ -37,7 +39,60 @@ namespace LimeBean {
             _schema = null;
         }
 
-        protected abstract IConvertible ConvertPropertyValue(IConvertible value);
+        IConvertible ConvertValue(IConvertible value) {
+            if(value == null)
+                return null;
+
+            switch(value.GetTypeCode()) {
+                case TypeCode.Boolean:
+                case TypeCode.SByte:
+                case TypeCode.Byte:
+                case TypeCode.Int16:
+                case TypeCode.UInt16:
+                case TypeCode.Int32:
+                case TypeCode.UInt32:
+                case TypeCode.Int64:
+                    return ConvertLongValue(value.ToInt64(CultureInfo.InvariantCulture));
+
+                case TypeCode.Single:
+                case TypeCode.Double:
+                    var number = value.ToDouble(CultureInfo.InvariantCulture);
+
+                    if(RecognizeIntegers) {
+                        const double
+                            minSafeInteger = -0x1fffffffffffff,
+                            maxSafeInteger = 0x1fffffffffffff;
+
+                        if(Math.Truncate(number) == number && number >= minSafeInteger && number <= maxSafeInteger)
+                            return ConvertLongValue(Convert.ToInt64(number));
+                    }
+
+                    return number;
+            }
+
+            var text = value.ToString(CultureInfo.InvariantCulture);
+
+            if(TrimStrings)
+                text = text.Trim();
+
+            if(ConvertEmptyStringToNull && text.Length < 1)
+                return null;
+
+            if(RecognizeIntegers && text.Length > 0 && text.Length < 21 && !Char.IsLetter(text, 0)) {
+                long number;
+                if(Int64.TryParse(text, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out number)) {
+                    if(number.ToString(CultureInfo.InvariantCulture) == text)
+                        return ConvertLongValue(number);
+                }
+            }
+
+            return text;
+        }
+
+        protected virtual IConvertible ConvertLongValue(long value) {
+            return value;
+        }
+
         protected abstract int GetRankFromValue(IConvertible value);
         protected abstract int GetRankFromSqlType(string sqlType);
         protected abstract string GetSqlTypeFromRank(int rank);        
@@ -94,7 +149,7 @@ namespace LimeBean {
                 var paramName = "p" + index++;
                 propNames.Add(QuoteName(propName));
                 paramNames.Add(FormatParam(paramName));
-                paramValues[paramName] = ConvertPropertyValue(PreprocessPropertyValue(data[propName]));
+                paramValues[paramName] = ConvertValue(data[propName]);
             }
 
             var sql = "insert into " + QuoteName(kind) + " ("
@@ -119,7 +174,7 @@ namespace LimeBean {
                     pairs.Append(", ");
 
                 var paramName = "p" + index++;                
-                paramValues[paramName] = ConvertPropertyValue(PreprocessPropertyValue(data[propName]));
+                paramValues[paramName] = ConvertValue(data[propName]);
 
                 pairs
                     .Append(QuoteName(propName))
@@ -138,7 +193,7 @@ namespace LimeBean {
         TableColumns GetColumnsFromData(IDictionary<string, IConvertible> data) {
             var result = new TableColumns(data.Count);
             foreach(var entry in data)
-                result[entry.Key] = GetRankFromValue(ConvertPropertyValue(PreprocessPropertyValue(entry.Value)));
+                result[entry.Key] = GetRankFromValue(ConvertValue(entry.Value));
             return result;
         }
 
@@ -216,20 +271,6 @@ namespace LimeBean {
 
         protected virtual string FormatParam(string name) {
             return "@" + name;
-        }
-
-        IConvertible PreprocessPropertyValue(IConvertible value) {
-            var text = value as String;
-            if(text != null) {
-                if(TrimStrings)
-                    text = text.Trim();
-                if(ConvertEmptyStringToNull && text.Length < 1)
-                    text = null;
-
-                return text;
-            }
-
-            return value;
         }
 
     }

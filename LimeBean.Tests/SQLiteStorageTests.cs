@@ -190,7 +190,11 @@ namespace LimeBean.Tests {
 
             // native SQLite types
             check(null, null);
-            check("hello", "hello");            
+            check("hello", "hello");
+            check(123L, 123L);
+            check(3.14, 3.14);
+
+            // extremal vaues
             check(Int64.MinValue, Int64.MinValue);
             check(Int64.MaxValue, Int64.MaxValue);
             check(Double.Epsilon, Double.Epsilon);
@@ -207,13 +211,19 @@ namespace LimeBean.Tests {
             check(1, 1L);
             check(true, 1L);
             check(false, 0L);
+            check(TypeCode.DateTime, 16L);
+            check(123.0, 123L); // done by driver?
 
             // downscale to long
-            check("123", 123L);
-            check(123.0, 123L);
+            check("123", 123L);            
             check(123uL, 123L);
             check(123M, 123L);
-            check(TypeCode.DateTime, 16L);
+
+            // disabled downscale to long
+            _storage.RecognizeIntegers = false;
+            check("123", "123");
+            check(123M, "123");
+            _storage.RecognizeIntegers = true;
 
             // prevented downscale to long
             check("-0", "-0");

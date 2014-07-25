@@ -242,6 +242,10 @@ namespace LimeBean {
             set { Storage.ConvertEmptyStringToNull = value; }
         }
 
+        public bool RecognizeIntegers {
+            get { return Storage.RecognizeIntegers; }
+            set { Storage.RecognizeIntegers = value; }
+        }
 
         public string QuoteName(string name) {
             return Storage.QuoteName(name);

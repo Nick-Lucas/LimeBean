@@ -21,29 +21,6 @@ namespace LimeBean {
             : base(db) {
         }
 
-        protected override IConvertible ConvertPropertyValue(IConvertible value) {
-            if(value == null)
-                return null;
-
-            switch(value.GetTypeCode()) {
-                case TypeCode.Boolean:
-                case TypeCode.SByte:
-                case TypeCode.Byte:
-                case TypeCode.Int16:
-                case TypeCode.UInt16:
-                case TypeCode.Int32:
-                case TypeCode.UInt32:
-                case TypeCode.Int64:
-                    return value.ToInt64(CultureInfo.InvariantCulture);
-
-                case TypeCode.Single:
-                case TypeCode.Double:
-                    return value.ToDouble(CultureInfo.InvariantCulture);
-            }
-
-            return TryRepresentAsLong(value.ToString(CultureInfo.InvariantCulture));
-        }
-
         protected override int GetRankFromValue(IConvertible value) {
             if(value == null)
                 return RANK_NONE;
