@@ -14,7 +14,7 @@ namespace LimeBean {
 
         // NOTE using NUMERIC affinity does not work because driver forces conversion to Decimal
         internal const int
-            RANK_NONE = 0,
+            RANK_ANY = 0,
             RANK_TEXT = 1;
 
         public SQLiteStorage(IDatabaseAccess db)
@@ -23,12 +23,12 @@ namespace LimeBean {
 
         protected override int GetRankFromValue(IConvertible value) {
             if(value == null)
-                return RANK_NONE;
+                return RANK_ANY;
 
             switch(value.GetTypeCode()) {
                 case TypeCode.Int64:
                 case TypeCode.Double:
-                    return RANK_NONE;
+                    return RANK_ANY;
 
                 case TypeCode.String:
                     return RANK_TEXT;
@@ -38,21 +38,28 @@ namespace LimeBean {
         }
 
         protected override int GetRankFromSqlType(string sqlType) {
-            switch(sqlType.ToLower()) { 
-                case "none":
-                    return RANK_NONE;
+            // according to http://www.sqlite.org/datatype3.html#affname
 
-                case "text":
+            if(String.IsNullOrEmpty(sqlType))
+                return RANK_ANY;
+
+            sqlType = sqlType.ToLower();
+
+            if(!sqlType.Contains("int")) {
+                if(sqlType.Contains("char") || sqlType.Contains("clob") || sqlType.Contains("text"))
                     return RANK_TEXT;
+
+                if(sqlType.Contains("blob"))
+                    return RANK_ANY;
             }
 
-            return RANK_MAX;
+            return RANK_CUSTOM;
         }
 
         protected override string GetSqlTypeFromRank(int rank) {
             switch(rank) { 
-                case RANK_NONE:
-                    return "none";
+                case RANK_ANY:
+                    return null;
 
                 case RANK_TEXT:
                     return "text";
@@ -66,11 +73,13 @@ namespace LimeBean {
             var tables = Db.Col<string>(false, "select name from sqlite_master where type = 'table' and name <> 'sqlite_sequence'");
             foreach(var tableName in tables) {
                 var columns = new TableColumns();
-                foreach(var row in Db.Rows(false, "pragma table_info(" + QuoteName(tableName) + ")")) {
-                    var isKey = Convert.ToBoolean(row["pk"]);
-                    if(isKey)
+                foreach(var row in Db.Rows(false, "pragma table_info(" + QuoteName(tableName) + ")")) {                    
+                    if(Convert.ToBoolean(row["pk"]))
                         continue;
-                    columns[Convert.ToString(row["name"])] = GetRankFromSqlType(Convert.ToString(row["type"]));
+                                          
+                    columns[Convert.ToString(row["name"])] = Convert.ToBoolean(row["notnull"]) || row["dflt_value"] != null
+                        ? RANK_CUSTOM
+                        : GetRankFromSqlType(Convert.ToString(row["type"]));
                 }
                 result[tableName] = columns;
             }

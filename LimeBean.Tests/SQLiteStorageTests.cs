@@ -30,18 +30,43 @@ namespace LimeBean.Tests {
         [Test]
         public void Schema() {
             _db.Exec(@"create table t (
-                " + Bean.ID_PROP_NAME + @" integer primary key, 
-                n None, 
-                t TEXT, 
-                o            
+                pk integer primary key, 
+
+                a1,
+                a2 LONGBLOB,
+
+                t1 mediumtext,
+                t2 CLOB,
+                t3 VarChar(123),
+                
+                x1 charint,
+                x2 numeric,
+                x3 real,
+                x4 eprst,
+                
+                x5 text not null,
+                x6 text default 'a'
             )");
 
             var schema = _storage.GetSchema();
             Assert.AreEqual(1, schema.Count);
-            Assert.IsFalse(schema["t"].ContainsKey(Bean.ID_PROP_NAME));
-            Assert.AreEqual(SQLiteStorage.RANK_NONE, schema["t"]["n"]);
-            Assert.AreEqual(SQLiteStorage.RANK_TEXT, schema["t"]["t"]);
-            Assert.AreEqual(SQLiteStorage.RANK_MAX, schema["t"]["o"]);
+
+            var t = schema["t"];
+            Assert.IsFalse(t.ContainsKey("pk"));
+
+            Assert.AreEqual(SQLiteStorage.RANK_ANY, t["a1"]);
+            Assert.AreEqual(SQLiteStorage.RANK_ANY, t["a2"]);
+
+            Assert.AreEqual(SQLiteStorage.RANK_TEXT, t["t1"]);
+            Assert.AreEqual(SQLiteStorage.RANK_TEXT, t["t2"]);
+            Assert.AreEqual(SQLiteStorage.RANK_TEXT, t["t3"]);
+
+            Assert.AreEqual(SQLiteStorage.RANK_CUSTOM, t["x1"]);
+            Assert.AreEqual(SQLiteStorage.RANK_CUSTOM, t["x2"]);
+            Assert.AreEqual(SQLiteStorage.RANK_CUSTOM, t["x3"]);
+            Assert.AreEqual(SQLiteStorage.RANK_CUSTOM, t["x4"]);
+            Assert.AreEqual(SQLiteStorage.RANK_CUSTOM, t["x5"]);
+            Assert.AreEqual(SQLiteStorage.RANK_CUSTOM, t["x6"]);
         }
 
         [Test]
@@ -85,10 +110,10 @@ namespace LimeBean.Tests {
             Assert.AreEqual(null, row["p4"]);
 
             var table = _storage.GetSchema()["kind1"];
-            Assert.AreEqual(SQLiteStorage.RANK_NONE, table["p1"]);
-            Assert.AreEqual(SQLiteStorage.RANK_NONE, table["p2"]);
+            Assert.AreEqual(SQLiteStorage.RANK_ANY, table["p1"]);
+            Assert.AreEqual(SQLiteStorage.RANK_ANY, table["p2"]);
             Assert.AreEqual(SQLiteStorage.RANK_TEXT, table["p3"]);
-            Assert.AreEqual(SQLiteStorage.RANK_NONE, table["p4"]);
+            Assert.AreEqual(SQLiteStorage.RANK_ANY, table["p4"]);
         }
 
         [Test]
@@ -101,7 +126,7 @@ namespace LimeBean.Tests {
             });
 
             var schema = _storage.GetSchema();
-            Assert.AreEqual(SQLiteStorage.RANK_NONE, schema["kind1"]["x"]);
+            Assert.AreEqual(SQLiteStorage.RANK_ANY, schema["kind1"]["x"]);
 
             _storage.Store("kind1", new Dictionary<string, IConvertible> { 
                 { "x", "hello" },
@@ -110,7 +135,7 @@ namespace LimeBean.Tests {
 
             schema = _storage.GetSchema();
             Assert.AreEqual(SQLiteStorage.RANK_TEXT, schema["kind1"]["x"]);
-            Assert.AreEqual(SQLiteStorage.RANK_NONE, schema["kind1"]["y"]);
+            Assert.AreEqual(SQLiteStorage.RANK_ANY, schema["kind1"]["y"]);
 
             var rows = _db.Rows(true, "select * from kind1 order by " + Bean.ID_PROP_NAME);
             Assert.AreEqual("1", rows[0]["x"]);

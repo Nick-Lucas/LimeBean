@@ -11,7 +11,7 @@ namespace LimeBean {
     using Schema = Dictionary<string, Dictionary<string, int>>;
 
     abstract class DatabaseStorage : IStorage, IDatabaseSpecifics {
-        protected internal const int RANK_MAX = Int32.MaxValue;
+        protected internal const int RANK_CUSTOM = Int32.MaxValue;
 
         Schema _schema;
         bool _isFluidMode;
