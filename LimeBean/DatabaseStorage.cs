@@ -114,6 +114,13 @@ namespace LimeBean {
 
             if(id == null) {
                 ExecInsert(kind, data);
+
+                // NOTE on concurrency
+                // "last insert id" is connection-aware, but not thread-safe
+                // http://stackoverflow.com/q/21185666
+                // http://stackoverflow.com/q/9313205
+                // http://www.sqlite.org/lang_corefunc.html
+
                 return GetLastInsertID();
             }
 
