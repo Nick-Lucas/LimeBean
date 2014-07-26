@@ -56,6 +56,7 @@
     <Compile Include="BeanCrud.cs" />
     <Compile Include="IDatabaseAccess.cs" />
     <Compile Include="ITransactionSupport.cs" />
+    <Compile Include="MariaDbStorage.cs" />
     <Compile Include="SQLiteStorage.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
