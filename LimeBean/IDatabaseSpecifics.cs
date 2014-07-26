@@ -6,6 +6,8 @@ using System.Text;
 namespace LimeBean {
     
     interface IDatabaseSpecifics {
+        string DbName { get; }
+
         bool TrimStrings { get; set; }
         bool ConvertEmptyStringToNull { get; set; }
         bool RecognizeIntegers { get; set; }

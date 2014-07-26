@@ -27,6 +27,7 @@ namespace LimeBean {
         public bool ConvertEmptyStringToNull { get; set; }
         public bool RecognizeIntegers { get; set; }
 
+        public abstract string DbName { get; }
         protected IDatabaseAccess Db { get; private set; }
 
         internal Schema GetSchema() {

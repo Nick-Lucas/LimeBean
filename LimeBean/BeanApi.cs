@@ -84,8 +84,12 @@ namespace LimeBean {
 
         DatabaseStorage CreateStorage() { 
             var type = Connection.GetType().FullName;
-            if(type.StartsWith("System.Data.SQLite"))
+
+            if(type == "System.Data.SQLite.SQLiteConnection")
                 return new SQLiteStorage(Db);
+
+            if(type == "MySql.Data.MySqlClient.MySqlConnection")
+                return new MariaDbStorage(Db);
 
             throw new NotSupportedException();
         }
@@ -231,6 +235,10 @@ namespace LimeBean {
         }
 
         // IDatabaseSpecifics
+
+        public string DbName {
+            get { return Storage.DbName; }
+        }
 
         public bool TrimStrings {
             get { return Storage.TrimStrings; }

@@ -24,6 +24,10 @@ namespace LimeBean {
             db.Exec("set names utf8");
         }
 
+        public override string DbName {
+            get { return "MariaDB"; }
+        }
+
         protected override int GetRankFromValue(IConvertible value) {
             throw new NotImplementedException();
         }

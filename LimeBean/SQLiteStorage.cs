@@ -21,6 +21,10 @@ namespace LimeBean {
             : base(db) {
         }
 
+        public override string DbName {
+            get { return "SQLite"; }
+        }
+
         protected override int GetRankFromValue(IConvertible value) {
             if(value == null)
                 return RANK_ANY;

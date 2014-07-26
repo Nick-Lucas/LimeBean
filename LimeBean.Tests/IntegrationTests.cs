@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using MySql.Data.MySqlClient;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
@@ -34,6 +35,12 @@ namespace LimeBean.Tests {
                 try { crud.Trash(bean); } catch { }
                 Assert.IsTrue(db.Cell<int>(true, "select count(*) from test") > 0);
             }
+        }
+
+        [Test]
+        public void StorageSelection() {
+            Assert.AreEqual("SQLite", new BeanApi("data source=:memory:", SQLiteFactory.Instance).DbName);
+            Assert.AreEqual("MariaDB", new BeanApi("server=localhost; uid=root; pwd=qwerty", MySqlClientFactory.Instance).DbName);            
         }
 
         class ThrowingBean : Bean {
