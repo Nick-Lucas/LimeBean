@@ -28,8 +28,49 @@ namespace LimeBean {
             get { return "MariaDB"; }
         }
 
+        protected override IConvertible ConvertLongValue(long value) {
+            if(-128L <= value && value <= 127L)
+                return Convert.ToSByte(value);
+
+            if(-0x80000000L <= value && value <= 0x7FFFFFFFL)
+                return Convert.ToInt32(value);
+
+            return value;
+        }
+
         protected override int GetRankFromValue(IConvertible value) {
-            throw new NotImplementedException();
+            if(value == null)
+                return RANK_INT8;
+
+            switch(value.GetTypeCode()) { 
+                case TypeCode.SByte:
+                    return RANK_INT8;
+
+                case TypeCode.Int32:
+                    return RANK_INT32;
+
+                case TypeCode.Int64:
+                    return RANK_INT64;
+
+                case TypeCode.Double:
+                    return RANK_DOUBLE;
+
+                case TypeCode.String:
+                    var len = (value as String).Length;
+                    
+                    if(len <= 32)
+                        return RANK_TEXT5;
+
+                    if(len <= 255)
+                        return RANK_TEXT8;
+
+                    if(len <= 65535)
+                        return RANK_TEXT16;
+
+                    return RANK_TEXT24;
+            }
+
+            throw new NotSupportedException();
         }
 
         protected override int GetRankFromSqlType(string sqlType) {
@@ -64,7 +105,33 @@ namespace LimeBean {
         }
 
         protected override string GetSqlTypeFromRank(int rank) {
-            throw new NotImplementedException();
+            switch(rank) { 
+                case RANK_INT8:
+                    return "tinyint";
+
+                case RANK_INT32:
+                    return "int";
+
+                case RANK_INT64:
+                    return "bigint";
+
+                case RANK_DOUBLE:
+                    return "double";
+
+                case RANK_TEXT5:
+                    return "varchar(32)";
+
+                case RANK_TEXT8:
+                    return "varchar(255)";
+
+                case RANK_TEXT16:
+                    return "text";
+
+                case RANK_TEXT24:
+                    return "mediumtext";
+            }
+
+            throw new NotSupportedException();
         }
 
         protected override Schema LoadSchema() {
@@ -94,11 +161,11 @@ namespace LimeBean {
         }
 
         protected override string GetPrimaryKeySqlType() {
-            throw new NotImplementedException();
+            return "bigint not null auto_increment primary key";
         }
 
         public override long GetLastInsertID() {
-            throw new NotImplementedException();
+            return Db.Cell<long>(false, "select last_insert_id()");
         }
     }
 
