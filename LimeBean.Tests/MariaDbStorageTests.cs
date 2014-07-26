@@ -156,6 +156,44 @@ namespace LimeBean.Tests {
             Assert.AreEqual(MariaDbStorage.RANK_TEXT16, cols["p8"]);
             Assert.AreEqual(MariaDbStorage.RANK_TEXT24, cols["p9"]);
         }
+
+        [Test]
+        public void AlterTable() {
+            _storage.EnterFluidMode();
+
+            var data = new Dictionary<string, IConvertible> {
+                { "p1", 1 },
+                { "p2", 1000 },
+                { "p3", Int64.MaxValue },
+                { "p4", 3.14 },
+                { "p5", "abc" },
+                { "p6", "".PadRight(33, 'a') },
+                { "p7", "".PadRight(256, 'a') },
+                { "p8", "".PadRight(65536, 'a') }
+            };
+
+            _storage.Store("foo", data);
+
+            for(var i = 1; i < 8; i++)
+                data["p" + i] = data["p" + (i + 1)];
+
+            data["p8"] = 123;
+            data["p9"] = 123;
+
+            _storage.Store("foo", data);
+
+            var cols = _storage.GetSchema()["foo"];
+
+            Assert.AreEqual(MariaDbStorage.RANK_INT32, cols["p1"]);
+            Assert.AreEqual(MariaDbStorage.RANK_INT64, cols["p2"]);
+            Assert.AreEqual(MariaDbStorage.RANK_DOUBLE, cols["p3"]);
+            Assert.AreEqual(MariaDbStorage.RANK_TEXT5, cols["p4"]);
+            Assert.AreEqual(MariaDbStorage.RANK_TEXT8, cols["p5"]);
+            Assert.AreEqual(MariaDbStorage.RANK_TEXT16, cols["p6"]);
+            Assert.AreEqual(MariaDbStorage.RANK_TEXT24, cols["p7"]);
+            Assert.AreEqual(MariaDbStorage.RANK_TEXT24, cols["p8"]);
+            Assert.AreEqual(MariaDbStorage.RANK_INT8, cols["p9"]);
+        }
     }
 
 }

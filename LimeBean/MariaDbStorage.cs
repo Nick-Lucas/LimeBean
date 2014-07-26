@@ -157,7 +157,15 @@ namespace LimeBean {
         }
 
         protected override void UpdateSchema(string kind, TableColumns oldColumns, TableColumns changedColumns, TableColumns addedColumns) {
-            throw new NotImplementedException();
+            var operations = new List<string>();
+
+            foreach(var entry in changedColumns)
+                operations.Add(String.Format("change {0} {0} {1}", QuoteName(entry.Key), GetSqlTypeFromRank(entry.Value)));
+
+            foreach(var entry in addedColumns)
+                operations.Add(String.Format("add {0} {1}", QuoteName(entry.Key), GetSqlTypeFromRank(entry.Value)));
+
+            Db.Exec("alter table " + QuoteName(kind) + " " + String.Join(", ", operations));
         }
 
         protected override string GetPrimaryKeySqlType() {
