@@ -197,81 +197,72 @@ namespace LimeBean.Tests {
         [Test, SetCulture("ru")]
         public void Roundtrip() {
             _storage.EnterFluidMode();
-
-            Action<IConvertible, IConvertible> check = (before, after) => {
-                _db.Exec("drop table if exists kind1");
-                _storage.InvalidateSchema();                
-
-                var id = _storage.Store("kind1", new Dictionary<string, IConvertible> { 
-                    { "p", before }
-                });
-
-                var loaded = _storage.Load("kind1", id);
-                Assert.AreEqual(after, loaded["p"]);
-
-                if(after != null)
-                    Assert.AreEqual(after.GetType(), loaded["p"].GetType());
-            };
+            var checker = new RoundtripChecker(_db, _storage);
 
             // native SQLite types
-            check(null, null);
-            check("hello", "hello");
-            check(123L, 123L);
-            check(3.14, 3.14);
+            checker.Check(null, null);
+            checker.Check("hello", "hello");
+            checker.Check(123L, 123L);
+            checker.Check(3.14, 3.14);
 
             // extremal vaues
-            check(Int64.MinValue, Int64.MinValue);
-            check(Int64.MaxValue, Int64.MaxValue);
-            check(Double.Epsilon, Double.Epsilon);
-            check(Double.MinValue, Double.MinValue);
-            check(Double.MaxValue, Double.MaxValue);
+            checker.Check(Int64.MinValue, Int64.MinValue);
+            checker.Check(Int64.MaxValue, Int64.MaxValue);
+            checker.Check(Double.Epsilon, Double.Epsilon);
+            checker.Check(Double.MinValue, Double.MinValue);
+            checker.Check(Double.MaxValue, Double.MaxValue);
 
             // conversion to string
-            check(9223372036854775808, "9223372036854775808");
-            check(9223372036854775808M, "9223372036854775808");
-            check(new DateTime(1984, 6, 14, 13, 14, 15), "06/14/1984 13:14:15");
+            checker.Check(9223372036854775808, "9223372036854775808");
+            checker.Check(9223372036854775808M, "9223372036854775808");
+            checker.Check(new DateTime(1984, 6, 14, 13, 14, 15), "06/14/1984 13:14:15");
 
             // upscale to long
-            check(0, 0L);
-            check(1, 1L);
-            check(true, 1L);
-            check(false, 0L);
-            check(TypeCode.DateTime, 16L);
-            check(123.0, 123L); // done by driver?
+            checker.Check(0, 0L);
+            checker.Check(1, 1L);
+            checker.Check(true, 1L);
+            checker.Check(false, 0L);
+            checker.Check(TypeCode.DateTime, 16L);
+        }
 
-            // downscale to long
-            check("123", 123L);            
-            check(123uL, 123L);
-            check(123M, 123L);
+        [Test]
+        public void StringRelaxations() {
+            _storage.EnterFluidMode();
+            var checker = new RoundtripChecker(_db, _storage);
 
-            // disabled downscale to long
-            _storage.RecognizeIntegers = false;
-            check("123", "123");
-            check(123M, "123");
-            _storage.RecognizeIntegers = true;
+            checker.Check("", null);
+            checker.Check(" \t", null);
 
-            // prevented downscale to long
-            check("-0", "-0");
-            check("00", "00");
-            check("+123", "+123");
-            check("0123", "0123");
-            check("0x123", "0x123");
-            check(-1.00M, "-1.00");
-            check("3.0e+5", "3.0e+5");
-
-            // string relaxations
-            check("", null);
-            check(" ", null);
-            check("123 ", 123L);
-            check(" 123", 123L);
+            _storage.ConvertEmptyStringToNull = false;
+            checker.Check(" \t", "");
 
             _storage.TrimStrings = false;
-            _storage.ConvertEmptyStringToNull = false;
+            checker.Check(" \t", " \t");
+        }
 
-            check("", "");
-            check(" ", " ");
-            check("123 ", "123 ");
-            check(" 123", " 123");
+        [Test]
+        public void RegognizeIntegers() {
+            _storage.EnterFluidMode();
+            var checker = new RoundtripChecker(_db, _storage);
+
+            checker.Check(123.0, 123L);
+            checker.Check(123M, 123L);
+            checker.Check(" 123 ", 123L);            
+
+            checker.Check("-0", "-0");
+            checker.Check("+0", "+0");
+            checker.Check("+1", "+1");
+            checker.Check("00", "00");            
+            checker.Check("0123", "0123");
+            checker.Check("0x123", "0x123");
+            checker.Check(-1.0M, "-1.0");
+            checker.Check("3.0e+5", "3.0e+5");
+
+            _storage.TrimStrings = false;
+            checker.Check(" 123 ", " 123 ");
+
+            _storage.RecognizeIntegers = false;
+            checker.Check("123", "123");
         }
 
         [Test]
