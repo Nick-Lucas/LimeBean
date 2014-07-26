@@ -175,6 +175,10 @@ namespace LimeBean {
         public override long GetLastInsertID() {
             return Db.Cell<long>(false, "select last_insert_id()");
         }
+
+        protected override string GetCreateTableStatementSuffix() {
+            return "engine=InnoDB default charset=utf8 collate=utf8_unicode_ci";
+        }
     }
 
 }

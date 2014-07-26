@@ -236,7 +236,7 @@ namespace LimeBean {
 
         protected abstract string GetPrimaryKeySqlType();
 
-        protected string GetCreateTableStatementSuffix() {
+        protected virtual string GetCreateTableStatementSuffix() {
             return String.Empty;
         }
 
