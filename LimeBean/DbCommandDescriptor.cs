@@ -1,107 +1,49 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 
 namespace LimeBean {
 
     struct DbCommandDescriptor : IEquatable<DbCommandDescriptor> {
-        readonly string _sql;
-        readonly string[] _paramNames;
-        readonly object[] _paramValues;
-        readonly int _tag;
+        public readonly int Tag;
+        public readonly string Sql;
+        public readonly object[] Parameters;        
 
         public DbCommandDescriptor(string sql, params object[] parameters)
             : this(0, sql, parameters) {
         }
 
         public DbCommandDescriptor(int tag, string sql, params object[] parameters) {
-            _tag = tag;
-            _sql = sql;
-
-            if(parameters == null) {
-                _paramNames = null;
-                _paramValues = new object[] { null };
-            } else {
-                var named = ExtractNamedParameters(parameters);
-                if(named != null) {
-                    _paramNames = named.Keys
-                        .Cast<object>()
-                        .Select(key => Convert.ToString(key, CultureInfo.InvariantCulture))
-                        .OrderBy(key => key)
-                        .ToArray();
-
-                    _paramValues = _paramNames.Select(key => named[key]).ToArray();
-                } else {
-                    _paramNames = null;
-                    _paramValues = new object[parameters.Length];
-                    Array.Copy(parameters, _paramValues, parameters.Length);
-                }
-            }
+            Tag = tag;
+            Sql = sql;
+            Parameters = parameters ?? new object[] { null };
         }
 
-        static IDictionary ExtractNamedParameters(object[] parameters) {
-            if(parameters.Length != 1)
-                return null;
-
-            var first = parameters.First();
-            if(first == null || first is DBNull || first is ValueType || first is String)
-                return null;
-
-            var dict = first as IDictionary;
-            if(dict != null)
-                return dict;
-
-            return TypeDescriptor.GetProperties(first).Cast<PropertyDescriptor>().ToDictionary(
-                prop => prop.Name,
-                prop => prop.GetValue(first)
-            );
+#if DEBUG
+        public override string ToString() {
+            var text = "[" + Tag + "] " + Sql;
+            if(Parameters.Any())
+                text += " with " + String.Join(", ", Parameters);
+            return text;
         }
-
-        public IDbCommand ToCommand(IDbConnection connection) {
-            var cmd = connection.CreateCommand();
-            cmd.CommandText = _sql;
-
-            for(var i = 0; i < _paramValues.Length; i++) {
-                var p = cmd.CreateParameter();
-                p.Value = _paramValues[i];
-
-                if(_paramNames != null)
-                    p.ParameterName = _paramNames[i];
-
-                cmd.Parameters.Add(p);
-            }
-
-            return cmd;
-        }
+#endif
 
         public bool Equals(DbCommandDescriptor other) {
-            return _tag == other._tag
-                && _sql == other._sql
-                && ArraysEqual(_paramNames, other._paramNames)
-                && ArraysEqual(_paramValues, other._paramValues);
+            return Tag == other.Tag
+                && Sql == other.Sql
+                && ArraysEqual(Parameters, other.Parameters);
         }
-        
+
 
         public override bool Equals(object obj) {
             return obj is DbCommandDescriptor && Equals((DbCommandDescriptor)obj);
         }
 
         public override int GetHashCode() {
-            var hash = CombineHashCodes(_tag, _sql.GetHashCode());
+            var hash = CombineHashCodes(Tag, Sql.GetHashCode());
 
-            if(_paramNames != null) {
-                foreach(var name in _paramNames)
-                    hash = CombineHashCodes(hash, EqualityComparer<string>.Default.GetHashCode(name));
-            } else {
-                hash = CombineHashCodes(hash, 0);
-            }
-
-            foreach(var value in _paramValues)
+            foreach(var value in Parameters)
                 hash = CombineHashCodes(hash, EqualityComparer<object>.Default.GetHashCode(value));
 
             return hash;

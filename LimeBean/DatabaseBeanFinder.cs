@@ -6,15 +6,15 @@ using System.Text;
 namespace LimeBean {
 
     class DatabaseBeanFinder : IBeanFinder {
-        IDatabaseSpecifics _specifics;
+        IDatabaseDetails _details;
         IDatabaseAccess _db;
         IBeanCrud _crud;
 
-        public DatabaseBeanFinder(IDatabaseSpecifics specifics, IDatabaseAccess db, IBeanCrud crud) {
-            _specifics = specifics;
+        public DatabaseBeanFinder(IDatabaseDetails details, IDatabaseAccess db, IBeanCrud crud) {
+            _details = details;
             _db = db;
             _crud = crud;
-        }        
+        }
 
         // Find
 
@@ -72,7 +72,7 @@ namespace LimeBean {
         }
 
         string FormatSelectQuery(string kind, string expr, bool countOnly = false) {
-            var sql = "select " + (countOnly ? "count(*)" : "*") + " from " + _specifics.QuoteName(kind);
+            var sql = "select " + (countOnly ? "count(*)" : "*") + " from " + _details.QuoteName(kind);
             if(!String.IsNullOrEmpty(expr))
                 sql += " " + expr;
             return sql;

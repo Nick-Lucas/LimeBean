@@ -40,24 +40,26 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="BeanApi.cs" />
+    <Compile Include="CommonDatabaseDetails.cs" />
+    <Compile Include="DatabaseAccess.cs" />
     <Compile Include="DatabaseBeanFinder.cs" />
     <Compile Include="DatabaseStorage.cs" />
+    <Compile Include="DbCommandDescriptor.cs" />
     <Compile Include="Bean.cs" />
     <Compile Include="BeanObserver.cs" />
     <Compile Include="Cache.cs" />
-    <Compile Include="DatabaseAccess.cs" />
-    <Compile Include="DbCommandDescriptor.cs" />
     <Compile Include="IBeanCrud.cs" />
     <Compile Include="IBeanFinder.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="IDatabaseSpecifics.cs" />
+    <Compile Include="IDatabaseDetails.cs" />
     <Compile Include="IStorage.cs" />
     <Compile Include="BeanCrud.cs" />
     <Compile Include="IDatabaseAccess.cs" />
     <Compile Include="ITransactionSupport.cs" />
-    <Compile Include="MariaDbStorage.cs" />
-    <Compile Include="SQLiteStorage.cs" />
+    <Compile Include="IValueRelaxations.cs" />
+    <Compile Include="MariaDbDetails.cs" />
+    <Compile Include="SQLiteDetails.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

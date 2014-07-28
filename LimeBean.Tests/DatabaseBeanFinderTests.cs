@@ -19,11 +19,10 @@ namespace LimeBean.Tests {
             _conn = new SQLiteConnection("data source=:memory:");
             _conn.Open();
 
-            _db = new DatabaseAccess(_conn);
-
-            DatabaseStorage storage = new SQLiteStorage(_db);
-            IBeanCrud crud = new BeanCrud(storage, _db);
-            _finder = new DatabaseBeanFinder(storage, _db, crud);
+            IDatabaseDetails details = new SQLiteDetails();
+            _db = new DatabaseAccess(_conn, details);
+            IBeanCrud crud = new BeanCrud(new DatabaseStorage(details, _db), _db);
+            _finder = new DatabaseBeanFinder(details, _db, crud);
 
             _db.Exec("create table foo(x)");
             _db.Exec("insert into foo(x) values(1)");
@@ -42,7 +41,7 @@ namespace LimeBean.Tests {
             Assert.AreEqual(3, _finder.Find<Foo>(true).Count());
 
             Assert.AreEqual(2, _finder.Find(true, "foo", "where x in (?, ?)", 1, 3).Count());
-            Assert.AreEqual(1, _finder.Find<Foo>(true, "where x=@x", new { x = 3 }).Count());
+            Assert.AreEqual(1, _finder.Find<Foo>(true, "where x={0}", 3).Count());
 
             Assert.IsEmpty(_finder.Find(true, "foo", "where x is null"));
             Assert.IsEmpty(_finder.Find<Foo>(true, "where x is ?", null));
@@ -54,7 +53,7 @@ namespace LimeBean.Tests {
             Assert.AreEqual(3, _finder.FindOne<Foo>(true, "order by x desc")["x"]);
 
             Assert.AreEqual(2, _finder.FindOne(true, "foo", "where x=?", 2)["x"]);
-            Assert.AreEqual(2, _finder.FindOne<Foo>(true, "where x > @from and x < @to", new { from = 1, to = 3 })["x"]);
+            Assert.AreEqual(2, _finder.FindOne<Foo>(true, "where x > {0} and x < {1}", 1, 3)["x"]);
 
             Assert.IsNull(_finder.FindOne(true, "foo", "where 0"));
             Assert.IsNull(_finder.FindOne<Foo>(true, "where x > ?", 100));

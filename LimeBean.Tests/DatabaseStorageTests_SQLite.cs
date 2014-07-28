@@ -9,8 +9,9 @@ using System.Text;
 namespace LimeBean.Tests {
 
     [TestFixture]
-    public class SQLiteStorageTests {
+    public class DatabaseStorageTests_SQLite {
         IDbConnection _conn;
+        IDatabaseDetails _details;
         IDatabaseAccess _db;
         DatabaseStorage _storage;
 
@@ -18,8 +19,11 @@ namespace LimeBean.Tests {
         public void SetUp() {
             _conn = new SQLiteConnection("data source=:memory:");
             _conn.Open();
-            _db = new DatabaseAccess(_conn);
-            _storage = new SQLiteStorage(_db);
+
+            _details = new SQLiteDetails();
+
+            _db = new DatabaseAccess(_conn, _details);
+            _storage = new DatabaseStorage(_details, _db);
         }
 
         [TearDown]
@@ -54,19 +58,19 @@ namespace LimeBean.Tests {
             var t = schema["t"];
             Assert.IsFalse(t.ContainsKey("pk"));
 
-            Assert.AreEqual(SQLiteStorage.RANK_ANY, t["a1"]);
-            Assert.AreEqual(SQLiteStorage.RANK_ANY, t["a2"]);
+            Assert.AreEqual(SQLiteDetails.RANK_ANY, t["a1"]);
+            Assert.AreEqual(SQLiteDetails.RANK_ANY, t["a2"]);
 
-            Assert.AreEqual(SQLiteStorage.RANK_TEXT, t["t1"]);
-            Assert.AreEqual(SQLiteStorage.RANK_TEXT, t["t2"]);
-            Assert.AreEqual(SQLiteStorage.RANK_TEXT, t["t3"]);
+            Assert.AreEqual(SQLiteDetails.RANK_TEXT, t["t1"]);
+            Assert.AreEqual(SQLiteDetails.RANK_TEXT, t["t2"]);
+            Assert.AreEqual(SQLiteDetails.RANK_TEXT, t["t3"]);
 
-            Assert.AreEqual(SQLiteStorage.RANK_CUSTOM, t["x1"]);
-            Assert.AreEqual(SQLiteStorage.RANK_CUSTOM, t["x2"]);
-            Assert.AreEqual(SQLiteStorage.RANK_CUSTOM, t["x3"]);
-            Assert.AreEqual(SQLiteStorage.RANK_CUSTOM, t["x4"]);
-            Assert.AreEqual(SQLiteStorage.RANK_CUSTOM, t["x5"]);
-            Assert.AreEqual(SQLiteStorage.RANK_CUSTOM, t["x6"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x1"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x2"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x3"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x4"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x5"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x6"]);
         }
 
         [Test]
@@ -110,10 +114,10 @@ namespace LimeBean.Tests {
             Assert.AreEqual(null, row["p4"]);
 
             var table = _storage.GetSchema()["kind1"];
-            Assert.AreEqual(SQLiteStorage.RANK_ANY, table["p1"]);
-            Assert.AreEqual(SQLiteStorage.RANK_ANY, table["p2"]);
-            Assert.AreEqual(SQLiteStorage.RANK_TEXT, table["p3"]);
-            Assert.AreEqual(SQLiteStorage.RANK_ANY, table["p4"]);
+            Assert.AreEqual(SQLiteDetails.RANK_ANY, table["p1"]);
+            Assert.AreEqual(SQLiteDetails.RANK_ANY, table["p2"]);
+            Assert.AreEqual(SQLiteDetails.RANK_TEXT, table["p3"]);
+            Assert.AreEqual(SQLiteDetails.RANK_ANY, table["p4"]);
         }
 
         [Test]
@@ -126,7 +130,7 @@ namespace LimeBean.Tests {
             });
 
             var schema = _storage.GetSchema();
-            Assert.AreEqual(SQLiteStorage.RANK_ANY, schema["kind1"]["x"]);
+            Assert.AreEqual(SQLiteDetails.RANK_ANY, schema["kind1"]["x"]);
 
             _storage.Store("kind1", new Dictionary<string, IConvertible> { 
                 { "x", "hello" },
@@ -134,8 +138,8 @@ namespace LimeBean.Tests {
             });
 
             schema = _storage.GetSchema();
-            Assert.AreEqual(SQLiteStorage.RANK_TEXT, schema["kind1"]["x"]);
-            Assert.AreEqual(SQLiteStorage.RANK_ANY, schema["kind1"]["y"]);
+            Assert.AreEqual(SQLiteDetails.RANK_TEXT, schema["kind1"]["x"]);
+            Assert.AreEqual(SQLiteDetails.RANK_ANY, schema["kind1"]["y"]);
 
             var rows = _db.Rows(true, "select * from kind1 order by " + Bean.ID_PROP_NAME);
             Assert.AreEqual("1", rows[0]["x"]);
@@ -161,9 +165,9 @@ namespace LimeBean.Tests {
             });
         }
 
-        [Test, ExpectedException(ExpectedMessage="Row not found")]
+        [Test, ExpectedException(ExpectedMessage = "Row not found")]
         public void StoreWithKeyMissingFromDb() {
-            _storage.EnterFluidMode();            
+            _storage.EnterFluidMode();
             _storage.Store("foo", new Dictionary<string, IConvertible> { { Bean.ID_PROP_NAME, 123 }, { "a", 1 } });
         }
 
@@ -247,12 +251,12 @@ namespace LimeBean.Tests {
 
             checker.Check(123.0, 123L);
             checker.Check(123M, 123L);
-            checker.Check(" 123 ", 123L);            
+            checker.Check(" 123 ", 123L);
 
             checker.Check("-0", "-0");
             checker.Check("+0", "+0");
             checker.Check("+1", "+1");
-            checker.Check("00", "00");            
+            checker.Check("00", "00");
             checker.Check("0123", "0123");
             checker.Check("0x123", "0x123");
             checker.Check(-1.0M, "-1.0");
@@ -273,7 +277,7 @@ namespace LimeBean.Tests {
 
             Assert.DoesNotThrow(delegate() {
                 _storage.EnterFluidMode();
-                _storage.Trash("kind1", 1);            
+                _storage.Trash("kind1", 1);
             });
         }
 
@@ -282,10 +286,13 @@ namespace LimeBean.Tests {
             var emptiness = new Dictionary<string, IConvertible>();
 
             _storage.EnterFluidMode();
-            var id1 = _storage.Store("kind1", emptiness);
-            var id2 = _storage.Store("kind1", emptiness);
 
-            _storage.Trash("kind1", id1);
+            var ids = new[] {
+                _storage.Store("kind1", emptiness),
+                _storage.Store("kind1", emptiness)
+            };
+
+            _storage.Trash("kind1", ids[0]);
             Assert.AreEqual(1, _db.Cell<int>(true, "select count(*) from kind1"));
         }
 
@@ -346,7 +353,7 @@ namespace LimeBean.Tests {
         [Test]
         public void BacktickInName() {
             Assert.Throws<ArgumentException>(delegate() {
-                _storage.QuoteName("`"); 
+                _details.QuoteName("`");
             });
         }
     }

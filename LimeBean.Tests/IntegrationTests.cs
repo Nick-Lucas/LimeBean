@@ -16,11 +16,12 @@ namespace LimeBean.Tests {
             using(var conn = new SQLiteConnection("data source=:memory:")) {
                 conn.Open();
 
-                IDatabaseAccess db = new DatabaseAccess(conn);
-                IStorage storage = new SQLiteStorage(db);
+                IDatabaseDetails details = new SQLiteDetails();
+                IDatabaseAccess db = new DatabaseAccess(conn, details);
+                DatabaseStorage storage = new DatabaseStorage(details, db);
                 IBeanCrud crud = new BeanCrud(storage, db);               
 
-                (storage as DatabaseStorage).EnterFluidMode();
+                storage.EnterFluidMode();
 
                 var bean = crud.Dispense<ThrowingBean>();
                 bean["foo"] = "ok";
@@ -38,9 +39,9 @@ namespace LimeBean.Tests {
         }
 
         [Test]
-        public void StorageSelection() {
-            Assert.AreEqual("SQLite", new BeanApi("data source=:memory:", SQLiteFactory.Instance).DbName);
-            Assert.AreEqual("MariaDB", new BeanApi("server=localhost; uid=root; pwd=qwerty", MySqlClientFactory.Instance).DbName);            
+        public void Api_DetailsSelection() {
+            Assert.AreEqual("SQLite", new BeanApi("data source=:memory:", SQLiteFactory.Instance).CreateDetails().DbName);
+            Assert.AreEqual("MariaDB", new BeanApi("server=localhost; uid=root; pwd=qwerty", MySqlClientFactory.Instance).CreateDetails().DbName);            
         }
 
         class ThrowingBean : Bean {

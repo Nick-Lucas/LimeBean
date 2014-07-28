@@ -72,9 +72,9 @@
     <Compile Include="InMemoryStorage.cs" />
     <Compile Include="BeanCrudTests.cs" />
     <Compile Include="IntegrationTests.cs" />
-    <Compile Include="MariaDbStorageTests.cs" />
+    <Compile Include="DatabaseStorageTests_MariaDb.cs" />
     <Compile Include="RoundtripChecker.cs" />
-    <Compile Include="SQLiteStorageTests.cs" />
+    <Compile Include="DatabaseStorageTests_SQLite.cs" />
     <Compile Include="TracingObserver.cs" />
   </ItemGroup>
   <ItemGroup>

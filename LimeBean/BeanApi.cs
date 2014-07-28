@@ -7,12 +7,13 @@ using System.Text;
 
 namespace LimeBean {
 
-    public class BeanApi : IDisposable, IBeanCrud, IBeanFinder, IDatabaseAccess, IDatabaseSpecifics {
+    public class BeanApi : IDisposable, IBeanCrud, IBeanFinder, IDatabaseAccess, IValueRelaxations {
         DbProviderFactory _provider;
         string _connectionString;
 
         bool _sharedConnection;
         IDbConnection _connection;
+        IDatabaseDetails _details;
         IDatabaseAccess _db;
         DatabaseStorage _storage;
         IBeanCrud _crud;
@@ -50,10 +51,18 @@ namespace LimeBean {
             }
         }
 
+        IDatabaseDetails Details {
+            get {
+                if(_details == null)
+                    _details = CreateDetails();
+                return _details;
+            }
+        }
+
         IDatabaseAccess Db {
             get {
                 if(_db == null)
-                    _db = new DatabaseAccess(Connection);
+                    _db = new DatabaseAccess(Connection, Details);
                 return _db;
             }
         }
@@ -61,7 +70,7 @@ namespace LimeBean {
         DatabaseStorage Storage {
             get {
                 if(_storage == null)
-                    _storage = CreateStorage();
+                    _storage = new DatabaseStorage(Details, Db);
                 return _storage;
             }
         }
@@ -77,19 +86,19 @@ namespace LimeBean {
         IBeanFinder Finder {
             get {
                 if(_finder == null)
-                    _finder = new DatabaseBeanFinder(Storage, Db, Crud);
+                    _finder = new DatabaseBeanFinder(Details, Db, Crud);
                 return _finder;
             }
         }
 
-        DatabaseStorage CreateStorage() { 
+        internal IDatabaseDetails CreateDetails() { 
             var type = Connection.GetType().FullName;
 
             if(type == "System.Data.SQLite.SQLiteConnection")
-                return new SQLiteStorage(Db);
+                return new SQLiteDetails();
 
             if(type == "MySql.Data.MySqlClient.MySqlConnection")
-                return new MariaDbStorage(Db);
+                return new MariaDbDetails();
 
             throw new NotSupportedException();
         }
@@ -234,11 +243,7 @@ namespace LimeBean {
             Db.Transaction(action);
         }
 
-        // IDatabaseSpecifics
-
-        public string DbName {
-            get { return Storage.DbName; }
-        }
+        // IValueRelaxations
 
         public bool TrimStrings {
             get { return Storage.TrimStrings; }
@@ -253,14 +258,6 @@ namespace LimeBean {
         public bool RecognizeIntegers {
             get { return Storage.RecognizeIntegers; }
             set { Storage.RecognizeIntegers = value; }
-        }
-
-        public string QuoteName(string name) {
-            return Storage.QuoteName(name);
-        }
-
-        public long GetLastInsertID() {
-            return Storage.GetLastInsertID();
         }
 
         // Shortcuts

@@ -9,8 +9,9 @@ using System.Text;
 namespace LimeBean.Tests {
 
     [TestFixture]
-    public class MariaDbStorageTests {
+    public class DatabaseStorageTests_MariaDb {
         IDbConnection _conn;
+        IDatabaseDetails _details;
         IDatabaseAccess _db;
         DatabaseStorage _storage;
 
@@ -19,7 +20,9 @@ namespace LimeBean.Tests {
             _conn = new MySqlConnection("server=localhost; uid=root; pwd=qwerty");
             _conn.Open();
 
-            _db = new DatabaseAccess(_conn);
+            _details = new MariaDbDetails();
+
+            _db = new DatabaseAccess(_conn, _details);
             _db.Exec("set sql_mode=STRICT_TRANS_TABLES");
         }
 
@@ -30,7 +33,7 @@ namespace LimeBean.Tests {
             _db.Exec("create database " + dbname);
             _db.Exec("use " + dbname);
 
-            _storage = new MariaDbStorage(_db);
+            _storage = new DatabaseStorage(_details, _db);
         }
 
         [TestFixtureTearDown]
@@ -89,42 +92,42 @@ namespace LimeBean.Tests {
             var t = schema["t"];
             Assert.IsFalse(t.ContainsKey("pk"));
 
-            Assert.AreEqual(MariaDbStorage.RANK_INT8, t["ti1"]);
-            Assert.AreEqual(MariaDbStorage.RANK_INT8, t["ti2"]);
-            Assert.AreEqual(MariaDbStorage.RANK_INT8, t["ti3"]);
-            Assert.AreEqual(MariaDbStorage.RANK_INT8, t["ti4"]);
+            Assert.AreEqual(MariaDbDetails.RANK_INT8, t["ti1"]);
+            Assert.AreEqual(MariaDbDetails.RANK_INT8, t["ti2"]);
+            Assert.AreEqual(MariaDbDetails.RANK_INT8, t["ti3"]);
+            Assert.AreEqual(MariaDbDetails.RANK_INT8, t["ti4"]);
 
-            Assert.AreEqual(MariaDbStorage.RANK_INT32, t["i1"]);
-            Assert.AreEqual(MariaDbStorage.RANK_INT32, t["i2"]);
-            Assert.AreEqual(MariaDbStorage.RANK_INT32, t["i3"]);
+            Assert.AreEqual(MariaDbDetails.RANK_INT32, t["i1"]);
+            Assert.AreEqual(MariaDbDetails.RANK_INT32, t["i2"]);
+            Assert.AreEqual(MariaDbDetails.RANK_INT32, t["i3"]);
 
-            Assert.AreEqual(MariaDbStorage.RANK_INT64, t["bi1"]);
-            Assert.AreEqual(MariaDbStorage.RANK_INT64, t["bi2"]);
+            Assert.AreEqual(MariaDbDetails.RANK_INT64, t["bi1"]);
+            Assert.AreEqual(MariaDbDetails.RANK_INT64, t["bi2"]);
 
-            Assert.AreEqual(MariaDbStorage.RANK_DOUBLE, t["d1"]);
-            Assert.AreEqual(MariaDbStorage.RANK_DOUBLE, t["d2"]);
+            Assert.AreEqual(MariaDbDetails.RANK_DOUBLE, t["d1"]);
+            Assert.AreEqual(MariaDbDetails.RANK_DOUBLE, t["d2"]);
 
-            Assert.AreEqual(MariaDbStorage.RANK_TEXT5, t["t1"]);
-            Assert.AreEqual(MariaDbStorage.RANK_TEXT8, t["t2"]);
-            Assert.AreEqual(MariaDbStorage.RANK_TEXT8, t["t3"]);
-            Assert.AreEqual(MariaDbStorage.RANK_TEXT16, t["t4"]);
-            Assert.AreEqual(MariaDbStorage.RANK_TEXT24, t["t5"]);
+            Assert.AreEqual(MariaDbDetails.RANK_TEXT5, t["t1"]);
+            Assert.AreEqual(MariaDbDetails.RANK_TEXT8, t["t2"]);
+            Assert.AreEqual(MariaDbDetails.RANK_TEXT8, t["t3"]);
+            Assert.AreEqual(MariaDbDetails.RANK_TEXT16, t["t4"]);
+            Assert.AreEqual(MariaDbDetails.RANK_TEXT24, t["t5"]);
 
-            Assert.AreEqual(MariaDbStorage.RANK_CUSTOM, t["x1"]);
-            Assert.AreEqual(MariaDbStorage.RANK_CUSTOM, t["x2"]);
-            Assert.AreEqual(MariaDbStorage.RANK_CUSTOM, t["x3"]);
-            Assert.AreEqual(MariaDbStorage.RANK_CUSTOM, t["x4"]);
-            Assert.AreEqual(MariaDbStorage.RANK_CUSTOM, t["x6"]);
-            Assert.AreEqual(MariaDbStorage.RANK_CUSTOM, t["x7"]);
-            Assert.AreEqual(MariaDbStorage.RANK_CUSTOM, t["x8"]);
-            Assert.AreEqual(MariaDbStorage.RANK_CUSTOM, t["x9"]);
-            Assert.AreEqual(MariaDbStorage.RANK_CUSTOM, t["x10"]);
-            Assert.AreEqual(MariaDbStorage.RANK_CUSTOM, t["x11"]);
-            Assert.AreEqual(MariaDbStorage.RANK_CUSTOM, t["x12"]);
-            Assert.AreEqual(MariaDbStorage.RANK_CUSTOM, t["x13"]);
-            Assert.AreEqual(MariaDbStorage.RANK_CUSTOM, t["x14"]);
-            Assert.AreEqual(MariaDbStorage.RANK_CUSTOM, t["x15"]);
-            Assert.AreEqual(MariaDbStorage.RANK_CUSTOM, t["x16"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x1"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x2"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x3"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x4"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x6"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x7"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x8"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x9"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x10"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x11"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x12"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x13"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x14"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x15"]);
+            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x16"]);
         }
 
         [Test]
@@ -146,15 +149,15 @@ namespace LimeBean.Tests {
             _storage.Store("foo", data);
 
             var cols = _storage.GetSchema()["foo"];
-            Assert.AreEqual(MariaDbStorage.RANK_INT8, cols["p1"]);
-            Assert.AreEqual(MariaDbStorage.RANK_INT8, cols["p2"]);
-            Assert.AreEqual(MariaDbStorage.RANK_INT32, cols["p3"]);
-            Assert.AreEqual(MariaDbStorage.RANK_INT64, cols["p4"]);
-            Assert.AreEqual(MariaDbStorage.RANK_DOUBLE, cols["p5"]);
-            Assert.AreEqual(MariaDbStorage.RANK_TEXT5, cols["p6"]);
-            Assert.AreEqual(MariaDbStorage.RANK_TEXT8, cols["p7"]);
-            Assert.AreEqual(MariaDbStorage.RANK_TEXT16, cols["p8"]);
-            Assert.AreEqual(MariaDbStorage.RANK_TEXT24, cols["p9"]);
+            Assert.AreEqual(MariaDbDetails.RANK_INT8, cols["p1"]);
+            Assert.AreEqual(MariaDbDetails.RANK_INT8, cols["p2"]);
+            Assert.AreEqual(MariaDbDetails.RANK_INT32, cols["p3"]);
+            Assert.AreEqual(MariaDbDetails.RANK_INT64, cols["p4"]);
+            Assert.AreEqual(MariaDbDetails.RANK_DOUBLE, cols["p5"]);
+            Assert.AreEqual(MariaDbDetails.RANK_TEXT5, cols["p6"]);
+            Assert.AreEqual(MariaDbDetails.RANK_TEXT8, cols["p7"]);
+            Assert.AreEqual(MariaDbDetails.RANK_TEXT16, cols["p8"]);
+            Assert.AreEqual(MariaDbDetails.RANK_TEXT24, cols["p9"]);
         }
 
         [Test]
@@ -184,15 +187,15 @@ namespace LimeBean.Tests {
 
             var cols = _storage.GetSchema()["foo"];
 
-            Assert.AreEqual(MariaDbStorage.RANK_INT32, cols["p1"]);
-            Assert.AreEqual(MariaDbStorage.RANK_INT64, cols["p2"]);
-            Assert.AreEqual(MariaDbStorage.RANK_DOUBLE, cols["p3"]);
-            Assert.AreEqual(MariaDbStorage.RANK_TEXT5, cols["p4"]);
-            Assert.AreEqual(MariaDbStorage.RANK_TEXT8, cols["p5"]);
-            Assert.AreEqual(MariaDbStorage.RANK_TEXT16, cols["p6"]);
-            Assert.AreEqual(MariaDbStorage.RANK_TEXT24, cols["p7"]);
-            Assert.AreEqual(MariaDbStorage.RANK_TEXT24, cols["p8"]);
-            Assert.AreEqual(MariaDbStorage.RANK_INT8, cols["p9"]);
+            Assert.AreEqual(MariaDbDetails.RANK_INT32, cols["p1"]);
+            Assert.AreEqual(MariaDbDetails.RANK_INT64, cols["p2"]);
+            Assert.AreEqual(MariaDbDetails.RANK_DOUBLE, cols["p3"]);
+            Assert.AreEqual(MariaDbDetails.RANK_TEXT5, cols["p4"]);
+            Assert.AreEqual(MariaDbDetails.RANK_TEXT8, cols["p5"]);
+            Assert.AreEqual(MariaDbDetails.RANK_TEXT16, cols["p6"]);
+            Assert.AreEqual(MariaDbDetails.RANK_TEXT24, cols["p7"]);
+            Assert.AreEqual(MariaDbDetails.RANK_TEXT24, cols["p8"]);
+            Assert.AreEqual(MariaDbDetails.RANK_INT8, cols["p9"]);
         }
 
         [Test, SetCulture("ru")]

@@ -9,14 +9,14 @@ using System.Text.RegularExpressions;
 namespace LimeBean {
 
     class DatabaseAccess : IDatabaseAccess {
-        static readonly Regex READONLY_SQL_RE = new Regex(@"^\s*(select|pragma|show)\s", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
         IDbConnection _connection;
+        IDatabaseDetails _details;
         int _txLevel;
         Cache<DbCommandDescriptor, object> _cache = new Cache<DbCommandDescriptor, object>();
 
-        public DatabaseAccess(IDbConnection connection) {
+        public DatabaseAccess(IDbConnection connection, IDatabaseDetails details) {
             _connection = connection;
+            _details = details;
         }
 
         public bool InTransaction { get { return _txLevel > 0; } }
@@ -28,7 +28,7 @@ namespace LimeBean {
         }
 
         public int Exec(string sql, object[] parameters) {
-            using(var cmd = new DbCommandDescriptor(sql, parameters).ToCommand(_connection)) {
+            using(var cmd = CreateCommand(new DbCommandDescriptor(sql, parameters))) {
                 QueryWillExecute(cmd);
                 return cmd.ExecuteNonQuery();
             }
@@ -112,8 +112,33 @@ namespace LimeBean {
 
         // Internals
 
+        public IDbCommand CreateCommand(DbCommandDescriptor descriptor) {
+            var cmd = _connection.CreateCommand();
+            var parameters = descriptor.Parameters;
+
+            if(parameters.Length > 0) {
+                var paramNames = new string[parameters.Length];
+
+                for(var i = 0; i < parameters.Length; i++) {
+                    var name = _details.GetParamName(i);
+                    paramNames[i] = name;
+
+                    var p = cmd.CreateParameter();
+                    p.ParameterName = name;
+                    p.Value = parameters[i];
+                    cmd.Parameters.Add(p);
+                }
+
+                cmd.CommandText = String.Format(descriptor.Sql, paramNames);
+            } else {
+                cmd.CommandText = descriptor.Sql;
+            }
+
+            return cmd;
+        }
+
         IEnumerable<T> EnumerateRecords<T>(DbCommandDescriptor descriptor, Func<IDataRecord, T> converter) {
-            using(var cmd = descriptor.ToCommand(_connection)) {
+            using(var cmd = CreateCommand(descriptor)) {
                 QueryWillExecute(cmd);
                 using(var reader = cmd.ExecuteReader()) {
                     while(reader.Read())
@@ -148,12 +173,12 @@ namespace LimeBean {
         }
 
         void QueryWillExecute(IDbCommand cmd) {
-            if(!READONLY_SQL_RE.IsMatch(cmd.CommandText))
+            if(!_details.IsReadOnlyCommand(cmd.CommandText))
                 _cache.Clear();
 
             if(QueryExecuting != null)
                 QueryExecuting(cmd);
-            
+
             // Console.WriteLine(cmd.CommandText);
         }
 

@@ -18,7 +18,7 @@ namespace LimeBean.Tests {
         public void SetUp() {
             _conn = new SQLiteConnection("data source=:memory:");
             _conn.Open();
-            _db = new DatabaseAccess(_conn);
+            _db = new DatabaseAccess(_conn, new SQLiteDetails());
         }
 
         [TearDown]
@@ -88,7 +88,7 @@ namespace LimeBean.Tests {
             _db.QueryExecuting += cmd => queryCount++;
             _db.CacheCapacity = 3;
 
-            var sql = "select * from foo where x = ?";
+            var sql = "select * from foo where x = {0}";
 
             // fill up: 0, 1, 2
             for(var i = 0; i < 3; i++)

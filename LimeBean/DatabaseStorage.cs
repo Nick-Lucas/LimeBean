@@ -7,28 +7,32 @@ using System.Text;
 
 namespace LimeBean {
 
-    using TableColumns = Dictionary<string, int>;
-    using Schema = Dictionary<string, Dictionary<string, int>>;
+    using Schema = Dictionary<string, IDictionary<string, int>>;
 
-    abstract class DatabaseStorage : IStorage, IDatabaseSpecifics {
-        protected internal const int RANK_CUSTOM = Int32.MaxValue;
-
+    class DatabaseStorage : IStorage, IValueRelaxations {
         Schema _schema;
         bool _isFluidMode;
+        IDatabaseDetails _details;
+        IDatabaseAccess _db;
 
-        public DatabaseStorage(IDatabaseAccess db) {
-            Db = db;
+        public DatabaseStorage(IDatabaseDetails details, IDatabaseAccess db) {
+            _details = details;
+            _db = db;
+
             TrimStrings = true;
             ConvertEmptyStringToNull = true;
             RecognizeIntegers = true;
+
+            _details.ExecInitCommands(_db);
         }
 
         public bool TrimStrings { get; set; }
         public bool ConvertEmptyStringToNull { get; set; }
         public bool RecognizeIntegers { get; set; }
 
-        public abstract string DbName { get; }
-        protected IDatabaseAccess Db { get; private set; }
+        public void EnterFluidMode() {
+            _isFluidMode = true;
+        }
 
         internal Schema GetSchema() {
             if(_schema == null)
@@ -38,6 +42,34 @@ namespace LimeBean {
 
         internal void InvalidateSchema() {
             _schema = null;
+        }
+
+        Schema LoadSchema() {
+            var result = new Schema();
+            foreach(var tableName in _details.GetTableNames(_db)) {
+                var columns = new Dictionary<string, int>();
+                foreach(var col in _details.GetColumns(_db, tableName)) {
+                    if(_details.IsPrimaryKeyColumn(col))
+                        continue;
+
+                    columns[_details.GetColumnName(col)] = !_details.IsNullableColumn(col) || _details.GetColumnDefaultValue(col) != null
+                        ? CommonDatabaseDetails.RANK_CUSTOM
+                        : _details.GetRankFromSqlType(_details.GetColumnType(col));
+                }
+                result[tableName] = columns;
+            }
+            return result;
+        }
+
+        bool IsKnownKind(string kind) {
+            return GetSchema().ContainsKey(kind);
+        }
+
+        IDictionary<string, int> GetColumnsFromData(IDictionary<string, IConvertible> data) {
+            var result = new Dictionary<string, int>(data.Count);
+            foreach(var entry in data)
+                result[entry.Key] = _details.GetRankFromValue(ConvertValue(entry.Value));
+            return result;
         }
 
         IConvertible ConvertValue(IConvertible value) {
@@ -53,7 +85,7 @@ namespace LimeBean {
                 case TypeCode.Int32:
                 case TypeCode.UInt32:
                 case TypeCode.Int64:
-                    return ConvertLongValue(value.ToInt64(CultureInfo.InvariantCulture));
+                    return _details.ConvertLongValue(value.ToInt64(CultureInfo.InvariantCulture));
 
                 case TypeCode.Single:
                 case TypeCode.Double:
@@ -65,7 +97,7 @@ namespace LimeBean {
                             maxSafeInteger = 0x1fffffffffffff;
 
                         if(Math.Truncate(number) == number && number >= minSafeInteger && number <= maxSafeInteger)
-                            return ConvertLongValue(Convert.ToInt64(number));
+                            return _details.ConvertLongValue(Convert.ToInt64(number));
                     }
 
                     return number;
@@ -83,22 +115,12 @@ namespace LimeBean {
                 long number;
                 if(Int64.TryParse(text, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out number)) {
                     if(number.ToString(CultureInfo.InvariantCulture) == text)
-                        return ConvertLongValue(number);
+                        return _details.ConvertLongValue(number);
                 }
             }
 
             return text;
         }
-
-        protected virtual IConvertible ConvertLongValue(long value) {
-            return value;
-        }
-
-        protected abstract int GetRankFromValue(IConvertible value);
-        protected abstract int GetRankFromSqlType(string sqlType);
-        protected abstract string GetSqlTypeFromRank(int rank);        
-        protected abstract Schema LoadSchema();
-        protected abstract void UpdateSchema(string kind, TableColumns oldColumns, TableColumns changedColumns, TableColumns addedColumns);
 
         public long Store(string kind, IDictionary<string, IConvertible> data) {
             var id = new Nullable<long>();
@@ -121,7 +143,7 @@ namespace LimeBean {
                 // http://stackoverflow.com/q/9313205
                 // http://www.sqlite.org/lang_corefunc.html
 
-                return GetLastInsertID();
+                return _details.GetLastInsertID(_db);
             }
 
             if(data.Count > 0)
@@ -134,91 +156,80 @@ namespace LimeBean {
             if(_isFluidMode && !IsKnownKind(kind))
                 return null;
 
-            return Db.Row(true, "select * from " + QuoteName(kind) + " where " + QuoteName(Bean.ID_PROP_NAME) + " = " + id);
+            return _db.Row(true, "select * from " + QuoteName(kind) + WhereId(id));
         }
 
         public void Trash(string kind, long id) {
             if(_isFluidMode && !IsKnownKind(kind))
                 return;
 
-            Db.Exec("delete from " + QuoteName(kind) + " where " + QuoteName(Bean.ID_PROP_NAME) + " = " + id);
+            _db.Exec("delete from " + QuoteName(kind) + WhereId(id));
         }
 
         void ExecInsert(string kind, IDictionary<string, IConvertible> data) {
             if(data.Count < 1)
-                data = new Dictionary<string, IConvertible> { { Bean.ID_PROP_NAME, null } }; 
+                data = new Dictionary<string, IConvertible> { { Bean.ID_PROP_NAME, null } };
 
-            var propNames = new List<string>(data.Count);
-            var paramNames = new List<string>(data.Count);
-            var paramValues = new Dictionary<string, object>(data.Count);
+            var propNames = new string[data.Count];
+            var propValues = new object[data.Count];
+            var placeholders = new string[data.Count];
 
             var index = 0;
-            foreach(var propName in data.Keys) {
-                var paramName = "p" + index++;
-                propNames.Add(QuoteName(propName));
-                paramNames.Add(FormatParam(paramName));
-                paramValues[paramName] = ConvertValue(data[propName]);
+            foreach(var entry in data) {
+                propNames[index] = QuoteName(entry.Key);
+                propValues[index] = ConvertValue(entry.Value);
+                placeholders[index] = "{" + index + "}";
+                index++;
             }
 
             var sql = "insert into " + QuoteName(kind) + " ("
                 + String.Join(", ", propNames) + ") values ("
-                + String.Join(", ", paramNames) + ")";
+                + String.Join(", ", placeholders) + ")";
 
-            Db.Exec(sql, paramValues);
+            _db.Exec(sql, propValues);
         }
 
         void ExecUpdate(string kind, long id, IDictionary<string, IConvertible> data) {
-            const string keyParamName = "pk";
+            var propValues = new object[data.Count];
+            var sql = new StringBuilder();
 
-            var paramValues = new Dictionary<string, object>(1 + data.Count) { 
-                { keyParamName, id }
-            };
-
-            var pairs = new StringBuilder();
+            sql
+                .Append("update ")
+                .Append(QuoteName(kind))
+                .Append(" set ");
 
             var index = 0;
-            foreach(var propName in data.Keys) {
-                if(pairs.Length > 0)
-                    pairs.Append(", ");
+            foreach(var entry in data) {
+                if(index > 0)
+                    sql.Append(", ");
 
-                var paramName = "p" + index++;                
-                paramValues[paramName] = ConvertValue(data[propName]);
+                propValues[index] = ConvertValue(entry.Value);
 
-                pairs
-                    .Append(QuoteName(propName))
+                sql
+                    .Append(QuoteName(entry.Key))
                     .Append(" = ")
-                    .Append(FormatParam(paramName));
+                    .Append("{").Append(index).Append("}");
+
+                index++;
             }
 
-            var sql = "update " + QuoteName(kind)
-                + " set " + pairs
-                + " where " + QuoteName(Bean.ID_PROP_NAME) + " = " + FormatParam(keyParamName);
+            sql.Append(WhereId(id));
 
-            if(Db.Exec(sql, paramValues) < 1)
+            if(_db.Exec(sql.ToString(), propValues) < 1)
                 throw new Exception("Row not found");
         }
 
-        TableColumns GetColumnsFromData(IDictionary<string, IConvertible> data) {
-            var result = new TableColumns(data.Count);
-            foreach(var entry in data)
-                result[entry.Key] = GetRankFromValue(ConvertValue(entry.Value));
-            return result;
-        }
-
-        bool IsKnownKind(string kind) {
-            return GetSchema().ContainsKey(kind);
-        }
 
         void CheckSchema(string kind, IDictionary<string, IConvertible> data) {
             var newColumns = GetColumnsFromData(data);
 
             if(!IsKnownKind(kind)) {
-                ExecCreateTable(kind, newColumns);
+                _db.Exec(CommonDatabaseDetails.FormatCreateTableCommand(_details, kind, newColumns));
                 InvalidateSchema();
             } else {
                 var oldColumns = GetSchema()[kind];
-                var changedColumns = new TableColumns();
-                var addedColumns = new TableColumns();
+                var changedColumns = new Dictionary<string, int>();
+                var addedColumns = new Dictionary<string, int>();
 
                 foreach(var name in newColumns.Keys) {
                     if(!oldColumns.ContainsKey(name))
@@ -228,57 +239,18 @@ namespace LimeBean {
                 }
 
                 if(changedColumns.Count > 0 || addedColumns.Count > 0) {
-                    UpdateSchema(kind, oldColumns, changedColumns, addedColumns);
+                    _details.UpdateSchema(_db, kind, oldColumns, changedColumns, addedColumns);
                     InvalidateSchema();
                 }
             }
         }
 
-        protected abstract string GetPrimaryKeySqlType();
-
-        protected virtual string GetCreateTableStatementSuffix() {
-            return String.Empty;
+        string WhereId(long id) { 
+            return " where " + QuoteName(Bean.ID_PROP_NAME) + " = " + id;
         }
 
-        protected void ExecCreateTable(string kind, TableColumns columns) {
-            var sql = new StringBuilder()
-                .Append("create table ")
-                .Append(QuoteName(kind))
-                .Append(" (")
-                .Append(QuoteName(Bean.ID_PROP_NAME))
-                .Append(" ")
-                .Append(GetPrimaryKeySqlType());
-
-            foreach(var name in columns.Keys) {
-                sql
-                    .Append(", ")
-                    .Append(QuoteName(name))
-                    .Append(" ")
-                    .Append(GetSqlTypeFromRank(columns[name]));
-            }
-
-            sql
-                .Append(") ")
-                .Append(GetCreateTableStatementSuffix());
-
-            Db.Exec(sql.ToString());
-        }
-
-        public void EnterFluidMode() {
-            _isFluidMode = true;
-        }
-
-        public virtual string QuoteName(string name) {
-            if(name.Contains("`"))
-                throw new ArgumentException();
-
-            return "`" + name + "`";
-        }
-
-        public abstract long GetLastInsertID();
-
-        protected virtual string FormatParam(string name) {
-            return "@" + name;
+        string QuoteName(string name) {
+            return _details.QuoteName(name);
         }
 
     }
