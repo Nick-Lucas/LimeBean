@@ -11,7 +11,7 @@ namespace LimeBean {
     class DatabaseAccess : IDatabaseAccess {
         IDbConnection _connection;
         IDatabaseDetails _details;
-        int _txLevel;
+        Stack<IDbTransaction> _txStack = new Stack<IDbTransaction>();
         Cache<DbCommandDescriptor, object> _cache = new Cache<DbCommandDescriptor, object>();
 
         public DatabaseAccess(IDbConnection connection, IDatabaseDetails details) {
@@ -19,7 +19,7 @@ namespace LimeBean {
             _details = details;
         }
 
-        public bool InTransaction { get { return _txLevel > 0; } }
+        public bool InTransaction { get { return _txStack.Count > 0; } }
         public event Action<IDbCommand> QueryExecuting;
 
         public int CacheCapacity {
@@ -91,7 +91,7 @@ namespace LimeBean {
             using(var tx = _connection.BeginTransaction()) {
                 var shouldRollback = false;
 
-                _txLevel++;
+                _txStack.Push(tx);
                 try {
                     shouldRollback = !action();
                 } catch {
@@ -104,7 +104,7 @@ namespace LimeBean {
                     } else {
                         tx.Commit();
                     }
-                    _txLevel--;
+                    _txStack.Pop();
                 }
             }
         }
@@ -112,7 +112,7 @@ namespace LimeBean {
 
         // Internals
 
-        public IDbCommand CreateCommand(DbCommandDescriptor descriptor) {
+        IDbCommand CreateCommand(DbCommandDescriptor descriptor) {
             var cmd = _connection.CreateCommand();
             var parameters = descriptor.Parameters;
 
@@ -133,6 +133,9 @@ namespace LimeBean {
             } else {
                 cmd.CommandText = descriptor.Sql;
             }
+
+            if(InTransaction)
+                cmd.Transaction = _txStack.Peek();
 
             return cmd;
         }

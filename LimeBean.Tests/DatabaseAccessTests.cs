@@ -170,5 +170,27 @@ namespace LimeBean.Tests {
 
             Assert.AreEqual(1, _db.Cell<int>(true, "select x from foo"));
         }
+
+        [Test]
+        public void TransactionAssignedToCommand() {
+            var trace = new List<IDbTransaction>();
+
+            _db.QueryExecuting += cmd => trace.Add(cmd.Transaction);
+
+            _db.Transaction(delegate() {
+                _db.Exec("select 1");
+                _db.Transaction(delegate() {
+                    _db.Exec("select 2");
+                    return true;
+                });
+                _db.Exec("select 3");
+                return true;
+            });
+
+            Assert.AreEqual(3, trace.Count);
+            Assert.IsEmpty(trace.Where(t => t == null));
+            Assert.AreSame(trace[0], trace[2]);
+            Assert.AreNotSame(trace[0], trace[1]);
+        }
     }
 }
