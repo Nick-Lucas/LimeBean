@@ -9,38 +9,14 @@ using System.Text;
 namespace LimeBean.Tests {
 
     [TestFixture]
-    public class DatabaseStorageTests_MariaDb {
-        IDbConnection _conn;
-        IDatabaseDetails _details;
-        IDatabaseAccess _db;
+    public class DatabaseStorageTests_MariaDb : MariaDbFixture {
         DatabaseStorage _storage;
 
-        [TestFixtureSetUp]
-        public void CommonSetUp() {
-            _conn = new MySqlConnection("server=localhost; uid=root; pwd=qwerty");
-            _conn.Open();
-
-            _details = new MariaDbDetails();
-
-            _db = new DatabaseAccess(_conn, _details);
-            _db.Exec("set sql_mode=STRICT_TRANS_TABLES");
-        }
-
         [SetUp]
-        public void SetUp() {
-            const string dbname = "lime_bean_tests";
-            _db.Exec("drop database if exists " + dbname);
-            _db.Exec("create database " + dbname);
-            _db.Exec("use " + dbname);
-
+        public override void SetUp() {
+            base.SetUp();
             _storage = new DatabaseStorage(_details, _db);
         }
-
-        [TestFixtureTearDown]
-        public void CommonTearDown() {
-            _conn.Dispose();
-        }
-
 
         [Test]
         public void Schema() {

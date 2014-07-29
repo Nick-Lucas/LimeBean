@@ -10,22 +10,7 @@ using System.Text;
 namespace LimeBean.Tests {
 
     [TestFixture]
-    public class DatabaseAccessTests {
-        IDbConnection _conn;
-        IDatabaseAccess _db;
-
-        [SetUp]
-        public void SetUp() {
-            _conn = new SQLiteConnection("data source=:memory:");
-            _conn.Open();
-            _db = new DatabaseAccess(_conn, new SQLiteDetails());
-        }
-
-        [TearDown]
-        public void TearDown() {
-            _conn.Dispose();
-        }
-
+    public class DatabaseAccessTests : SQLiteFixture {
         const string SELECT_RANDOM = "select hex(randomblob(16)) as r";
 
         [Test]
