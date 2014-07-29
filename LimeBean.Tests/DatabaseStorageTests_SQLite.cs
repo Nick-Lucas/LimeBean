@@ -11,7 +11,6 @@ namespace LimeBean.Tests {
     [TestFixture]
     public class DatabaseStorageTests_SQLite {
         IDbConnection _conn;
-        IDatabaseDetails _details;
         IDatabaseAccess _db;
         DatabaseStorage _storage;
 
@@ -20,10 +19,10 @@ namespace LimeBean.Tests {
             _conn = new SQLiteConnection("data source=:memory:");
             _conn.Open();
 
-            _details = new SQLiteDetails();
+            IDatabaseDetails details = new SQLiteDetails();
 
-            _db = new DatabaseAccess(_conn, _details);
-            _storage = new DatabaseStorage(_details, _db);
+            _db = new DatabaseAccess(_conn, details);
+            _storage = new DatabaseStorage(details, _db);
         }
 
         [TearDown]
@@ -353,7 +352,7 @@ namespace LimeBean.Tests {
         [Test]
         public void BacktickInName() {
             Assert.Throws<ArgumentException>(delegate() {
-                _details.QuoteName("`");
+                new SQLiteDetails().QuoteName("`");
             });
         }
 

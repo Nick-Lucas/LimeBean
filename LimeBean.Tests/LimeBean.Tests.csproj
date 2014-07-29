@@ -73,10 +73,8 @@
     <Compile Include="BeanCrudTests.cs" />
     <Compile Include="IntegrationTests.cs" />
     <Compile Include="DatabaseStorageTests_MariaDb.cs" />
-    <Compile Include="MariaDbFixture.cs" />
     <Compile Include="RoundtripChecker.cs" />
     <Compile Include="DatabaseStorageTests_SQLite.cs" />
-    <Compile Include="SQLiteFixture.cs" />
     <Compile Include="TracingObserver.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -9,20 +9,34 @@ using System.Text;
 namespace LimeBean.Tests {
 
     [TestFixture]
-    class DatabaseBeanFinderTests : SQLiteFixture {
+    class DatabaseBeanFinderTests {
+        IDbConnection _conn;
+        IDatabaseAccess _db;
         IBeanFinder _finder;
 
         [SetUp]
-        public override void SetUp() {
-            base.SetUp();
+        public void SetUp() {
+            _conn = new SQLiteConnection("data source=:memory:");
+            _conn.Open();
 
-            DatabaseStorage storage = new DatabaseStorage(_details, _db);
-            _finder = new DatabaseBeanFinder(_details, _db, new BeanCrud(storage, _db));
+            IDatabaseDetails details = new SQLiteDetails();           
+            IDatabaseAccess db = new DatabaseAccess(_conn, details);
+            IStorage storage = new DatabaseStorage(details, db);
+            IBeanCrud crud = new BeanCrud(storage, db);
+            IBeanFinder finder = new DatabaseBeanFinder(details, db, crud);
 
-            _db.Exec("create table foo(x)");
-            _db.Exec("insert into foo(x) values(1)");
-            _db.Exec("insert into foo(x) values(2)");
-            _db.Exec("insert into foo(x) values(3)");
+            db.Exec("create table foo(x)");
+            db.Exec("insert into foo(x) values(1)");
+            db.Exec("insert into foo(x) values(2)");
+            db.Exec("insert into foo(x) values(3)");
+
+            _db = db;
+            _finder = finder;
+        }
+
+        [TearDown]
+        public void TestFixtureTearDown() {
+            _conn.Dispose();
         }
 
         [Test]
