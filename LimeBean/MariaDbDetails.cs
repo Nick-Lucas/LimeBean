@@ -194,7 +194,7 @@ namespace LimeBean {
         }
 
         public bool IsReadOnlyCommand(string text) {
-            return Regex.IsMatch(text, @"^\s*(select|show|explain|describe)\s", RegexOptions.IgnoreCase);
+            return Regex.IsMatch(text, @"^\s*(select|show)\s", RegexOptions.IgnoreCase);
         }
     }
 

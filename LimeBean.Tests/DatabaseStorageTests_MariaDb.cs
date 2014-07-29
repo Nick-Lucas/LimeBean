@@ -206,6 +206,23 @@ namespace LimeBean.Tests {
             // enum
             checker.Check(TypeCode.DateTime, (sbyte)16);
         }
+
+        [Test]
+        public void SchemaReadingKeepsCache() {
+            _db.Exec("create table foo(bar int)");
+            _db.Exec("insert into foo(bar) values(1)");
+
+            var queryCount = 0;
+            _db.QueryExecuting += cmd => queryCount++;
+
+            _db.Cell<int>(true, "SELECT * from foo");
+            _storage.GetSchema();
+
+            var savedQueryCount = queryCount;
+            _db.Cell<int>(true, "SELECT * from foo");
+
+            Assert.AreEqual(savedQueryCount, queryCount);
+        }
     }
 
 }
