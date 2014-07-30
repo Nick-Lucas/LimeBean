@@ -49,7 +49,35 @@ namespace LimeBean {
         }
 
         public int GetRankFromValue(IConvertible value) {
-            throw new NotImplementedException();
+            if(value == null)
+                return RANK_BYTE;
+
+            switch(value.GetTypeCode()) {
+                case TypeCode.Byte:
+                    return RANK_BYTE;
+
+                case TypeCode.Int32:
+                    return RANK_INT32;
+
+                case TypeCode.Int64:
+                    return RANK_INT64;
+
+                case TypeCode.Double:
+                    return RANK_DOUBLE;
+
+                case TypeCode.String:
+                    var len = (value as String).Length;
+
+                    if(len <= 32)
+                        return RANK_TEXT_32;
+
+                    if(len <= 4000)
+                        return RANK_TEXT_4000;
+
+                    return RANK_TEXT_MAX;
+            }
+
+            throw new NotSupportedException();
         }
 
         public int GetRankFromSqlType(string sqlType) {
@@ -80,7 +108,30 @@ namespace LimeBean {
         }
 
         public string GetSqlTypeFromRank(int rank) {
-            throw new NotImplementedException();
+            switch(rank) { 
+                case RANK_BYTE:
+                    return "tinyint";
+
+                case RANK_INT32:
+                    return "int";
+
+                case RANK_INT64:
+                    return "bigint";
+
+                case RANK_DOUBLE:
+                    return "float(53)";
+
+                case RANK_TEXT_32:
+                    return "nvarchar(32)";
+
+                case RANK_TEXT_4000:
+                    return "nvarchar(4000)";
+
+                case RANK_TEXT_MAX:
+                    return "nvarchar(MAX)";
+            }
+
+            throw new NotSupportedException();
         }
 
         public IConvertible ConvertLongValue(long value) {

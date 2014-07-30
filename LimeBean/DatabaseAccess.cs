@@ -125,7 +125,7 @@ namespace LimeBean {
 
                     var p = cmd.CreateParameter();
                     p.ParameterName = name;
-                    p.Value = parameters[i];
+                    p.Value = parameters[i] ?? DBNull.Value;
                     cmd.Parameters.Add(p);
                 }
 

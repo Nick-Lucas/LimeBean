@@ -38,7 +38,7 @@ namespace LimeBean.Tests {
 
         [TearDown]
         public void TearDown() {
-            _db.Exec("alter database " + TEMP_DB_NAME + " set offline");
+            _db.Exec("use master");
             _db.Exec("drop database " + TEMP_DB_NAME);
         }
 
@@ -93,6 +93,35 @@ namespace LimeBean.Tests {
             Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, cols["x6"]);
             Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, cols["x7"]);
         }
+
+        [Test]
+        public void CreateTable() {
+            _storage.EnterFluidMode();
+
+            var data = new Dictionary<string, IConvertible> {
+                { "p1", null },
+                { "p2", 1 },
+                { "p3", -1 },
+                { "p4", Int64.MaxValue },
+                { "p5", 3.14 },
+                { "p6", "abc" },
+                { "p7", "".PadRight(33, 'a') },
+                { "p8", "".PadRight(4001, 'a') },
+            };
+
+            _storage.Store("foo", data);
+
+            var cols = _storage.GetSchema()["foo"];
+            Assert.AreEqual(MsSqlDetails.RANK_BYTE, cols["p1"]);
+            Assert.AreEqual(MsSqlDetails.RANK_BYTE, cols["p2"]);
+            Assert.AreEqual(MsSqlDetails.RANK_INT32, cols["p3"]);
+            Assert.AreEqual(MsSqlDetails.RANK_INT64, cols["p4"]);
+            Assert.AreEqual(MsSqlDetails.RANK_DOUBLE, cols["p5"]);
+            Assert.AreEqual(MsSqlDetails.RANK_TEXT_32, cols["p6"]);
+            Assert.AreEqual(MsSqlDetails.RANK_TEXT_4000, cols["p7"]);
+            Assert.AreEqual(MsSqlDetails.RANK_TEXT_MAX, cols["p8"]);
+        }
+
     }
 
 }
