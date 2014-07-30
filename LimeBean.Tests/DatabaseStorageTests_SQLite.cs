@@ -33,7 +33,7 @@ namespace LimeBean.Tests {
         [Test]
         public void Schema() {
             _db.Exec(@"create table t (
-                pk integer primary key, 
+                id int,
 
                 a1,
                 a2 LONGBLOB,
@@ -55,7 +55,7 @@ namespace LimeBean.Tests {
             Assert.AreEqual(1, schema.Count);
 
             var t = schema["t"];
-            Assert.IsFalse(t.ContainsKey("pk"));
+            Assert.IsFalse(t.ContainsKey("id"));
 
             Assert.AreEqual(SQLiteDetails.RANK_ANY, t["a1"]);
             Assert.AreEqual(SQLiteDetails.RANK_ANY, t["a2"]);

@@ -24,7 +24,6 @@ namespace LimeBean {
 
         string[] GetTableNames(IDatabaseAccess db);
         IDictionary<string, IConvertible>[] GetColumns(IDatabaseAccess db, string tableName);
-        bool IsPrimaryKeyColumn(IDictionary<string, IConvertible> column);
         bool IsNullableColumn(IDictionary<string, IConvertible> column);
         IConvertible GetColumnDefaultValue(IDictionary<string, IConvertible> column);
         string GetColumnName(IDictionary<string, IConvertible> column);

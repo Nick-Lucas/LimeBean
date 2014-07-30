@@ -161,10 +161,6 @@ namespace LimeBean {
             return db.Rows(false, "show columns from " + QuoteName(tableName));
         }
 
-        public bool IsPrimaryKeyColumn(IDictionary<string, IConvertible> column) {
-            return "PRI".Equals(column["Key"]);
-        }
-
         public bool IsNullableColumn(IDictionary<string, IConvertible> column) {
             return "YES".Equals(column["Null"]);
         }

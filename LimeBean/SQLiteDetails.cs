@@ -100,10 +100,6 @@ namespace LimeBean {
             return db.Rows(false, "pragma table_info(" + QuoteName(tableName) + ")");
         }
 
-        public bool IsPrimaryKeyColumn(IDictionary<string, IConvertible> column) {
-            return column["pk"].ToBoolean(CultureInfo.InvariantCulture);
-        }
-
         public bool IsNullableColumn(IDictionary<string, IConvertible> column) {
             return !column["notnull"].ToBoolean(CultureInfo.InvariantCulture);            
         }

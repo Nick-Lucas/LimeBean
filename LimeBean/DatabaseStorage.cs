@@ -49,10 +49,11 @@ namespace LimeBean {
             foreach(var tableName in _details.GetTableNames(_db)) {
                 var columns = new Dictionary<string, int>();
                 foreach(var col in _details.GetColumns(_db, tableName)) {
-                    if(_details.IsPrimaryKeyColumn(col))
+                    var name = _details.GetColumnName(col);
+                    if(name == Bean.ID_PROP_NAME)
                         continue;
 
-                    columns[_details.GetColumnName(col)] = !_details.IsNullableColumn(col) || _details.GetColumnDefaultValue(col) != null
+                    columns[name] = !_details.IsNullableColumn(col) || _details.GetColumnDefaultValue(col) != null
                         ? CommonDatabaseDetails.RANK_CUSTOM
                         : _details.GetRankFromSqlType(_details.GetColumnType(col));
                 }

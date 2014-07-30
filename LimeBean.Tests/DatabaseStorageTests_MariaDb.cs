@@ -49,7 +49,7 @@ namespace LimeBean.Tests {
         [Test]
         public void Schema() {
             _db.Exec(@"create table t(
-                pk integer primary key,
+                id int,
 
                 ti1 TinyInt(123),
                 ti2 TINYINT,
@@ -94,7 +94,7 @@ namespace LimeBean.Tests {
             Assert.AreEqual(1, schema.Count);
 
             var t = schema["t"];
-            Assert.IsFalse(t.ContainsKey("pk"));
+            Assert.IsFalse(t.ContainsKey("id"));
 
             Assert.AreEqual(MariaDbDetails.RANK_INT8, t["ti1"]);
             Assert.AreEqual(MariaDbDetails.RANK_INT8, t["ti2"]);
