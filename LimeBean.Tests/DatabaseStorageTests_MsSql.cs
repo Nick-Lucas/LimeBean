@@ -122,6 +122,41 @@ namespace LimeBean.Tests {
             Assert.AreEqual(MsSqlDetails.RANK_TEXT_MAX, cols["p8"]);
         }
 
+        [Test]
+        public void AlterTable() {
+            _storage.EnterFluidMode();
+
+            var data = new Dictionary<string, IConvertible> {
+                { "p1", 1 },
+                { "p2", -1 },
+                { "p3", Int64.MaxValue },
+                { "p4", 3.14 },
+                { "p5", "abc" },
+                { "p6", "".PadRight(33, 'a') },
+                { "p7", "".PadRight(4001, 'a') },
+            };
+
+            _storage.Store("foo", data);
+
+            for(var i = 1; i < 7; i++)
+                data["p" + i] = data["p" + (i + 1)];
+
+            data["p7"] = 123;
+            data["p8"] = 123;
+
+            _storage.Store("foo", data);
+
+            var cols = _storage.GetSchema()["foo"];
+            Assert.AreEqual(MsSqlDetails.RANK_INT32, cols["p1"]);
+            Assert.AreEqual(MsSqlDetails.RANK_INT64, cols["p2"]);
+            Assert.AreEqual(MsSqlDetails.RANK_DOUBLE, cols["p3"]);
+            Assert.AreEqual(MsSqlDetails.RANK_TEXT_32, cols["p4"]);
+            Assert.AreEqual(MsSqlDetails.RANK_TEXT_4000, cols["p5"]);
+            Assert.AreEqual(MsSqlDetails.RANK_TEXT_MAX, cols["p6"]);
+            Assert.AreEqual(MsSqlDetails.RANK_TEXT_MAX, cols["p7"]);
+            Assert.AreEqual(MsSqlDetails.RANK_BYTE, cols["p8"]);
+        }
+
     }
 
 }

@@ -169,7 +169,13 @@ namespace LimeBean {
         }
 
         public void UpdateSchema(IDatabaseAccess db, string tableName, IDictionary<string, int> oldColumns, IDictionary<string, int> changedColumns, IDictionary<string, int> addedColumns) {
-            throw new NotImplementedException();
+            tableName = QuoteName(tableName);
+
+            foreach(var entry in changedColumns)
+                db.Exec(String.Format("alter table {0} alter column {1} {2}", tableName, QuoteName(entry.Key), GetSqlTypeFromRank(entry.Value)));
+
+            foreach(var entry in addedColumns)
+                db.Exec(String.Format("alter table {0} add {1} {2}", tableName, QuoteName(entry.Key), GetSqlTypeFromRank(entry.Value)));
         }
 
         public bool IsReadOnlyCommand(string text) {
