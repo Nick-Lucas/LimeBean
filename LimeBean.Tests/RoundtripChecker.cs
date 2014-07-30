@@ -7,8 +7,6 @@ using System.Text;
 namespace LimeBean.Tests {
 
     class RoundtripChecker {
-        public static string LONG_STRING = String.Empty.PadRight(70 * 1000, 'x');
-
         IDatabaseAccess _db;
         DatabaseStorage _storage;
 

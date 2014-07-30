@@ -216,17 +216,10 @@ namespace LimeBean.Tests {
             checker.Check("hello", "hello");
 
             // extremal vaues
-            checker.Check(Int64.MinValue, Int64.MinValue);
-            checker.Check(Int64.MaxValue, Int64.MaxValue);
-            checker.Check(Double.Epsilon, Double.Epsilon);
-            checker.Check(Double.MinValue, Double.MinValue);
-            checker.Check(Double.MaxValue, Double.MaxValue);
-            checker.Check(RoundtripChecker.LONG_STRING, RoundtripChecker.LONG_STRING);
+            SharedChecks.CheckRoundtripOfExtremalValues(checker);
 
             // conversion to string
-            checker.Check(9223372036854775808, "9223372036854775808");
-            checker.Check(9223372036854775808M, "9223372036854775808");
-            checker.Check(new DateTime(1984, 6, 14, 13, 14, 15), "06/14/1984 13:14:15");
+            SharedChecks.CheckRoundtripForcesString(checker);
 
             // bool            
             checker.Check(true, (sbyte)1);
@@ -238,19 +231,7 @@ namespace LimeBean.Tests {
 
         [Test]
         public void SchemaReadingKeepsCache() {
-            _db.Exec("create table foo(bar int)");
-            _db.Exec("insert into foo(bar) values(1)");
-
-            var queryCount = 0;
-            _db.QueryExecuting += cmd => queryCount++;
-
-            _db.Cell<int>(true, "SELECT * from foo");
-            _storage.GetSchema();
-
-            var savedQueryCount = queryCount;
-            _db.Cell<int>(true, "SELECT * from foo");
-
-            Assert.AreEqual(savedQueryCount, queryCount);
+            SharedChecks.CheckSchemaReadingKeepsCache(_db, _storage);
         }
     }
 
