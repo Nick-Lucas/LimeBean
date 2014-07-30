@@ -19,7 +19,7 @@ namespace LimeBean.Tests {
         [TestFixtureSetUp]
         public void TestFixtureSetUp() {
             var server = Environment.GetEnvironmentVariable("LIME_TEST_SQLSERVER") ?? ".\\SQLEXPRESS";
-            _conn = new SqlConnection("server=" + server + "; user instance=true; integrated security=true;");
+            _conn = new SqlConnection("server=" + server + "; user instance=true; integrated security=true; connection timeout=60");
             _conn.Open();
         }
 
