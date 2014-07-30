@@ -10,6 +10,8 @@ namespace LimeBean.Tests {
 
     [TestFixture]
     public class DatabaseStorageTests_MariaDb {
+        static string TEMP_DB_NAME = "lime_bean_" + Guid.NewGuid().ToString("N");
+
         IDbConnection _conn;
         IDatabaseAccess _db;
         DatabaseStorage _storage;
@@ -26,14 +28,17 @@ namespace LimeBean.Tests {
             IDatabaseAccess db = new DatabaseAccess(_conn, details);            
             DatabaseStorage storage = new DatabaseStorage(details, db);
 
-            const string dbname = "lime_bean_tests";
             db.Exec("set sql_mode=STRICT_TRANS_TABLES");
-            db.Exec("drop database if exists " + dbname);
-            db.Exec("create database " + dbname);
-            db.Exec("use " + dbname);
+            db.Exec("create database " + TEMP_DB_NAME);
+            db.Exec("use " + TEMP_DB_NAME);
 
             _db = db;
             _storage = storage;
+        }
+
+        [TearDown]
+        public void TearDown() {
+            _db.Exec("drop database if exists " + TEMP_DB_NAME);
         }
 
         [TestFixtureTearDown]
