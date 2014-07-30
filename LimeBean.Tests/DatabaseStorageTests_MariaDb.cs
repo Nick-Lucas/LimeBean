@@ -209,8 +209,8 @@ namespace LimeBean.Tests {
 
             // supported ranks
             checker.Check(null, null);
-            checker.Check(1000, 1000);
             checker.Check((sbyte)123, (sbyte)123);
+            checker.Check(1000, 1000);            
             checker.Check(0x80000000L, 0x80000000L);            
             checker.Check(3.14, 3.14);
             checker.Check("hello", "hello");
@@ -221,6 +221,7 @@ namespace LimeBean.Tests {
             checker.Check(Double.Epsilon, Double.Epsilon);
             checker.Check(Double.MinValue, Double.MinValue);
             checker.Check(Double.MaxValue, Double.MaxValue);
+            checker.Check(RoundtripChecker.LONG_STRING, RoundtripChecker.LONG_STRING);
 
             // conversion to string
             checker.Check(9223372036854775808, "9223372036854775808");

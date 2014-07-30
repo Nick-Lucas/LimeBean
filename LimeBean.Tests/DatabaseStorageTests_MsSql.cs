@@ -158,6 +158,40 @@ namespace LimeBean.Tests {
             Assert.AreEqual(MsSqlDetails.RANK_BYTE, cols["p8"]);
         }
 
+        [Test, SetCulture("ru")]
+        public void Roundtrip() {
+            _storage.EnterFluidMode();
+            var checker = new RoundtripChecker(_db, _storage);
+
+            // supported ranks
+            checker.Check(null, null);
+            checker.Check(255, (byte)255);
+            checker.Check(1000, 1000);            
+            checker.Check(0x80000000L, 0x80000000L);
+            checker.Check(3.14, 3.14);
+            checker.Check("hello", "hello");
+
+            // extremal vaues
+            checker.Check(Int64.MinValue, Int64.MinValue);
+            checker.Check(Int64.MaxValue, Int64.MaxValue);
+            checker.Check(Double.Epsilon, Double.Epsilon);
+            checker.Check(Double.MinValue, Double.MinValue);
+            checker.Check(Double.MaxValue, Double.MaxValue);
+            checker.Check(RoundtripChecker.LONG_STRING, RoundtripChecker.LONG_STRING);
+
+            // conversion to string
+            checker.Check(9223372036854775808, "9223372036854775808");
+            checker.Check(9223372036854775808M, "9223372036854775808");
+            checker.Check(new DateTime(1984, 6, 14, 13, 14, 15), "06/14/1984 13:14:15");
+
+            // bool            
+            checker.Check(true, (byte)1);
+            checker.Check(false, (byte)0);
+
+            // enum
+            checker.Check(TypeCode.DateTime, (byte)16);
+        }
+
     }
 
 }

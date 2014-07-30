@@ -214,6 +214,7 @@ namespace LimeBean.Tests {
             checker.Check(Double.Epsilon, Double.Epsilon);
             checker.Check(Double.MinValue, Double.MinValue);
             checker.Check(Double.MaxValue, Double.MaxValue);
+            checker.Check(RoundtripChecker.LONG_STRING, RoundtripChecker.LONG_STRING);
 
             // conversion to string
             checker.Check(9223372036854775808, "9223372036854775808");

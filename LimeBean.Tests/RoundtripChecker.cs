@@ -7,6 +7,8 @@ using System.Text;
 namespace LimeBean.Tests {
 
     class RoundtripChecker {
+        public static string LONG_STRING = String.Empty.PadRight(70 * 1000, 'x');
+
         IDatabaseAccess _db;
         DatabaseStorage _storage;
 
@@ -16,18 +18,20 @@ namespace LimeBean.Tests {
         }
 
         public void Check(IConvertible before, IConvertible after) {            
-            _db.Exec("drop table if exists foo");
-            _storage.InvalidateSchema();
-
             var id = _storage.Store("foo", new Dictionary<string, IConvertible> { 
                     { "p", before }
                 });
 
-            var loaded = _storage.Load("foo", id);
-            Assert.AreEqual(after, loaded["p"]);
+            try {
+                var loaded = _storage.Load("foo", id);
+                Assert.AreEqual(after, loaded["p"]);
 
-            if(after != null)
-                Assert.AreEqual(after.GetType(), loaded["p"].GetType());        
+                if(after != null)
+                    Assert.AreEqual(after.GetType(), loaded["p"].GetType());
+            } finally {
+                _db.Exec("drop table foo");
+                _storage.InvalidateSchema();            
+            }
         }
 
     }
