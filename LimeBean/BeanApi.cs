@@ -92,13 +92,16 @@ namespace LimeBean {
         }
 
         internal IDatabaseDetails CreateDetails() { 
-            var type = Connection.GetType().FullName;
+            switch(Connection.GetType().FullName) { 
+                case "System.Data.SQLite.SQLiteConnection":
+                    return new SQLiteDetails();
+    
+                case "MySql.Data.MySqlClient.MySqlConnection":
+                    return new MariaDbDetails();
 
-            if(type == "System.Data.SQLite.SQLiteConnection")
-                return new SQLiteDetails();
-
-            if(type == "MySql.Data.MySqlClient.MySqlConnection")
-                return new MariaDbDetails();
+                case "System.Data.SqlClient.SqlConnection":
+                    return new MsSqlDetails();
+            }
 
             throw new NotSupportedException();
         }

@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Data.SQLite;
 using System.Linq;
 using System.Text;
@@ -41,7 +42,8 @@ namespace LimeBean.Tests {
         [Test]
         public void Api_DetailsSelection() {
             Assert.AreEqual("SQLite", new BeanApi(new SQLiteConnection()).CreateDetails().DbName);
-            Assert.AreEqual("MariaDB", new BeanApi(new MySqlConnection()).CreateDetails().DbName);            
+            Assert.AreEqual("MariaDB", new BeanApi(new MySqlConnection()).CreateDetails().DbName);
+            Assert.AreEqual("MsSql", new BeanApi(new SqlConnection()).CreateDetails().DbName);            
         }
 
         class ThrowingBean : Bean {
