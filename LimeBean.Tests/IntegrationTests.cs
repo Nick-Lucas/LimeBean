@@ -40,8 +40,8 @@ namespace LimeBean.Tests {
 
         [Test]
         public void Api_DetailsSelection() {
-            Assert.AreEqual("SQLite", new BeanApi("data source=:memory:", SQLiteFactory.Instance).CreateDetails().DbName);
-            Assert.AreEqual("MariaDB", new BeanApi("server=localhost; uid=root; pwd=qwerty", MySqlClientFactory.Instance).CreateDetails().DbName);            
+            Assert.AreEqual("SQLite", new BeanApi(new SQLiteConnection()).CreateDetails().DbName);
+            Assert.AreEqual("MariaDB", new BeanApi(new MySqlConnection()).CreateDetails().DbName);            
         }
 
         class ThrowingBean : Bean {
