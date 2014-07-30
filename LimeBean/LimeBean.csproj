@@ -59,6 +59,7 @@
     <Compile Include="ITransactionSupport.cs" />
     <Compile Include="IValueRelaxations.cs" />
     <Compile Include="MariaDbDetails.cs" />
+    <Compile Include="MsSqlDetails.cs" />
     <Compile Include="SQLiteDetails.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

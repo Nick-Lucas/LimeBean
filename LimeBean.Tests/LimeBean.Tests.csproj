@@ -48,6 +48,7 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DatabaseStorageTests_MsSql.cs" />
     <Compile Include="Examples\AspNet.cs" />
     <None Include="packages.config" />
   </ItemGroup>
