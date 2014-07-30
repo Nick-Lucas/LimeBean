@@ -10,11 +10,11 @@ namespace LimeBean.Tests {
 
     [TestFixture]
     public class DatabaseStorageTests_MsSql {
-        static string TEMP_DB_NAME = "lime_bean_" + Guid.NewGuid().ToString("N");
-
-        IDbConnection _conn;
+        IDbConnection _conn;        
         IDatabaseAccess _db;
         DatabaseStorage _storage;
+
+        List<string> _dropList = new List<string>();
 
         [TestFixtureSetUp]
         public void TestFixtureSetUp() {
@@ -29,21 +29,22 @@ namespace LimeBean.Tests {
             IDatabaseAccess db = new DatabaseAccess(_conn, details);
             DatabaseStorage storage = new DatabaseStorage(details, db);
 
-            db.Exec("create database " + TEMP_DB_NAME);
-            db.Exec("use " + TEMP_DB_NAME);
+            var name = "lime_bean_" + Guid.NewGuid().ToString("N");
+            _dropList.Add(name);
+
+            db.Exec("create database " + name);
+            db.Exec("use " + name);
 
             _db = db;
             _storage = storage;
         }
 
-        [TearDown]
-        public void TearDown() {
-            _db.Exec("use master");
-            _db.Exec("drop database " + TEMP_DB_NAME);
-        }
-
         [TestFixtureTearDown]
         public void TestFixtureTearDown() {
+            _db.Exec("use master");
+            foreach(var name in _dropList)
+                _db.Exec("drop database " + name);            
+
             _conn.Dispose();
         }
 
