@@ -176,7 +176,7 @@ namespace LimeBean {
         }
 
         void QueryWillExecute(IDbCommand cmd) {
-            if(!_details.IsReadOnlyCommand(cmd.CommandText))
+            if(_cache.Count > 0 && !_details.IsReadOnlyCommand(cmd.CommandText))
                 _cache.Clear();
 
             if(QueryExecuting != null)

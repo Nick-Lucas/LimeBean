@@ -26,6 +26,10 @@ namespace LimeBean {
             }
         }
 
+        public int Count {
+            get { return _values.Count; }
+        }
+
         public bool Contains(K key) {
             return _values.ContainsKey(key);
         }
