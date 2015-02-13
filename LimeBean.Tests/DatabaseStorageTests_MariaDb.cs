@@ -18,7 +18,7 @@ namespace LimeBean.Tests {
 
         [TestFixtureSetUp]
         public void TestFixtureSetUp() {
-            _conn = new MySqlConnection("server=localhost; uid=root; pwd=qwerty");
+            _conn = new MySqlConnection("server=" + TestEnv.MariaHost + "; uid=" + TestEnv.MariaUser + "; pwd=" + TestEnv.MariaPassword);
             _conn.Open();
         }
 
