@@ -59,10 +59,7 @@ namespace LimeBean {
                 return null;
             }
             set {
-                if(value == null)
-                    _props.Remove(name);
-                else
-                    _props[name] = value;
+                _props[name] = value;
             }
         }
 

@@ -46,6 +46,24 @@ namespace LimeBean.Tests {
             Assert.AreEqual("MsSql", new BeanApi(new SqlConnection()).CreateDetails().DbName);            
         }
 
+        [Test]
+        public void Regression_NullingExistingProp() {
+            using(var api = new BeanApi("data source=:memory:", SQLiteFactory.Instance)) {
+                api.EnterFluidMode();
+
+                var bean = api.Dispense("kind1");
+                bean["p"] = 123;
+
+                var id = api.Store(bean);
+
+                bean["p"] = null;
+                api.Store(bean);
+
+                bean = api.Load("kind1", id);
+                Assert.IsNull(bean["p"]);
+            }
+        }
+
         class ThrowingBean : Bean {
             public bool Throw;
 
