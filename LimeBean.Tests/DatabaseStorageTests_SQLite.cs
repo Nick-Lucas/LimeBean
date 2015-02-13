@@ -110,13 +110,13 @@ namespace LimeBean.Tests {
             Assert.AreEqual(123, row["p1"]);
             Assert.AreEqual(3.14, row["p2"]);
             Assert.AreEqual("hello", row["p3"]);
-            Assert.AreEqual(null, row["p4"]);
+            CollectionAssert.DoesNotContain(row.Keys, "p4");
 
             var table = _storage.GetSchema()["kind1"];
             Assert.AreEqual(SQLiteDetails.RANK_ANY, table["p1"]);
             Assert.AreEqual(SQLiteDetails.RANK_ANY, table["p2"]);
             Assert.AreEqual(SQLiteDetails.RANK_TEXT, table["p3"]);
-            Assert.AreEqual(SQLiteDetails.RANK_ANY, table["p4"]);
+            CollectionAssert.DoesNotContain(table.Keys, "p4");
         }
 
         [Test]
@@ -138,7 +138,7 @@ namespace LimeBean.Tests {
 
             schema = _storage.GetSchema();
             Assert.AreEqual(SQLiteDetails.RANK_TEXT, schema["kind1"]["x"]);
-            Assert.AreEqual(SQLiteDetails.RANK_ANY, schema["kind1"]["y"]);
+            CollectionAssert.DoesNotContain(schema["kind1"].Keys, "y");
 
             var rows = _db.Rows(true, "select * from kind1 order by " + Bean.ID_PROP_NAME);
             Assert.AreEqual("1", rows[0]["x"]);

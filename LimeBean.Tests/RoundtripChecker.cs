@@ -22,7 +22,7 @@ namespace LimeBean.Tests {
 
             try {
                 var loaded = _storage.Load("foo", id);
-                Assert.AreEqual(after, loaded["p"]);
+                Assert.AreEqual(after, loaded.ContainsKey("p") ? loaded["p"] : null);
 
                 if(after != null)
                     Assert.AreEqual(after.GetType(), loaded["p"].GetType());

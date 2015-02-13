@@ -41,9 +41,13 @@ namespace LimeBean {
             return null;
         }
 
+        public string GetInsertDefaultsPostfix() {
+            return "default values";
+        }
+
         public int GetRankFromValue(IConvertible value) {
             if(value == null)
-                return RANK_ANY;
+                return CommonDatabaseDetails.RANK_NULL;
 
             switch(value.GetTypeCode()) {
                 case TypeCode.Int64:

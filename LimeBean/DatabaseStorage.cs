@@ -69,7 +69,7 @@ namespace LimeBean {
         IDictionary<string, int> GetColumnsFromData(IDictionary<string, IConvertible> data) {
             var result = new Dictionary<string, int>(data.Count);
             foreach(var entry in data)
-                result[entry.Key] = _details.GetRankFromValue(ConvertValue(entry.Value));
+                result[entry.Key] = _details.GetRankFromValue(entry.Value);
             return result;
         }
 
@@ -132,8 +132,12 @@ namespace LimeBean {
                 data.Remove(Bean.ID_PROP_NAME);
             }
 
-            if(_isFluidMode)
+            data = data.ToDictionary(e => e.Key, e => ConvertValue(e.Value));
+
+            if(_isFluidMode) {
+                data = DropNulls(kind, data);
                 CheckSchema(kind, data);
+            }
 
             if(id == null) {
                 ExecInsert(kind, data);
@@ -168,9 +172,6 @@ namespace LimeBean {
         }
 
         void ExecInsert(string kind, IDictionary<string, IConvertible> data) {
-            if(data.Count < 1)
-                data = new Dictionary<string, IConvertible> { { Bean.ID_PROP_NAME, null } };
-
             var propNames = new string[data.Count];
             var propValues = new object[data.Count];
             var placeholders = new string[data.Count];
@@ -178,14 +179,16 @@ namespace LimeBean {
             var index = 0;
             foreach(var entry in data) {
                 propNames[index] = QuoteName(entry.Key);
-                propValues[index] = ConvertValue(entry.Value);
+                propValues[index] = entry.Value;
                 placeholders[index] = "{" + index + "}";
                 index++;
             }
 
-            var sql = "insert into " + QuoteName(kind) + " ("
-                + String.Join(", ", propNames) + ") values ("
-                + String.Join(", ", placeholders) + ")";
+            var sql = "insert into " + QuoteName(kind) + " ";
+            if(data.Count > 0)
+                sql += "(" + String.Join(", ", propNames) + ") values (" + String.Join(", ", placeholders) + ")";
+            else
+                sql += _details.GetInsertDefaultsPostfix();
 
             _db.Exec(sql, propValues);
         }
@@ -204,7 +207,7 @@ namespace LimeBean {
                 if(index > 0)
                     sql.Append(", ");
 
-                propValues[index] = ConvertValue(entry.Value);
+                propValues[index] = entry.Value;
 
                 sql
                     .Append(QuoteName(entry.Key))
@@ -220,6 +223,17 @@ namespace LimeBean {
                 throw new Exception("Row not found");
         }
 
+        IDictionary<string, IConvertible> DropNulls(string kind, IDictionary<string, IConvertible> data) {
+            var schema = GetSchema();
+            var result = new Dictionary<string, IConvertible>();
+
+            foreach(var entry in data) {
+                if(entry.Value != null || schema.ContainsKey(kind) && schema[kind].ContainsKey(entry.Key))                    
+                    result[entry.Key] = entry.Value;
+            }
+
+            return result;
+        }
 
         void CheckSchema(string kind, IDictionary<string, IConvertible> data) {
             var newColumns = GetColumnsFromData(data);

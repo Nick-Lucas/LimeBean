@@ -47,9 +47,13 @@ namespace LimeBean {
             return "engine=InnoDB default charset=utf8 collate=utf8_unicode_ci";
         }
 
+        public string GetInsertDefaultsPostfix() {
+            return "values ()";
+        }
+
         public int GetRankFromValue(IConvertible value) {
             if(value == null)
-                return RANK_INT8;
+                return CommonDatabaseDetails.RANK_NULL;
 
             switch(value.GetTypeCode()) {
                 case TypeCode.SByte:

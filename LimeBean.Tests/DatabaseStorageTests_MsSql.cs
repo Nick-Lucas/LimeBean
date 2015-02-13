@@ -112,7 +112,7 @@ namespace LimeBean.Tests {
             _storage.Store("foo", data);
 
             var cols = _storage.GetSchema()["foo"];
-            Assert.AreEqual(MsSqlDetails.RANK_BYTE, cols["p1"]);
+            CollectionAssert.DoesNotContain(cols.Keys, "p1");
             Assert.AreEqual(MsSqlDetails.RANK_BYTE, cols["p2"]);
             Assert.AreEqual(MsSqlDetails.RANK_INT32, cols["p3"]);
             Assert.AreEqual(MsSqlDetails.RANK_INT64, cols["p4"]);

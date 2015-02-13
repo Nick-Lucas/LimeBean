@@ -15,6 +15,7 @@ namespace LimeBean {
         void ExecInitCommands(IDatabaseAccess db);
         long GetLastInsertID(IDatabaseAccess db);
         string GetCreateTableStatementPostfix();
+        string GetInsertDefaultsPostfix();
 
         int GetRankFromValue(IConvertible value);
         int GetRankFromSqlType(string sqlType);

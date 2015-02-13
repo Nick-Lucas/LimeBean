@@ -153,7 +153,7 @@ namespace LimeBean.Tests {
             _storage.Store("foo", data);
 
             var cols = _storage.GetSchema()["foo"];
-            Assert.AreEqual(MariaDbDetails.RANK_INT8, cols["p1"]);
+            CollectionAssert.DoesNotContain(cols.Keys, "p1");
             Assert.AreEqual(MariaDbDetails.RANK_INT8, cols["p2"]);
             Assert.AreEqual(MariaDbDetails.RANK_INT32, cols["p3"]);
             Assert.AreEqual(MariaDbDetails.RANK_INT64, cols["p4"]);

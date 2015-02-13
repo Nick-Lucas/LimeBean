@@ -6,7 +6,9 @@ using System.Text;
 namespace LimeBean {
 
     static class CommonDatabaseDetails {
-        public const int RANK_CUSTOM = Int32.MaxValue;
+        public const int 
+            RANK_NULL = Int32.MinValue,
+            RANK_CUSTOM = Int32.MaxValue;
 
         public static string QuoteWithBackticks(string text) {
             if(text.Contains("`"))
@@ -40,7 +42,6 @@ namespace LimeBean {
 
             return sql.ToString();
         }
-
 
     }
 
