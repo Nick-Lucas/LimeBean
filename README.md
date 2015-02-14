@@ -1,6 +1,6 @@
 # LimeBean
 
-[![Build status](https://ci.appveyor.com/api/projects/status/1997c2ee6tv114pc)](https://ci.appveyor.com/project/AlekseyMartynov/limebean)
+[![Build status](https://ci.appveyor.com/api/projects/status/o3lauspwhfk898o7)](https://ci.appveyor.com/project/AlekseyMartynov/limebean)
 
 [RedBeanPHP](http://redbeanphp.com/)-inspired data access layer for .NET and Mono (actually, a port of [orange-bean](https://code.google.com/p/orange-bean/)).
 
