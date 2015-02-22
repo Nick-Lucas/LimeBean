@@ -10,13 +10,13 @@ namespace LimeBean {
         Bean Dispense(string kind);
         T Dispense<T>() where T : Bean, new();
 
-        Bean Load(string kind, IDictionary<string, IConvertible> data);
-        T Load<T>(IDictionary<string, IConvertible> data) where T : Bean, new();
+        Bean RowToBean(string kind, IDictionary<string, IConvertible> row);
+        T RowToBean<T>(IDictionary<string, IConvertible> row) where T : Bean, new();
 
-        Bean Load(string kind, long id);
-        T Load<T>(long id) where T : Bean, new();
+        Bean Load(string kind, IConvertible key);
+        T Load<T>(IConvertible key) where T : Bean, new();
 
-        long Store(Bean bean);
+        IConvertible Store(Bean bean);
 
         void Trash(Bean bean);
     }

@@ -19,31 +19,31 @@ namespace LimeBean {
         // Find
 
         public Bean[] Find(bool useCache, string kind, string expr = null, params object[] parameters) {
-            return Rows(useCache, kind, expr, parameters).Select(row => _crud.Load(kind, row)).ToArray();
+            return Rows(useCache, kind, expr, parameters).Select(row => _crud.RowToBean(kind, row)).ToArray();
         }
 
         public T[] Find<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new() {
-            return Rows(useCache, Bean.GetKind<T>(), expr, parameters).Select(_crud.Load<T>).ToArray();
+            return Rows(useCache, Bean.GetKind<T>(), expr, parameters).Select(_crud.RowToBean<T>).ToArray();
         }
 
         // FindOne
 
         public Bean FindOne(bool useCache, string kind, string expr = null, params object[] parameters) {
-            return _crud.Load(kind, Row(useCache, kind, expr, parameters));
+            return _crud.RowToBean(kind, Row(useCache, kind, expr, parameters));
         }
 
         public T FindOne<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new() {
-            return _crud.Load<T>(Row(useCache, Bean.GetKind<T>(), expr, parameters));
+            return _crud.RowToBean<T>(Row(useCache, Bean.GetKind<T>(), expr, parameters));
         }
 
         // Iterators
 
         public IEnumerable<Bean> FindIterator(string kind, string expr = null, params object[] parameters) {
-            return RowsIterator(kind, expr, parameters).Select(row => _crud.Load(kind, row));
+            return RowsIterator(kind, expr, parameters).Select(row => _crud.RowToBean(kind, row));
         }
 
         public IEnumerable<T> FindIterator<T>(string expr = null, params object[] parameters) where T : Bean, new() {
-            return RowsIterator(Bean.GetKind<T>(), expr, parameters).Select(_crud.Load<T>);
+            return RowsIterator(Bean.GetKind<T>(), expr, parameters).Select(_crud.RowToBean<T>);
         }
 
         // Count

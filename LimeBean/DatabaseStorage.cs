@@ -14,10 +14,12 @@ namespace LimeBean {
         bool _isFluidMode;
         IDatabaseDetails _details;
         IDatabaseAccess _db;
+        IKeyAccess _keyAccess;
 
-        public DatabaseStorage(IDatabaseDetails details, IDatabaseAccess db) {
+        public DatabaseStorage(IDatabaseDetails details, IDatabaseAccess db, IKeyAccess keys) {
             _details = details;
             _db = db;
+            _keyAccess = keys;
 
             TrimStrings = true;
             ConvertEmptyStringToNull = true;
@@ -47,10 +49,11 @@ namespace LimeBean {
         Schema LoadSchema() {
             var result = new Schema();
             foreach(var tableName in _details.GetTableNames(_db)) {
+                var autoIncrementName = _keyAccess.GetAutoIncrementName(tableName);
                 var columns = new Dictionary<string, int>();
                 foreach(var col in _details.GetColumns(_db, tableName)) {
                     var name = _details.GetColumnName(col);
-                    if(name == Bean.ID_PROP_NAME)
+                    if(name == autoIncrementName)
                         continue;
 
                     columns[name] = !_details.IsNullableColumn(col) || _details.GetColumnDefaultValue(col) != null
@@ -123,13 +126,18 @@ namespace LimeBean {
             return text;
         }
 
-        public long Store(string kind, IDictionary<string, IConvertible> data) {
-            var id = new Nullable<long>();
+        public IConvertible Store(string kind, IDictionary<string, IConvertible> data) {            
+            var key = _keyAccess.GetKey(kind, data);
+            var autoIncrement = _keyAccess.IsAutoIncrement(kind);
 
-            if(data.ContainsKey(Bean.ID_PROP_NAME)) {
-                id = data[Bean.ID_PROP_NAME].ToInt64(CultureInfo.InvariantCulture);
+            if(!autoIncrement && key == null)
+                throw new InvalidOperationException("Missing key value");
+
+            var isNew = !autoIncrement ? !IsKnownKey(kind, key) : key == null;
+
+            if(!isNew && key != null) {
                 data = new Dictionary<string, IConvertible>(data);
-                data.Remove(Bean.ID_PROP_NAME);
+                _keyAccess.SetKey(kind, data, null);
             }
 
             data = data.ToDictionary(e => e.Key, e => ConvertValue(e.Value));
@@ -139,9 +147,12 @@ namespace LimeBean {
                 CheckSchema(kind, data);
             }
 
-            if(id == null) {
+            if(isNew)
                 ExecInsert(kind, data);
+            else if(data.Count > 0)
+                ExecUpdate(kind, key, data);
 
+            if(isNew && autoIncrement) {
                 // NOTE on concurrency
                 // "last insert id" is connection-aware, but not thread-safe
                 // http://stackoverflow.com/q/21185666
@@ -151,24 +162,31 @@ namespace LimeBean {
                 return _details.GetLastInsertID(_db);
             }
 
-            if(data.Count > 0)
-                ExecUpdate(kind, id.Value, data);
-
-            return id.Value;
+            return key;
         }
 
-        public IDictionary<string, IConvertible> Load(string kind, long id) {
+        public IDictionary<string, IConvertible> Load(string kind, IConvertible key) {
             if(_isFluidMode && !IsKnownKind(kind))
                 return null;
 
-            return _db.Row(true, "select * from " + QuoteName(kind) + WhereId(id));
+            var args = CreateSimpleByKeyArguments("select *", kind, key);
+            return _db.Row(true, args.Item1, args.Item2);
         }
 
-        public void Trash(string kind, long id) {
+        public void Trash(string kind, IConvertible key) {
             if(_isFluidMode && !IsKnownKind(kind))
                 return;
 
-            _db.Exec("delete from " + QuoteName(kind) + WhereId(id));
+            var args = CreateSimpleByKeyArguments("delete", kind, key);
+            _db.Exec(args.Item1, args.Item2);
+        }
+
+        bool IsKnownKey(string kind, IConvertible key) {
+            if(_isFluidMode && !IsKnownKind(kind))
+                return false;
+
+            var args = CreateSimpleByKeyArguments("select count(*)", kind, key);
+            return _db.Cell<int>(false, args.Item1, args.Item2) > 0;
         }
 
         void ExecInsert(string kind, IDictionary<string, IConvertible> data) {
@@ -193,8 +211,8 @@ namespace LimeBean {
             _db.Exec(sql, propValues);
         }
 
-        void ExecUpdate(string kind, long id, IDictionary<string, IConvertible> data) {
-            var propValues = new object[data.Count];
+        void ExecUpdate(string kind, IConvertible key, IDictionary<string, IConvertible> data) {
+            var propValues = new List<object>();
             var sql = new StringBuilder();
 
             sql
@@ -207,7 +225,7 @@ namespace LimeBean {
                 if(index > 0)
                     sql.Append(", ");
 
-                propValues[index] = entry.Value;
+                propValues.Add(entry.Value);
 
                 sql
                     .Append(QuoteName(entry.Key))
@@ -217,10 +235,21 @@ namespace LimeBean {
                 index++;
             }
 
-            sql.Append(WhereId(id));
+            AppendKeyCriteria(kind, key, sql, propValues);
 
-            if(_db.Exec(sql.ToString(), propValues) < 1)
+            if(_db.Exec(sql.ToString(), propValues.ToArray()) < 1)
                 throw new Exception("Row not found");
+        }
+
+        Tuple<string, object[]> CreateSimpleByKeyArguments(string prefix, string kind, IConvertible key) {
+            var parameters = new List<object>();
+            var sql = new StringBuilder(prefix)
+                .Append(" from ")
+                .Append(QuoteName(kind));
+            
+            AppendKeyCriteria(kind, key, sql, parameters);
+            
+            return Tuple.Create(sql.ToString(), parameters.ToArray());
         }
 
         IDictionary<string, IConvertible> DropNulls(string kind, IDictionary<string, IConvertible> data) {
@@ -237,9 +266,13 @@ namespace LimeBean {
 
         void CheckSchema(string kind, IDictionary<string, IConvertible> data) {
             var newColumns = GetColumnsFromData(data);
+            var autoIncrementName = _keyAccess.GetAutoIncrementName(kind);
+
+            if(autoIncrementName != null)
+                newColumns.Remove(autoIncrementName);
 
             if(!IsKnownKind(kind)) {
-                _db.Exec(CommonDatabaseDetails.FormatCreateTableCommand(_details, kind, newColumns));
+                _db.Exec(CommonDatabaseDetails.FormatCreateTableCommand(_details, kind, autoIncrementName, newColumns));
                 InvalidateSchema();
             } else {
                 var oldColumns = GetSchema()[kind];
@@ -254,14 +287,36 @@ namespace LimeBean {
                 }
 
                 if(changedColumns.Count > 0 || addedColumns.Count > 0) {
-                    _details.UpdateSchema(_db, kind, oldColumns, changedColumns, addedColumns);
+                    _details.UpdateSchema(_db, kind, _keyAccess.GetAutoIncrementName(kind), oldColumns, changedColumns, addedColumns);
                     InvalidateSchema();
                 }
             }
         }
 
-        string WhereId(long id) { 
-            return " where " + QuoteName(Bean.ID_PROP_NAME) + " = " + id;
+        void AppendKeyCriteria(string kind, IConvertible key, StringBuilder sql, ICollection<object> parameters) {
+            sql.Append(" where ");
+
+            var compound = key as CompoundKey;
+            var names = _keyAccess.GetKeyNames(kind);
+
+            if(names.Count > 1 ^ compound != null)
+                throw new InvalidOperationException();
+
+            var first = true;
+            foreach(var name in names) {
+                if(!first)
+                    sql.Append(" and ");                
+            
+                sql.Append(QuoteName(name)).Append(" = {").Append(parameters.Count).Append("}");
+
+                if(compound != null)
+                    parameters.Add(compound[name]);
+                else
+                    parameters.Add(key);
+
+                first = false;
+            }
+            
         }
 
         string QuoteName(string name) {

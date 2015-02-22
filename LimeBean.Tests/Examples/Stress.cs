@@ -43,7 +43,7 @@ namespace LimeBean.Tests.Examples {
         [Test]
         public void IteratorRead() {
             foreach(var bean in R.FindIterator("foo")) {
-                var id = bean.ID;
+                var id = bean[Bean.ID_PROP_NAME];
                 // Console.WriteLine(id);
             }        
         }

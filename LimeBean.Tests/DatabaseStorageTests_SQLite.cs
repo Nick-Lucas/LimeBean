@@ -22,7 +22,7 @@ namespace LimeBean.Tests {
             IDatabaseDetails details = new SQLiteDetails();
 
             _db = new DatabaseAccess(_conn, details);
-            _storage = new DatabaseStorage(details, _db);
+            _storage = new DatabaseStorage(details, _db, new KeyUtil());
         }
 
         [TearDown]
@@ -55,7 +55,7 @@ namespace LimeBean.Tests {
             Assert.AreEqual(1, schema.Count);
 
             var t = schema["t"];
-            Assert.IsFalse(t.ContainsKey("id"));
+            Assert.IsFalse(t.ContainsKey(Bean.ID_PROP_NAME));
 
             Assert.AreEqual(SQLiteDetails.RANK_ANY, t["a1"]);
             Assert.AreEqual(SQLiteDetails.RANK_ANY, t["a2"]);

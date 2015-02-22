@@ -8,11 +8,13 @@ namespace LimeBean {
     class BeanCrud : IBeanCrud {
         IStorage _storage;
         ITransactionSupport _transactionSupport;
+        IKeyAccess _keyAccess;
         ICollection<BeanObserver> _observers;
 
-        public BeanCrud(IStorage storage, ITransactionSupport transactionSupport) {
+        public BeanCrud(IStorage storage, ITransactionSupport transactionSupport, IKeyAccess keys) {
             _storage = storage;
             _transactionSupport = transactionSupport;
+            _keyAccess = keys;
             _observers = new HashSet<BeanObserver>();
         }
 
@@ -32,29 +34,29 @@ namespace LimeBean {
             return ContinueDispense(new T());
         }
 
-        public Bean Load(string kind, IDictionary<string, IConvertible> data) {
-            if(data == null)
+        public Bean RowToBean(string kind, IDictionary<string, IConvertible> row) {
+            if(row == null)
                 return null;
             
-            return ContinueLoad(Dispense(kind), data);
+            return ContinueLoad(Dispense(kind), row);
         }
 
-        public T Load<T>(IDictionary<string, IConvertible> data) where T : Bean, new() {
-            if(data == null)
+        public T RowToBean<T>(IDictionary<string, IConvertible> row) where T : Bean, new() {
+            if(row == null)
                 return null;
 
-            return ContinueLoad(Dispense<T>(), data);
+            return ContinueLoad(Dispense<T>(), row);
         }
 
-        public Bean Load(string kind, long id) {
-            return Load(kind, _storage.Load(kind, id));
+        public Bean Load(string kind, IConvertible key) {
+            return RowToBean(kind, _storage.Load(kind, key));
         }
 
-        public T Load<T>(long id) where T : Bean, new() {
-            return Load<T>(_storage.Load(Bean.GetKind<T>(), id));
+        public T Load<T>(IConvertible key) where T : Bean, new() {
+            return RowToBean<T>(_storage.Load(Bean.GetKind<T>(), key));
         }
 
-        public long Store(Bean bean) {
+        public IConvertible Store(Bean bean) {
             EnsureDispensed(bean);
 
             ImplicitTransaction(delegate() {
@@ -62,7 +64,12 @@ namespace LimeBean {
                 foreach(var observer in _observers)
                     observer.BeforeStore(bean);
 
-                bean.ID = _storage.Store(bean.GetKind(), bean.Export());
+                var key = _storage.Store(bean.GetKind(), bean.Export());
+                if(key is CompoundKey) {
+                    // compound keys must not change during insert/update
+                } else {
+                    bean.SetKey(_keyAccess, key);
+                }
 
                 bean.AfterStore();
                 foreach(var observer in _observers)
@@ -71,13 +78,13 @@ namespace LimeBean {
                 return true;
             });
 
-            return bean.ID.Value;
+            return bean.GetKey(_keyAccess);
         }
 
         public void Trash(Bean bean) {
             EnsureDispensed(bean);
 
-            if(bean.ID == null)
+            if(bean.GetKey(_keyAccess) == null)
                 return;
 
             ImplicitTransaction(delegate() {
@@ -85,7 +92,7 @@ namespace LimeBean {
                 foreach(var observer in _observers)
                     observer.BeforeTrash(bean);
 
-                _storage.Trash(bean.GetKind(), bean.ID.Value);
+                _storage.Trash(bean.GetKind(), bean.GetKey(_keyAccess));
 
                 bean.AfterTrash();
                 foreach(var observer in _observers)

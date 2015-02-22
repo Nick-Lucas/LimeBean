@@ -18,7 +18,7 @@ namespace LimeBean.Tests {
 
         [TestFixtureSetUp]
         public void TestFixtureSetUp() {
-            _conn = new SqlConnection("server=" + TestEnv.MsSqlName + "; user instance=true; integrated security=true; connection timeout=90");
+            _conn = new SqlConnection(TestEnv.MsSqlConnectionString);
             _conn.Open();
         }
 
@@ -26,13 +26,9 @@ namespace LimeBean.Tests {
         public void SetUp() {
             IDatabaseDetails details = new MsSqlDetails();
             IDatabaseAccess db = new DatabaseAccess(_conn, details);
-            DatabaseStorage storage = new DatabaseStorage(details, db);
+            DatabaseStorage storage = new DatabaseStorage(details, db, new KeyUtil());
 
-            var name = "lime_bean_" + Guid.NewGuid().ToString("N");
-            _dropList.Add(name);
-
-            db.Exec("create database " + name);
-            db.Exec("use " + name);
+            TestEnv.MsSqlSetUp(db, _dropList);
 
             _db = db;
             _storage = storage;
@@ -40,10 +36,7 @@ namespace LimeBean.Tests {
 
         [TestFixtureTearDown]
         public void TestFixtureTearDown() {
-            _db.Exec("use master");
-            foreach(var name in _dropList)
-                _db.Exec("drop database " + name);            
-
+            TestEnv.MsSqlTearDown(_db, _dropList);
             _conn.Dispose();
         }
 
@@ -75,7 +68,7 @@ namespace LimeBean.Tests {
             Assert.AreEqual(1, schema.Count);
 
             var cols = schema["foo"];
-            Assert.IsFalse(cols.ContainsKey("id"));
+            Assert.IsFalse(cols.ContainsKey(Bean.ID_PROP_NAME));
 
             Assert.AreEqual(MsSqlDetails.RANK_BYTE, cols["b"]);
             Assert.AreEqual(MsSqlDetails.RANK_INT32, cols["i"]);

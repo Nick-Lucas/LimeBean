@@ -10,15 +10,13 @@ namespace LimeBean.Tests {
 
     [TestFixture]
     public class DatabaseStorageTests_MariaDb {
-        static string TEMP_DB_NAME = "lime_bean_" + Guid.NewGuid().ToString("N");
-
         IDbConnection _conn;
         IDatabaseAccess _db;
         DatabaseStorage _storage;
 
         [TestFixtureSetUp]
         public void TestFixtureSetUp() {
-            _conn = new MySqlConnection("server=" + TestEnv.MariaHost + "; uid=" + TestEnv.MariaUser + "; pwd=" + TestEnv.MariaPassword);
+            _conn = new MySqlConnection(TestEnv.MariaConnectionString);
             _conn.Open();
         }
 
@@ -26,11 +24,9 @@ namespace LimeBean.Tests {
         public void SetUp() {
             IDatabaseDetails details = new MariaDbDetails();
             IDatabaseAccess db = new DatabaseAccess(_conn, details);            
-            DatabaseStorage storage = new DatabaseStorage(details, db);
+            DatabaseStorage storage = new DatabaseStorage(details, db, new KeyUtil());
 
-            db.Exec("set sql_mode=STRICT_TRANS_TABLES");
-            db.Exec("create database " + TEMP_DB_NAME);
-            db.Exec("use " + TEMP_DB_NAME);
+            TestEnv.MariaSetUp(db);
 
             _db = db;
             _storage = storage;
@@ -38,7 +34,7 @@ namespace LimeBean.Tests {
 
         [TearDown]
         public void TearDown() {
-            _db.Exec("drop database if exists " + TEMP_DB_NAME);
+            TestEnv.MariaTearDown(_db);
         }
 
         [TestFixtureTearDown]
@@ -94,7 +90,7 @@ namespace LimeBean.Tests {
             Assert.AreEqual(1, schema.Count);
 
             var t = schema["t"];
-            Assert.IsFalse(t.ContainsKey("id"));
+            Assert.IsFalse(t.ContainsKey(Bean.ID_PROP_NAME));
 
             Assert.AreEqual(MariaDbDetails.RANK_INT8, t["ti1"]);
             Assert.AreEqual(MariaDbDetails.RANK_INT8, t["ti2"]);

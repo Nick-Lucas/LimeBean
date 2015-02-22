@@ -15,6 +15,7 @@ namespace LimeBean {
         IDbConnection _connection;
         IDatabaseDetails _details;
         IDatabaseAccess _db;
+        KeyUtil _keyUtil;
         DatabaseStorage _storage;
         IBeanCrud _crud;
         IBeanFinder _finder;
@@ -67,10 +68,18 @@ namespace LimeBean {
             }
         }
 
+        KeyUtil KeyUtil { 
+            get {
+                if(_keyUtil == null)
+                    _keyUtil = new KeyUtil();
+                return _keyUtil;
+            }
+        }
+
         DatabaseStorage Storage {
             get {
                 if(_storage == null)
-                    _storage = new DatabaseStorage(Details, Db);
+                    _storage = new DatabaseStorage(Details, Db, KeyUtil);
                 return _storage;
             }
         }
@@ -78,7 +87,7 @@ namespace LimeBean {
         IBeanCrud Crud {
             get {
                 if(_crud == null)
-                    _crud = new BeanCrud(Storage, Db);
+                    _crud = new BeanCrud(Storage, Db, KeyUtil);
                 return _crud;
             }
         }
@@ -138,23 +147,23 @@ namespace LimeBean {
             return Crud.Dispense<T>();
         }
 
-        public Bean Load(string kind, IDictionary<string, IConvertible> data) {
-            return Crud.Load(kind, data);
+        public Bean RowToBean(string kind, IDictionary<string, IConvertible> row) {
+            return Crud.RowToBean(kind, row);
         }
 
-        public T Load<T>(IDictionary<string, IConvertible> data) where T : Bean, new() {
-            return Crud.Load<T>(data);
+        public T RowToBean<T>(IDictionary<string, IConvertible> row) where T : Bean, new() {
+            return Crud.RowToBean<T>(row);
         }
 
-        public Bean Load(string kind, long id) {
-            return Crud.Load(kind, id);
+        public Bean Load(string kind, IConvertible key) {
+            return Crud.Load(kind, key);
         }
 
-        public T Load<T>(long id) where T : Bean, new() {
-            return Crud.Load<T>(id);
+        public T Load<T>(IConvertible key) where T : Bean, new() {
+            return Crud.Load<T>(key);
         }
 
-        public long Store(Bean bean) {
+        public IConvertible Store(Bean bean) {
             return Crud.Store(bean);
         }
 
@@ -265,18 +274,12 @@ namespace LimeBean {
 
         // Shortcuts
 
-        public Bean Load(string kind, long? id) {
-            if(id == null)
-                return null;
-
-            return Load(kind, id.Value);
+        public Bean Load(string kind, params IConvertible[] compoundKey){
+            return Load(kind, KeyUtil.PackCompoundKey(kind, compoundKey));
         }
 
-        public T Load<T>(long? id) where T : Bean, new() {
-            if(id == null)
-                return null;
-
-            return Load<T>(id.Value);
+        public T Load<T>(params IConvertible[] compoundKey) where T : Bean, new() {
+            return Load<T>(KeyUtil.PackCompoundKey(Bean.GetKind<T>(), compoundKey));
         }
 
         public Bean[] Find(string kind, string expr = null, params object[] parameters) {
@@ -324,6 +327,28 @@ namespace LimeBean {
                 action();
                 return true;
             });
+        }
+
+        // Custom keys
+
+        public void Key(string kind, string name, bool autoIncrement) {
+            KeyUtil.RegisterKey(kind, new[] { name }, autoIncrement);
+        }
+
+        public void Key(string kind, params string[] names) {
+            KeyUtil.RegisterKey(kind, names, null);
+        }
+
+        public void Key<T>(string name, bool autoIncrement) where T : Bean, new() {
+            Key(Bean.GetKind<T>(), name, autoIncrement);
+        }
+
+        public void Key<T>(params string[] names) where T : Bean, new() {
+            Key(Bean.GetKind<T>(), names);
+        }
+
+        public void Key(bool autoIncrementByDefautl) {
+            KeyUtil.AutoIncrementByDefault = autoIncrementByDefautl;
         }
 
     }

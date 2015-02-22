@@ -22,7 +22,7 @@ namespace LimeBean {
             get { return "MsSql"; }
         }
 
-        public string PrimaryKeySqlType {
+        public string AutoIncrementSqlType {
             get { return "bigint identity(1,1) primary key"; }
         }
 
@@ -172,7 +172,7 @@ namespace LimeBean {
             return String.Concat(column["system_type_id"], ":", column["max_length"]);
         }
 
-        public void UpdateSchema(IDatabaseAccess db, string tableName, IDictionary<string, int> oldColumns, IDictionary<string, int> changedColumns, IDictionary<string, int> addedColumns) {
+        public void UpdateSchema(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, int> oldColumns, IDictionary<string, int> changedColumns, IDictionary<string, int> addedColumns) {
             tableName = QuoteName(tableName);
 
             foreach(var entry in changedColumns)

@@ -19,8 +19,9 @@ namespace LimeBean.Tests {
 
                 IDatabaseDetails details = new SQLiteDetails();
                 IDatabaseAccess db = new DatabaseAccess(conn, details);
-                DatabaseStorage storage = new DatabaseStorage(details, db);
-                IBeanCrud crud = new BeanCrud(storage, db);               
+                IKeyAccess keys = new KeyUtil();
+                DatabaseStorage storage = new DatabaseStorage(details, db, keys);
+                IBeanCrud crud = new BeanCrud(storage, db, keys);
 
                 storage.EnterFluidMode();
 

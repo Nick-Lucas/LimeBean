@@ -48,6 +48,7 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomKeysTests.cs" />
     <Compile Include="DatabaseStorageTests_MsSql.cs" />
     <Compile Include="Examples\AspNet.cs" />
     <None Include="packages.config" />
@@ -67,6 +68,7 @@
     <Compile Include="CacheTests.cs" />
     <Compile Include="DatabaseAccessTests.cs" />
     <Compile Include="DbCommandDescriptorTests.cs" />
+    <Compile Include="Examples\AutoGuidKeys.cs" />
     <Compile Include="Examples\Crud.cs" />
     <Compile Include="Examples\Northwind.cs" />
     <Compile Include="Examples\Stress.cs" />

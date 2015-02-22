@@ -37,7 +37,7 @@ namespace LimeBean.Tests.Examples {
             // Database schema will be updated automatically for you
 
             // Now the bean has an id
-            Console.WriteLine(bean.ID);
+            Console.WriteLine(bean["id"]);
 
             // load a bean
             bean = R.Load("person", id);

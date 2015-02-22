@@ -7,7 +7,7 @@ namespace LimeBean {
 
     interface IDatabaseDetails {
         string DbName { get; }
-        string PrimaryKeySqlType { get; }
+        string AutoIncrementSqlType { get; }
 
         string GetParamName(int index);
         string QuoteName(string name);
@@ -33,6 +33,7 @@ namespace LimeBean {
         void UpdateSchema(
             IDatabaseAccess db, 
             string tableName, 
+            string autoIncrementName,
             IDictionary<string, int> oldColumns, 
             IDictionary<string, int> changedColumns, 
             IDictionary<string, int> addedColumns

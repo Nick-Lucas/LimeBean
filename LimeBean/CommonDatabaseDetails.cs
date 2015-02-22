@@ -17,24 +17,23 @@ namespace LimeBean {
             return "`" + text + "`";
         }
 
-        public static string FormatCreateTableCommand(IDatabaseDetails details, string tableName, IEnumerable<KeyValuePair<string, int>> columns) {
+        public static string FormatCreateTableCommand(IDatabaseDetails details, string tableName, string autoIncrementName, ICollection<KeyValuePair<string, int>> columns) {
             var sql = new StringBuilder()
                 .Append("create table ")
                 .Append(details.QuoteName(tableName))
-                .Append(" (")
-                .Append(details.QuoteName(Bean.ID_PROP_NAME))
-                .Append(" ")
-                .Append(details.PrimaryKeySqlType);
+                .Append(" (");
 
-            foreach(var pair in columns) {
-                sql
-                    .Append(", ")
-                    .Append(details.QuoteName(pair.Key))
-                    .Append(" ")
-                    .Append(details.GetSqlTypeFromRank(pair.Value));
-            }
+            var colSpecs = new List<string>(1 + columns.Count);
 
-            sql.Append(")");
+            if(!String.IsNullOrEmpty(autoIncrementName))
+                colSpecs.Add(details.QuoteName(autoIncrementName) + " " + details.AutoIncrementSqlType);
+
+            foreach(var pair in columns)
+                colSpecs.Add(details.QuoteName(pair.Key) + " " + details.GetSqlTypeFromRank(pair.Value));            
+
+            sql
+                .Append(String.Join(", ", colSpecs))
+                .Append(")");
 
             var postfix = details.GetCreateTableStatementPostfix();
             if(!String.IsNullOrEmpty(postfix))

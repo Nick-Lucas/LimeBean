@@ -21,8 +21,9 @@ namespace LimeBean.Tests {
 
             IDatabaseDetails details = new SQLiteDetails();           
             IDatabaseAccess db = new DatabaseAccess(_conn, details);
-            IStorage storage = new DatabaseStorage(details, db);
-            IBeanCrud crud = new BeanCrud(storage, db);
+            IKeyAccess keys = new KeyUtil();
+            IStorage storage = new DatabaseStorage(details, db, keys);
+            IBeanCrud crud = new BeanCrud(storage, db, keys);
             IBeanFinder finder = new DatabaseBeanFinder(details, db, crud);
 
             db.Exec("create table foo(x)");

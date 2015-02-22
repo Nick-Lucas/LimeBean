@@ -41,6 +41,7 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="BeanApi.cs" />
     <Compile Include="CommonDatabaseDetails.cs" />
+    <Compile Include="CompoundKey.cs" />
     <Compile Include="DatabaseAccess.cs" />
     <Compile Include="DatabaseBeanFinder.cs" />
     <Compile Include="DatabaseStorage.cs" />
@@ -48,16 +49,19 @@
     <Compile Include="Bean.cs" />
     <Compile Include="BeanObserver.cs" />
     <Compile Include="Cache.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="IBeanCrud.cs" />
     <Compile Include="IBeanFinder.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IDatabaseDetails.cs" />
+    <Compile Include="IKeyAccess.cs" />
     <Compile Include="IStorage.cs" />
     <Compile Include="BeanCrud.cs" />
     <Compile Include="IDatabaseAccess.cs" />
     <Compile Include="ITransactionSupport.cs" />
     <Compile Include="IValueRelaxations.cs" />
+    <Compile Include="KeyUtil.cs" />
     <Compile Include="MariaDbDetails.cs" />
     <Compile Include="MsSqlDetails.cs" />
     <Compile Include="SQLiteDetails.cs" />

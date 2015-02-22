@@ -34,33 +34,23 @@ namespace LimeBean {
             return _kind;
         }
 
-        public long? ID {
-            get { return GetNullable<long>(ID_PROP_NAME); }
-            internal set { Put(ID_PROP_NAME, value); }
+        internal IConvertible GetKey(IKeyAccess access) {
+            return access.GetKey(_kind, _props);
+        }
+
+        internal void SetKey(IKeyAccess access, IConvertible key) {
+            access.SetKey(_kind, _props, key);
         }
 
         public override string ToString() {
-            if(_kind == null)
-                return base.ToString();
-
-            var result = _kind;
-            if(ID != null)
-                result += " #" + ID;
-
-            return result;
+            return _kind ?? base.ToString();
         }
 
         // Accessors
 
         public IConvertible this[string name] {
-            get {
-                if(_props.ContainsKey(name))
-                    return _props[name];
-                return null;
-            }
-            set {
-                _props[name] = value;
-            }
+            get { return _props.GetSafe(name); }
+            set { _props[name] = value; }
         }
 
         public T Get<T>(string name) where T : IConvertible {

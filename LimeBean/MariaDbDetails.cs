@@ -23,7 +23,7 @@ namespace LimeBean {
             get { return "MariaDB"; }
         }
 
-        public string PrimaryKeySqlType {
+        public string AutoIncrementSqlType {
             get { return "bigint not null auto_increment primary key"; }
         }
 
@@ -181,7 +181,7 @@ namespace LimeBean {
             return column["Type"].ToString(CultureInfo.InvariantCulture);
         }
 
-        public void UpdateSchema(IDatabaseAccess db, string tableName, IDictionary<string, int> oldColumns, IDictionary<string, int> changedColumns, IDictionary<string, int> addedColumns) {
+        public void UpdateSchema(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, int> oldColumns, IDictionary<string, int> changedColumns, IDictionary<string, int> addedColumns) {
             var operations = new List<string>();
 
             foreach(var entry in changedColumns)

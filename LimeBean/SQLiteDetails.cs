@@ -18,7 +18,7 @@ namespace LimeBean {
             get { return "SQLite"; }
         }
 
-        public string PrimaryKeySqlType {
+        public string AutoIncrementSqlType {
             get { return "integer primary key"; }
         }
 
@@ -120,7 +120,7 @@ namespace LimeBean {
             return column["type"].ToString(CultureInfo.InvariantCulture);
         }
 
-        public void UpdateSchema(IDatabaseAccess db, string tableName, IDictionary<string, int> oldColumns, IDictionary<string, int> changedColumns, IDictionary<string, int> addedColumns) {
+        public void UpdateSchema(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, int> oldColumns, IDictionary<string, int> changedColumns, IDictionary<string, int> addedColumns) {
             var quotedTableName = QuoteName(tableName);
 
             if(changedColumns.Count > 0) {
@@ -140,10 +140,10 @@ namespace LimeBean {
                 }               
 
                 db.Exec("drop table if exists " + tmpName);
-                db.Exec(CommonDatabaseDetails.FormatCreateTableCommand(this, tmpName, orderedOldColumns));
+                db.Exec(CommonDatabaseDetails.FormatCreateTableCommand(this, tmpName, autoIncrementName, orderedOldColumns));
                 db.Exec("insert into " + tmpName + " select * from " + quotedTableName);
                 db.Exec("drop table " + quotedTableName);
-                db.Exec(CommonDatabaseDetails.FormatCreateTableCommand(this, tableName, orderedNewColumns));
+                db.Exec(CommonDatabaseDetails.FormatCreateTableCommand(this, tableName, autoIncrementName, orderedNewColumns));
                 db.Exec("insert into " + quotedTableName + " select * from " + tmpName);
                 db.Exec("drop table " + tmpName);
             }

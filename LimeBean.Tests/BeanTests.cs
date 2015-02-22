@@ -94,20 +94,16 @@ namespace LimeBean.Tests {
         [Test]
         public void ToStringMethod() {
             Assert.AreEqual("LimeBean.Bean", new Bean().ToString());
-
-            var bean = new Bean("product");
-            Assert.AreEqual("product", bean.ToString());
-            bean.ID = 123;
-            Assert.AreEqual("product #123", bean.ToString());            
+            Assert.AreEqual("product", new Bean("product").ToString());
         }
 
         [Test]
         public void Export() {
             var bean = new Bean();
-            bean.ID = 123;
+            bean[Bean.ID_PROP_NAME] = 123;
             bean.Put("a", 1).Put("b", "abc");
             CollectionAssert.AreEquivalent(bean.Export(), new Dictionary<string, IConvertible> { 
-                { Bean.ID_PROP_NAME, 123L }, { "a", 1 }, { "b", "abc" }
+                { Bean.ID_PROP_NAME, 123 }, { "a", 1 }, { "b", "abc" }
             });
             Assert.AreNotSame(bean.Export(), bean.Export());
         }

@@ -7,29 +7,32 @@ using System.Text;
 namespace LimeBean.Tests {
 
     class InMemoryStorage : IStorage {
-        IDictionary<long, IDictionary<string, IConvertible>> _storage = new Dictionary<long, IDictionary<string, IConvertible>>();
+        IList<IDictionary<string, IConvertible>> _storage = new List<IDictionary<string, IConvertible>>();        
         long _autoId = 0;
+        IKeyAccess _keyAccess = new KeyUtil();
 
-        long IStorage.Store(string kind, IDictionary<string, IConvertible> data) {
-            if(!data.ContainsKey(Bean.ID_PROP_NAME))
-                data[Bean.ID_PROP_NAME] = _autoId++;
+        public IConvertible Store(string kind, IDictionary<string, IConvertible> data) {
+            var key = _keyAccess.GetKey(kind, data);
 
-            var id = data[Bean.ID_PROP_NAME].ToInt64(CultureInfo.InvariantCulture);
+            if(key == null) {
+                key = _autoId++;
+                _keyAccess.SetKey(kind, data, key);
+            } else {
+                Trash(kind, key);
+            }
 
-            _storage[id] = data;
-            return id;
-
+            _storage.Add(data);
+            return key;
         }
 
-        IDictionary<string, IConvertible> IStorage.Load(string kind, long id) {
-            if(!_storage.ContainsKey(id))
-                return null;
-
-            return _storage[id];
+        public IDictionary<string, IConvertible> Load(string kind, IConvertible key) {
+            return _storage.FirstOrDefault(item => _keyAccess.GetKey(kind, item) == key);
         }
 
-        void IStorage.Trash(string kind, long id) {
-            _storage.Remove(id);
+        public void Trash(string kind, IConvertible key) {
+            var item = Load(kind, key);
+            if(item != null)
+                _storage.Remove(item);
         }
     }
 

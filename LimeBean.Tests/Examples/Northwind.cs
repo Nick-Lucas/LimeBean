@@ -16,6 +16,8 @@ namespace LimeBean.Tests.Examples {
         [SetUp]
         public void SetUp() {
             R = new BeanApi("data source=:memory:", SQLiteFactory.Instance);
+            R.Key<Category>("CategoryID");
+            R.Key<Product>("ProductID");            
             R.EnterFluidMode();
         }
 
@@ -32,9 +34,14 @@ namespace LimeBean.Tests.Examples {
 
             // Typed property accessors
 
-            public string Name {
-                get { return Get<string>("Name"); }
-                set { Put("Name", value); }
+            public int? CategoryID {
+                get { return GetNullable<int>("CategoryID"); }
+                set { Put("CategoryID", value); }
+            }
+
+            public string CategoryName {
+                get { return Get<string>("CategoryName"); }
+                set { Put("CategoryName", value); }
             }
 
             public string Description {
@@ -42,12 +49,12 @@ namespace LimeBean.Tests.Examples {
                 set { Put("Description", value); }
             }
 
-            bool HasName { get { return !String.IsNullOrWhiteSpace(Name); } }
+            bool HasName { get { return !String.IsNullOrWhiteSpace(CategoryName); } }
 
             // Helper method to find all products in this category
             // NOTE internal LRU cache is used, so DB is not hit every time
             public Product[] GetProducts() {
-                return R.Find<Product>("where CategoryID = ?", ID);
+                return R.Find<Product>("where CategoryID = ?", CategoryID);
             }
 
             // Validation rules prevent storing of unnamed categories
@@ -66,7 +73,7 @@ namespace LimeBean.Tests.Examples {
 
             public override string ToString() {
                 if(HasName)
-                    return Name;
+                    return CategoryName;
 
                 return base.ToString();
             }
@@ -80,13 +87,18 @@ namespace LimeBean.Tests.Examples {
 
             // Typed accessors
 
+            public int? ProductID {
+                get { return GetNullable<int>("ProductID"); }
+                set { Put("ProductID", value); }
+            }
+
             public string Name {
                 get { return Get<string>("Name"); }
                 set { Put("Name", value); }
             }
 
-            public long? CategoryID {
-                get { return GetNullable<long>("CategoryID"); }
+            public int? CategoryID {
+                get { return GetNullable<int>("CategoryID"); }
                 set { Put("CategoryID", value); }
             }
 
@@ -104,7 +116,7 @@ namespace LimeBean.Tests.Examples {
             // NOTE internal LRU cache is used during loading
             public Category Category {
                 get { return R.Load<Category>(CategoryID); }
-                set { CategoryID = value.ID; }
+                set { CategoryID = value.CategoryID; }
             }
 
             // A set of validation checks
@@ -124,11 +136,11 @@ namespace LimeBean.Tests.Examples {
         [Test]
         public void Scenario() {
             var beverages = R.Dispense<Category>();
-            beverages.Name = "Beverages";
+            beverages.CategoryName = "Beverages";
             beverages.Description = "Soft drinks, coffees, teas, beers, and ales";
 
             var condiments = R.Dispense<Category>();
-            condiments.Name = "Condiments";
+            condiments.CategoryName = "Condiments";
             condiments.Description = "Sweet and savory sauces, relishes, spreads, and seasonings";
 
             R.Store(beverages);

@@ -6,9 +6,9 @@ using System.Text;
 namespace LimeBean {
 
     interface IStorage {
-        long Store(string kind, IDictionary<string, IConvertible> data);
-        IDictionary<string, IConvertible> Load(string kind, long id);
-        void Trash(string kind, long id);
+        IConvertible Store(string kind, IDictionary<string, IConvertible> data);
+        IDictionary<string, IConvertible> Load(string kind, IConvertible key);
+        void Trash(string kind, IConvertible key);
     }
 
 }
