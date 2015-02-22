@@ -152,7 +152,7 @@ namespace LimeBean {
 
         static IDictionary<string, IConvertible> RecordToDict(IDataRecord record) {
             var count = record.FieldCount;
-            var result = new Dictionary<string, IConvertible>(count);
+            var result = new Dictionary<string, IConvertible>();
 
             for(var i = 0; i < count; i++)
                 result[record.GetName(i)] = GetCellValue<IConvertible>(record, i);

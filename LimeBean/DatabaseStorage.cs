@@ -70,7 +70,7 @@ namespace LimeBean {
         }
 
         IDictionary<string, int> GetColumnsFromData(IDictionary<string, IConvertible> data) {
-            var result = new Dictionary<string, int>(data.Count);
+            var result = new Dictionary<string, int>();
             foreach(var entry in data)
                 result[entry.Key] = _details.GetRankFromValue(entry.Value);
             return result;
