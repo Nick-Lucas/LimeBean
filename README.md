@@ -22,6 +22,7 @@ LimeBean does not use any Reflection, IL emitting, `dynamic`, etc. Instead it re
 * [Untyped CRUD](https://github.com/AlekseyMartynov/LimeBean/blob/master/LimeBean.Tests/Examples/Crud.cs)
 * [Strongly-typed models with inter-bean links and lifecycle hooks](https://github.com/AlekseyMartynov/LimeBean/blob/master/LimeBean.Tests/Examples/Northwind.cs)
 * [Usage in ASP.NET](https://github.com/AlekseyMartynov/LimeBean/blob/master/LimeBean.Tests/Examples/AspNet.cs)
+* [GUID primary keys](https://github.com/AlekseyMartynov/LimeBean/blob/master/LimeBean.Tests/Examples/AutoGuidKeys.cs)
 
 ## API
 
@@ -29,7 +30,6 @@ All available properties and methods are exposed via the [BeanApi facade class](
 
 ## Limitations and Cautions
 
-* All tables must have integer auto-increment primary key named `id`
 * Non thread-safe: use one API instance per thread, or maintain thread synchronization with locks. Read-only access is not thread-safe either because of the internal LRU cache.
 * Property values must be `IConvertible`. Any other values have to be stored as strings.
 
