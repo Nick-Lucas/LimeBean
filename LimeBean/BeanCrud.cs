@@ -127,7 +127,7 @@ namespace LimeBean {
         }
 
         void ImplicitTransaction(Func<bool> action) {
-            if(_transactionSupport == null || _transactionSupport.InTransaction)
+            if(_transactionSupport == null || !_transactionSupport.ImplicitTransactions || _transactionSupport.InTransaction)
                 action();
             else
                 _transactionSupport.Transaction(action);

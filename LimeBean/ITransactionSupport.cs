@@ -6,6 +6,7 @@ using System.Text;
 namespace LimeBean {
 
     interface ITransactionSupport {
+        bool ImplicitTransactions { get; set; }
         bool InTransaction { get; }
         void Transaction(Func<bool> action);
     }

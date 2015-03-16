@@ -17,8 +17,10 @@ namespace LimeBean {
         public DatabaseAccess(IDbConnection connection, IDatabaseDetails details) {
             _connection = connection;
             _details = details;
+            ImplicitTransactions = true;
         }
 
+        public bool ImplicitTransactions { get; set; }
         public bool InTransaction { get { return _txStack.Count > 0; } }
         public event Action<IDbCommand> QueryExecuting;
 

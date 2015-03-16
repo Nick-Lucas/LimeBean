@@ -247,6 +247,11 @@ namespace LimeBean {
 
         // ITransactionSupport
 
+        public bool ImplicitTransactions {
+            get { return Db.ImplicitTransactions; }
+            set { Db.ImplicitTransactions = value; }
+        }
+
         public bool InTransaction {
             get { return Db.InTransaction; }
         }

@@ -41,6 +41,20 @@ namespace LimeBean.Tests {
         }
 
         [Test]
+        public void DisableImplicitTransactions() {
+            using(var api = new BeanApi("data source=:memory:", SQLiteFactory.Instance)) {
+                api.EnterFluidMode();
+                api.ImplicitTransactions = false;
+
+                var bean = api.Dispense<ThrowingBean>();
+                bean.Throw = true;
+                try { api.Store(bean); } catch { }
+
+                Assert.AreEqual(1, api.Count<ThrowingBean>());
+            }           
+        }
+
+        [Test]
         public void Api_DetailsSelection() {
             Assert.AreEqual("SQLite", new BeanApi(new SQLiteConnection()).CreateDetails().DbName);
             Assert.AreEqual("MariaDB", new BeanApi(new MySqlConnection()).CreateDetails().DbName);
