@@ -19,6 +19,7 @@ namespace LimeBean {
         }
 
         IDictionary<string, IConvertible> _props = new Dictionary<string, IConvertible>();
+        IDictionary<string, IConvertible> _dirtyBackup;
         string _kind;
 
         internal bool Dispensed;
@@ -50,7 +51,10 @@ namespace LimeBean {
 
         public IConvertible this[string name] {
             get { return _props.GetSafe(name); }
-            set { _props[name] = value; }
+            set {
+                SaveDirtyBackup(name, value);
+                _props[name] = value;
+            }
         }
 
         public T Get<T>(string name) where T : IConvertible {
@@ -103,6 +107,38 @@ namespace LimeBean {
         internal void Import(IDictionary<string, IConvertible> data) {
             foreach(var entry in data)
                 this[entry.Key] = entry.Value;
+        }
+
+        // Dirty tracking
+
+        void SaveDirtyBackup(string name, IConvertible newValue) {
+            var currentValue = this[name];
+            if(Equals(newValue, currentValue))
+                return;
+
+            var initialValue = currentValue;
+            if(_dirtyBackup != null && _dirtyBackup.ContainsKey(name))
+                initialValue = _dirtyBackup[name];
+
+            if(Equals(newValue, initialValue)) {
+                if(_dirtyBackup != null)
+                    _dirtyBackup.Remove(name);
+            } else {
+                if(_dirtyBackup == null)
+                    _dirtyBackup = new Dictionary<string, IConvertible>();
+                _dirtyBackup[name] = currentValue;
+            }
+        }
+
+        internal void ForgetDirtyBackup() {
+            _dirtyBackup = null;
+        }
+
+        internal ICollection<string> GetDirtyNames() {
+            if(_dirtyBackup == null)
+                return new string[0];
+
+            return new HashSet<string>(_dirtyBackup.Keys);
         }
 
         // Hooks

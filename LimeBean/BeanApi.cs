@@ -131,6 +131,11 @@ namespace LimeBean {
 
         // IBeanCrud
 
+        public bool DirtyTracking {
+            get { return Crud.DirtyTracking; }
+            set { Crud.DirtyTracking = value; }
+        }
+
         public void AddObserver(BeanObserver observer) {
             Crud.AddObserver(observer);
         }

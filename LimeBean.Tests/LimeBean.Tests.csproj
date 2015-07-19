@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="CustomKeysTests.cs" />
     <Compile Include="DatabaseStorageTests_MsSql.cs" />
+    <Compile Include="DirtyTrackingTests.cs" />
     <Compile Include="Examples\AspNet.cs" />
     <None Include="packages.config" />
   </ItemGroup>

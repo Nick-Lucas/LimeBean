@@ -126,6 +126,24 @@ namespace LimeBean.Tests {
             Assert.AreEqual(2, bean["b"]);
         }
 
+        [Test]
+        public void GetDrityNames() {
+            var bean = new Bean();
+            CollectionAssert.IsEmpty(bean.GetDirtyNames());
+
+            bean["a"] = 1;
+            CollectionAssert.AreEquivalent(new[] { "a" }, bean.GetDirtyNames());
+
+            bean["a"] = null;
+            CollectionAssert.IsEmpty(bean.GetDirtyNames());
+
+            bean["a"] = 1;
+            bean.ForgetDirtyBackup();
+            CollectionAssert.IsEmpty(bean.GetDirtyNames());
+
+            bean["a"] = null;
+            CollectionAssert.AreEquivalent(new[] { "a" }, bean.GetDirtyNames());
+        }
     }
 
 

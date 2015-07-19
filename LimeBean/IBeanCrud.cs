@@ -4,6 +4,8 @@ using System.Collections.Generic;
 namespace LimeBean {
 
     interface IBeanCrud {
+        bool DirtyTracking { get; set; }
+
         void AddObserver(BeanObserver observer);
         void RemoveObserver(BeanObserver observer);
 

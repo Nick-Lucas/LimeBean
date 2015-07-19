@@ -126,7 +126,11 @@ namespace LimeBean {
             return text;
         }
 
-        public IConvertible Store(string kind, IDictionary<string, IConvertible> data) {            
+        public IConvertible Store(string kind, IDictionary<string, IConvertible> data) {
+            return Store(kind, data, null);
+        }
+
+        public IConvertible Store(string kind, IDictionary<string, IConvertible> data, ICollection<string> dirtyNames) {            
             var key = _keyAccess.GetKey(kind, data);
             var autoIncrement = _keyAccess.IsAutoIncrement(kind);
 
@@ -140,7 +144,9 @@ namespace LimeBean {
                 _keyAccess.SetKey(kind, data, null);
             }
 
-            data = data.ToDictionary(e => e.Key, e => ConvertValue(e.Value));
+            data = data
+                .Where(e => dirtyNames == null || dirtyNames.Contains(e.Key))
+                .ToDictionary(e => e.Key, e => ConvertValue(e.Value));
 
             if(_isFluidMode) {
                 data = DropNulls(kind, data);

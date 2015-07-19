@@ -11,7 +11,7 @@ namespace LimeBean.Tests {
         long _autoId = 0;
         IKeyAccess _keyAccess = new KeyUtil();
 
-        public IConvertible Store(string kind, IDictionary<string, IConvertible> data) {
+        public IConvertible Store(string kind, IDictionary<string, IConvertible> data, ICollection<string> dirtyNames) {
             var key = _keyAccess.GetKey(kind, data);
 
             if(key == null) {

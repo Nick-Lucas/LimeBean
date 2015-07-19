@@ -16,7 +16,10 @@ namespace LimeBean {
             _transactionSupport = transactionSupport;
             _keyAccess = keys;
             _observers = new HashSet<BeanObserver>();
+            DirtyTracking = true;
         }
+
+        public bool DirtyTracking { get; set; }
 
         public void AddObserver(BeanObserver observer) {
             _observers.Add(observer);
@@ -64,7 +67,7 @@ namespace LimeBean {
                 foreach(var observer in _observers)
                     observer.BeforeStore(bean);
 
-                var key = _storage.Store(bean.GetKind(), bean.Export());
+                var key = _storage.Store(bean.GetKind(), bean.Export(), DirtyTracking ? bean.GetDirtyNames() : null);
                 if(key is CompoundKey) {
                     // compound keys must not change during insert/update
                 } else {
@@ -78,6 +81,7 @@ namespace LimeBean {
                 return true;
             });
 
+            bean.ForgetDirtyBackup();
             return bean.GetKey(_keyAccess);
         }
 
@@ -118,6 +122,7 @@ namespace LimeBean {
                 observer.BeforeLoad(bean);
 
             bean.Import(row);
+            bean.ForgetDirtyBackup();
 
             bean.AfterLoad();
             foreach(var observer in _observers)
