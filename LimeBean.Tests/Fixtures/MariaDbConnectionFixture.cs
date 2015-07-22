@@ -1,4 +1,4 @@
-﻿#if !DNX
+﻿#if !DNXCORE50
 using System;
 using System.Data.Common;
 using MySql.Data.MySqlClient;

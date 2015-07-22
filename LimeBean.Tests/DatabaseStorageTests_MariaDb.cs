@@ -1,4 +1,4 @@
-﻿#if !DNX
+﻿#if !DNXCORE50
 using LimeBean.Tests.Fixtures;
 using System;
 using System.Collections.Generic;

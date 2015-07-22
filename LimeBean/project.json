@@ -1,9 +1,6 @@
 {
-    "compilationOptions" : {
-        "define": [ "DNX" ]
-    },
     "frameworks": {      
-        "dnxcore50": {
+        "dotnet": {
             "dependencies": {
                 "System.Collections.Concurrent": "4.0.10-*",
                 "System.Data.Common": "4.0.0-*",
@@ -13,7 +10,7 @@
                 "System.Text.RegularExpressions": "4.0.10-*"            
             }        
         },
-        "dnx451": {
+        "net": {
             "frameworkAssemblies": {
                 "System.Data": ""
             }

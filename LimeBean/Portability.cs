@@ -2,7 +2,7 @@
 
 namespace LimeBean {
 
-#if DNX
+#if DOTNET
 
     using System.Reflection;
 

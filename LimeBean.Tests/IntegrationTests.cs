@@ -56,7 +56,7 @@ namespace LimeBean.Tests {
             Assert.Equal("SQLite", new BeanApi(SQLitePortability.CreateConnection()).CreateDetails().DbName);            
             Assert.Equal("MsSql", new BeanApi(new SqlConnection()).CreateDetails().DbName);
 
-#if !DNX
+#if !DNXCORE50
             Assert.Equal("MariaDB", new BeanApi(new MySql.Data.MySqlClient.MySqlConnection()).CreateDetails().DbName);
 #endif
         }

@@ -1,23 +1,26 @@
 {   
     "compilationOptions" : {
-        "define": [ "DNX", "USE_MS_SQLITE" ]
-    },    
+        "define": [ "USE_MS_SQLITE" ]
+    },
     "exclude": [ 
         "Examples/*.cs"
     ],        
     "dependencies": {
         "LimeBean": "",
-        "Microsoft.Data.SQLite": "1.0.0-beta7", 
+        "Microsoft.Data.SQLite": "1.0.0-beta7-10957",
         "xunit": "2.1-*",
         "xunit.runner.dnx": "2.1-*"            
     },
     "frameworks": {        
         "dnxcore50": { 
             "dependencies": {
-                "System.Data.SqlClient": "4.0-*",
+                "System.Data.SqlClient": "4.0-*"
             }
         },
         "dnx451": {
-        }
+            "dependencies": {
+                "MySql.ConnectorNET.Data": "6.8.3"
+            }
+        }        
     }
 }
