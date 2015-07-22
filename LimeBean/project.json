@@ -10,7 +10,7 @@
                 "System.Text.RegularExpressions": "4.0.10-*"            
             }        
         },
-        "net": {
+        "net40": {
             "frameworkAssemblies": {
                 "System.Data": ""
             }
