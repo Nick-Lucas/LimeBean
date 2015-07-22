@@ -1,5 +1,4 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
@@ -7,22 +6,19 @@ using System.Text;
 
 namespace LimeBean.Tests.Examples {
 
-    [TestFixture, Explicit]
-    public class Northwind {
+    public class Northwind : IDisposable {
         // NOTE in web apps BeanApi must have per-request life-time
         // For example, in ASP.NET it should live in HttpContext.Items
         public static BeanApi R { get; set; }
 
-        [SetUp]
-        public void SetUp() {
+        public Northwind() {
             R = new BeanApi("data source=:memory:", SQLiteFactory.Instance);
             R.Key<Category>("CategoryID");
             R.Key<Product>("ProductID");            
             R.EnterFluidMode();
         }
 
-        [TearDown]
-        public void TearDown() {
+        public void Dispose() {
             R.Dispose();
         }
 
@@ -133,7 +129,6 @@ namespace LimeBean.Tests.Examples {
         }
 
 
-        [Test]
         public void Scenario() {
             var beverages = R.Dispense<Category>();
             beverages.CategoryName = "Beverages";

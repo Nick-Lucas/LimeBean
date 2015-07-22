@@ -1,29 +1,21 @@
-﻿using MySql.Data.MySqlClient;
-using NUnit.Framework;
+﻿#if !DNX
+using LimeBean.Tests.Fixtures;
 using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
+using Xunit;
 
 namespace LimeBean.Tests {
 
-    [TestFixture]
-    public class DatabaseStorageTests_MariaDb {
-        IDbConnection _conn;
+    public class DatabaseStorageTests_MariaDb : IDisposable, IClassFixture<MariaDbConnectionFixture> {
         IDatabaseAccess _db;
         DatabaseStorage _storage;
 
-        [TestFixtureSetUp]
-        public void TestFixtureSetUp() {
-            _conn = new MySqlConnection(TestEnv.MariaConnectionString);
-            _conn.Open();
-        }
-
-        [SetUp]
-        public void SetUp() {
+        public DatabaseStorageTests_MariaDb(MariaDbConnectionFixture fixture) {
             IDatabaseDetails details = new MariaDbDetails();
-            IDatabaseAccess db = new DatabaseAccess(_conn, details);            
+            IDatabaseAccess db = new DatabaseAccess(fixture.Connection, details);            
             DatabaseStorage storage = new DatabaseStorage(details, db, new KeyUtil());
 
             TestEnv.MariaSetUp(db);
@@ -32,17 +24,11 @@ namespace LimeBean.Tests {
             _storage = storage;
         }
 
-        [TearDown]
-        public void TearDown() {
+        public void Dispose() {
             TestEnv.MariaTearDown(_db);
         }
 
-        [TestFixtureTearDown]
-        public void TestFixtureTearDown() {
-            _conn.Dispose();
-        }
-        
-        [Test]
+        [Fact]
         public void Schema() {
             _db.Exec(@"create table t(
                 id int,
@@ -87,50 +73,50 @@ namespace LimeBean.Tests {
             )");
 
             var schema = _storage.GetSchema();
-            Assert.AreEqual(1, schema.Count);
+            Assert.Equal(1, schema.Count);
 
             var t = schema["t"];
-            Assert.IsFalse(t.ContainsKey(Bean.ID_PROP_NAME));
+            Assert.False(t.ContainsKey(Bean.ID_PROP_NAME));
 
-            Assert.AreEqual(MariaDbDetails.RANK_INT8, t["ti1"]);
-            Assert.AreEqual(MariaDbDetails.RANK_INT8, t["ti2"]);
-            Assert.AreEqual(MariaDbDetails.RANK_INT8, t["ti3"]);
-            Assert.AreEqual(MariaDbDetails.RANK_INT8, t["ti4"]);
+            Assert.Equal(MariaDbDetails.RANK_INT8, t["ti1"]);
+            Assert.Equal(MariaDbDetails.RANK_INT8, t["ti2"]);
+            Assert.Equal(MariaDbDetails.RANK_INT8, t["ti3"]);
+            Assert.Equal(MariaDbDetails.RANK_INT8, t["ti4"]);
 
-            Assert.AreEqual(MariaDbDetails.RANK_INT32, t["i1"]);
-            Assert.AreEqual(MariaDbDetails.RANK_INT32, t["i2"]);
-            Assert.AreEqual(MariaDbDetails.RANK_INT32, t["i3"]);
+            Assert.Equal(MariaDbDetails.RANK_INT32, t["i1"]);
+            Assert.Equal(MariaDbDetails.RANK_INT32, t["i2"]);
+            Assert.Equal(MariaDbDetails.RANK_INT32, t["i3"]);
 
-            Assert.AreEqual(MariaDbDetails.RANK_INT64, t["bi1"]);
-            Assert.AreEqual(MariaDbDetails.RANK_INT64, t["bi2"]);
+            Assert.Equal(MariaDbDetails.RANK_INT64, t["bi1"]);
+            Assert.Equal(MariaDbDetails.RANK_INT64, t["bi2"]);
 
-            Assert.AreEqual(MariaDbDetails.RANK_DOUBLE, t["d1"]);
-            Assert.AreEqual(MariaDbDetails.RANK_DOUBLE, t["d2"]);
+            Assert.Equal(MariaDbDetails.RANK_DOUBLE, t["d1"]);
+            Assert.Equal(MariaDbDetails.RANK_DOUBLE, t["d2"]);
 
-            Assert.AreEqual(MariaDbDetails.RANK_TEXT5, t["t1"]);
-            Assert.AreEqual(MariaDbDetails.RANK_TEXT8, t["t2"]);
-            Assert.AreEqual(MariaDbDetails.RANK_TEXT8, t["t3"]);
-            Assert.AreEqual(MariaDbDetails.RANK_TEXT16, t["t4"]);
-            Assert.AreEqual(MariaDbDetails.RANK_TEXT24, t["t5"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT5, t["t1"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT8, t["t2"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT8, t["t3"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT16, t["t4"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT24, t["t5"]);
 
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x1"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x2"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x3"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x4"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x6"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x7"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x8"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x9"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x10"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x11"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x12"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x13"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x14"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x15"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, t["x16"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x1"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x2"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x3"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x4"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x6"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x7"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x8"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x9"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x10"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x11"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x12"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x13"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x14"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x15"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x16"]);
         }
 
-        [Test]
+        [Fact]
         public void CreateTable() {
             _storage.EnterFluidMode();
 
@@ -149,18 +135,18 @@ namespace LimeBean.Tests {
             _storage.Store("foo", data);
 
             var cols = _storage.GetSchema()["foo"];
-            CollectionAssert.DoesNotContain(cols.Keys, "p1");
-            Assert.AreEqual(MariaDbDetails.RANK_INT8, cols["p2"]);
-            Assert.AreEqual(MariaDbDetails.RANK_INT32, cols["p3"]);
-            Assert.AreEqual(MariaDbDetails.RANK_INT64, cols["p4"]);
-            Assert.AreEqual(MariaDbDetails.RANK_DOUBLE, cols["p5"]);
-            Assert.AreEqual(MariaDbDetails.RANK_TEXT5, cols["p6"]);
-            Assert.AreEqual(MariaDbDetails.RANK_TEXT8, cols["p7"]);
-            Assert.AreEqual(MariaDbDetails.RANK_TEXT16, cols["p8"]);
-            Assert.AreEqual(MariaDbDetails.RANK_TEXT24, cols["p9"]);
+            Assert.DoesNotContain("p1", cols.Keys);
+            Assert.Equal(MariaDbDetails.RANK_INT8, cols["p2"]);
+            Assert.Equal(MariaDbDetails.RANK_INT32, cols["p3"]);
+            Assert.Equal(MariaDbDetails.RANK_INT64, cols["p4"]);
+            Assert.Equal(MariaDbDetails.RANK_DOUBLE, cols["p5"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT5, cols["p6"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT8, cols["p7"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT16, cols["p8"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT24, cols["p9"]);
         }
 
-        [Test]
+        [Fact]
         public void AlterTable() {
             _storage.EnterFluidMode();
 
@@ -187,48 +173,51 @@ namespace LimeBean.Tests {
 
             var cols = _storage.GetSchema()["foo"];
 
-            Assert.AreEqual(MariaDbDetails.RANK_INT32, cols["p1"]);
-            Assert.AreEqual(MariaDbDetails.RANK_INT64, cols["p2"]);
-            Assert.AreEqual(MariaDbDetails.RANK_DOUBLE, cols["p3"]);
-            Assert.AreEqual(MariaDbDetails.RANK_TEXT5, cols["p4"]);
-            Assert.AreEqual(MariaDbDetails.RANK_TEXT8, cols["p5"]);
-            Assert.AreEqual(MariaDbDetails.RANK_TEXT16, cols["p6"]);
-            Assert.AreEqual(MariaDbDetails.RANK_TEXT24, cols["p7"]);
-            Assert.AreEqual(MariaDbDetails.RANK_TEXT24, cols["p8"]);
-            Assert.AreEqual(MariaDbDetails.RANK_INT8, cols["p9"]);
+            Assert.Equal(MariaDbDetails.RANK_INT32, cols["p1"]);
+            Assert.Equal(MariaDbDetails.RANK_INT64, cols["p2"]);
+            Assert.Equal(MariaDbDetails.RANK_DOUBLE, cols["p3"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT5, cols["p4"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT8, cols["p5"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT16, cols["p6"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT24, cols["p7"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT24, cols["p8"]);
+            Assert.Equal(MariaDbDetails.RANK_INT8, cols["p9"]);
         }
 
-        [Test, SetCulture("ru")]
+        [Fact]
         public void Roundtrip() {
-            _storage.EnterFluidMode();
-            var checker = new RoundtripChecker(_db, _storage);
+            AssertExtensions.WithCulture("ru", delegate() {
+                _storage.EnterFluidMode();
+                var checker = new RoundtripChecker(_db, _storage);
 
-            // supported ranks
-            checker.Check(null, null);
-            checker.Check((sbyte)123, (sbyte)123);
-            checker.Check(1000, 1000);            
-            checker.Check(0x80000000L, 0x80000000L);            
-            checker.Check(3.14, 3.14);
-            checker.Check("hello", "hello");
+                // supported ranks
+                checker.Check(null, null);
+                checker.Check((sbyte)123, (sbyte)123);
+                checker.Check(1000, 1000);
+                checker.Check(0x80000000L, 0x80000000L);
+                checker.Check(3.14, 3.14);
+                checker.Check("hello", "hello");
 
-            // extremal vaues
-            SharedChecks.CheckRoundtripOfExtremalValues(checker);
+                // extremal vaues
+                SharedChecks.CheckRoundtripOfExtremalValues(checker);
 
-            // conversion to string
-            SharedChecks.CheckRoundtripForcesString(checker);
+                // conversion to string
+                SharedChecks.CheckRoundtripForcesString(checker);
 
-            // bool            
-            checker.Check(true, (sbyte)1);
-            checker.Check(false, (sbyte)0);
+                // bool            
+                checker.Check(true, (sbyte)1);
+                checker.Check(false, (sbyte)0);
 
-            // enum
-            checker.Check(TypeCode.DateTime, (sbyte)16);
+                // enum
+                checker.Check(TypeCode.DateTime, (sbyte)16);
+            });
         }
 
-        [Test]
+        [Fact]
         public void SchemaReadingKeepsCache() {
             SharedChecks.CheckSchemaReadingKeepsCache(_db, _storage);
         }
     }
 
 }
+#endif

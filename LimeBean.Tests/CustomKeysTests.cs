@@ -1,28 +1,23 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Linq;
 using System.Text;
+using Xunit;
 
 namespace LimeBean.Tests {
 
-    [TestFixture]
-    public class CustomKeysTests {
+    public class CustomKeysTests : IDisposable {
         BeanApi _api;
 
-        [SetUp]
-        public void SetUp() { 
-            _api = new BeanApi("data source=:memory:", SQLiteFactory.Instance);
+        public CustomKeysTests() {
+            _api = SQLitePortability.CreateApi();
         }
 
-        [TearDown]
-        public void TearDown() {
-            _api.Dispose();
+        public void Dispose() {
+            _api.Dispose();        
         }
 
-
-        [Test]
+        [Fact]
         public void Assigned_FrozenMode() {
             _api.Exec("create table foo (pk, prop)");
             _api.Key("foo", "pk", false);
@@ -32,26 +27,28 @@ namespace LimeBean.Tests {
             bean["prop"] = "value1";
 
             var key = _api.Store(bean);
-            Assert.AreEqual("pk1", key);
+            Assert.Equal("pk1", key);
 
             bean["prop"] = "value2";
-            Assert.AreEqual(key, _api.Store(bean));
+            Assert.Equal(key, _api.Store(bean));
 
             bean = _api.Load("foo", key);
-            Assert.AreEqual(key, bean["pk"]);
-            Assert.AreEqual("value2", bean["prop"]);
+            Assert.Equal(key, bean["pk"]);
+            Assert.Equal("value2", bean["prop"]);
 
             _api.Trash(bean);
-            Assert.AreEqual(0, _api.Count("foo"));  
+            Assert.Equal(0, _api.Count("foo"));  
         }
 
-        [Test, ExpectedException(typeof(InvalidOperationException))]
+        [Fact]
         public void Assigned_Null() {
             _api.Key("foo", "any", false);
-            _api.Store(_api.Dispense("foo"));
+            Assert.Throws<InvalidOperationException>(delegate() {                
+                _api.Store(_api.Dispense("foo"));
+            });
         }
 
-        [Test]
+        [Fact]
         public void Assigned_Modification() {
             _api.EnterFluidMode();
             _api.Key("foo", "pk", false);
@@ -63,11 +60,11 @@ namespace LimeBean.Tests {
             bean["pk"] = 2;
             _api.Store(bean);
 
-            Assert.AreEqual(2, _api.Count("foo"));
+            Assert.Equal(2, _api.Count("foo"));
             // moral: keys should be immutable
         }
 
-        [Test]
+        [Fact]
         public void AssignedCompound_FrozenMode() {
             _api.Exec("create table foo (pk1, pk2, pk3, prop)");
             _api.Key("foo", "pk1", "pk2", "pk3");
@@ -79,31 +76,31 @@ namespace LimeBean.Tests {
             bean["prop"] = "value1";
 
             var key = _api.Store(bean) as CompoundKey;
-            Assert.AreEqual("pk1=1, pk2=2, pk3=3", key.ToString());
+            Assert.Equal("pk1=1, pk2=2, pk3=3", key.ToString());
 
             bean["prop"] = "value2";
-            Assert.AreEqual("pk1=1, pk2=2, pk3=3", _api.Store(bean).ToString());
+            Assert.Equal("pk1=1, pk2=2, pk3=3", _api.Store(bean).ToString());
 
             bean = _api.Load("foo", key);
-            Assert.AreEqual(1, bean["pk1"]);
-            Assert.AreEqual(2, bean["pk2"]);
-            Assert.AreEqual(3, bean["pk3"]);
-            Assert.AreEqual("value2", bean["prop"]);
+            Assert.Equal(1L, bean["pk1"]);
+            Assert.Equal(2L, bean["pk2"]);
+            Assert.Equal(3L, bean["pk3"]);
+            Assert.Equal("value2", bean["prop"]);
 
             _api.Trash(bean);
-            Assert.AreEqual(0, _api.Count("foo"));        
+            Assert.Equal(0, _api.Count("foo"));        
         }
 
-        [Test]
+        [Fact]
         public void CustomAutoIncrement_FluidMode() {
             _api.EnterFluidMode();
             _api.Key("foo", "custom field");
             _api.Store(_api.Dispense("foo"));
 
-            Assert.AreEqual(1, _api.Count("foo", "where [custom field]=1"));
+            Assert.Equal(1, _api.Count("foo", "where [custom field]=1"));
         }
 
-        [Test]
+        [Fact]
         public void AssignedCompound_FluidMode() {
             _api.EnterFluidMode();
             _api.Key("foo", "a", "b");
@@ -113,32 +110,37 @@ namespace LimeBean.Tests {
             bean["b"] = 2;
             _api.Store(bean);
 
-            Assert.AreEqual(1, _api.Count("foo", "where a=1 and b=2"));
+            Assert.Equal(1, _api.Count("foo", "where a=1 and b=2"));
         }
 
-        [Test]
+        [Fact]
         public void AssignedCompound_Load() {
             _api.Exec("create table foo (k1, k2, v)");
             _api.Exec("insert into foo values (1, 'a', 'ok')");
             _api.Key("foo", "k1", "k2");
 
             var bean = _api.Load("foo", 1, "a");
-            Assert.AreEqual("ok", bean["v"]);
+            Assert.Equal("ok", bean["v"]);
         }
 
-        [Test, ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void AssignedCompound_Malformed() {
             _api.EnterFluidMode();
             _api.Key("foo", "k1", "k2");
 
             var bean = _api.Dispense("foo");
             bean["k1"] = 1;
-            _api.Store(bean);
+
+            Assert.Throws<ArgumentNullException>(delegate() {
+                _api.Store(bean);
+            });
         }
 
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void AssignedCompound_Empty() {
-            _api.Key("foo");
+            Assert.Throws<ArgumentException>(delegate() {
+                _api.Key("foo");
+            });
         }
 
     }

@@ -1,37 +1,36 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Xunit;
 
 namespace LimeBean.Tests {
 
-    [TestFixture]
     public class BeanCrudTests {
 
-        [Test]
+        [Fact]
         public void Dispense_Default() {
             var crud = new BeanCrud(null, null, null);
             var bean = crud.Dispense("test");
-            Assert.AreEqual("test", bean.GetKind());
-            Assert.AreEqual(typeof(Bean), bean.GetType());
+            Assert.Equal("test", bean.GetKind());
+            Assert.Equal(typeof(Bean), bean.GetType());
         }
 
-        [Test]
+        [Fact]
         public void Dispense_Hooks() {
             var crud = new BeanCrud(null, null, null);
             var observer = new TracingObserver();
             crud.AddObserver(observer);
 
             var bean = crud.Dispense<Tracer>();
-            Assert.AreEqual("tracer", bean.GetKind());
+            Assert.Equal("tracer", bean.GetKind());
 
-            Assert.AreEqual("ad:", bean.TraceLog);
-            Assert.AreEqual("ad:", observer.TraceLog);
-            Assert.AreSame(bean, observer.LastBean);
+            Assert.Equal("ad:", bean.TraceLog);
+            Assert.Equal("ad:", observer.TraceLog);
+            Assert.Same(bean, observer.LastBean);
         }
 
-        [Test]
+        [Fact]
         public void Store() {
             var crud = new BeanCrud(new InMemoryStorage(), null, new KeyUtil());
             var observer = new TracingObserver();
@@ -40,22 +39,22 @@ namespace LimeBean.Tests {
             var bean = crud.Dispense<Tracer>();
 
             var id = crud.Store(bean);
-            Assert.AreEqual(0, id);
-            Assert.AreEqual(0, bean[Bean.ID_PROP_NAME]);
-            Assert.AreEqual("ad: bs: as:" + id, bean.TraceLog);
-            Assert.AreEqual("ad: bs: as:" + id, observer.TraceLog);
+            Assert.Equal(0L, id);
+            Assert.Equal(0L, bean[Bean.ID_PROP_NAME]);
+            Assert.Equal("ad: bs: as:" + id, bean.TraceLog);
+            Assert.Equal("ad: bs: as:" + id, observer.TraceLog);
         }
 
 
-        [Test]
+        [Fact]
         public void Load() {
             var crud = new BeanCrud(new InMemoryStorage(), null, new KeyUtil());
             var observer = new TracingObserver();
             crud.AddObserver(observer);
 
             // Load non-existing bean
-            Assert.IsNull(crud.Load("any", 123));
-            Assert.IsEmpty(observer.TraceLog);
+            Assert.Null(crud.Load("any", 123));
+            Assert.Empty(observer.TraceLog);
 
             var bean = crud.Dispense<Tracer>();
             bean.Put("p1", "test");
@@ -64,14 +63,14 @@ namespace LimeBean.Tests {
             observer.TraceLog = "";
 
             bean = crud.Load<Tracer>(id);
-            Assert.AreEqual("ad: bl: al:" + id, bean.TraceLog);
-            Assert.AreEqual("ad: bl: al:" + id, observer.TraceLog);
-            Assert.IsNotNull(bean[Bean.ID_PROP_NAME]);
-            Assert.AreEqual(id, bean[Bean.ID_PROP_NAME]);
-            Assert.AreEqual("test", bean["p1"]);
+            Assert.Equal("ad: bl: al:" + id, bean.TraceLog);
+            Assert.Equal("ad: bl: al:" + id, observer.TraceLog);
+            Assert.NotNull(bean[Bean.ID_PROP_NAME]);
+            Assert.Equal(id, bean[Bean.ID_PROP_NAME]);
+            Assert.Equal("test", bean["p1"]);
         }
 
-        [Test]
+        [Fact]
         public void Trash() {
             var crud = new BeanCrud(new InMemoryStorage(), null, new KeyUtil());
             var observer = new TracingObserver();
@@ -81,21 +80,21 @@ namespace LimeBean.Tests {
 
             observer.TraceLog = bean.TraceLog = "";
             crud.Trash(bean);
-            Assert.IsEmpty(bean.TraceLog);
-            Assert.IsEmpty(observer.TraceLog);
+            Assert.Empty(bean.TraceLog);
+            Assert.Empty(observer.TraceLog);
 
             var id = crud.Store(bean);
 
             observer.TraceLog = bean.TraceLog = "";
             crud.Trash(bean);
-            Assert.AreEqual("bt:" + id + " at:" + id, bean.TraceLog);
-            Assert.AreEqual("bt:" + id + " at:" + id, observer.TraceLog);
-            Assert.AreEqual(id, bean[Bean.ID_PROP_NAME]);
+            Assert.Equal("bt:" + id + " at:" + id, bean.TraceLog);
+            Assert.Equal("bt:" + id + " at:" + id, observer.TraceLog);
+            Assert.Equal(id, bean[Bean.ID_PROP_NAME]);
 
-            Assert.IsNull(crud.Load<Tracer>(id));
+            Assert.Null(crud.Load<Tracer>(id));
         }
 
-        [Test]
+        [Fact]
         public void RowToBean() {
             var crud = new BeanCrud(new InMemoryStorage(), null, null);
             var observer = new TracingObserver();
@@ -105,10 +104,10 @@ namespace LimeBean.Tests {
                 { "s", "hello" }
             });
 
-            Assert.IsNull(bean[Bean.ID_PROP_NAME]);
-            Assert.AreEqual("hello", bean["s"]);
-            Assert.AreEqual("ad: bl: al:", bean.TraceLog);
-            Assert.AreEqual("ad: bl: al:", observer.TraceLog);
+            Assert.Null(bean[Bean.ID_PROP_NAME]);
+            Assert.Equal("hello", bean["s"]);
+            Assert.Equal("ad: bl: al:", bean.TraceLog);
+            Assert.Equal("ad: bl: al:", observer.TraceLog);
 
             observer.TraceLog = "";
 
@@ -117,15 +116,15 @@ namespace LimeBean.Tests {
                 { "s", "see you" }
             });            
 
-            Assert.AreEqual(123, bean[Bean.ID_PROP_NAME]);
-            Assert.AreEqual("see you", bean["s"]);
-            Assert.AreEqual("ad: bl: al:123", bean.TraceLog);
-            Assert.AreEqual("ad: bl: al:123", observer.TraceLog);
+            Assert.Equal(123, bean[Bean.ID_PROP_NAME]);
+            Assert.Equal("see you", bean["s"]);
+            Assert.Equal("ad: bl: al:123", bean.TraceLog);
+            Assert.Equal("ad: bl: al:123", observer.TraceLog);
 
-            Assert.IsNull(crud.Load("temp",  (IConvertible)null));
+            Assert.Null(crud.Load("temp",  (IConvertible)null));
         }
 
-        [Test]
+        [Fact]
         public void PreventDirectInstantiation() {
             var crud = new BeanCrud(null, null, null);
             

@@ -1,36 +1,31 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SQLite;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
+using Xunit;
 
 namespace LimeBean.Tests {
 
-    [TestFixture]
-    public class DatabaseAccessTests {
-        IDbConnection _conn;
+    public class DatabaseAccessTests : IDisposable {
+        DbConnection _conn;
         IDatabaseAccess _db;
 
         const string SELECT_RANDOM = "select hex(randomblob(16)) as r";
 
-        [SetUp]
-        public void SetUp() {
-            _conn = new SQLiteConnection("data source=:memory:");
+        public DatabaseAccessTests() {
+            _conn = SQLitePortability.CreateConnection();
             _conn.Open();
 
             _db = new DatabaseAccess(_conn, new SQLiteDetails());
         }
 
-        [TearDown]
-        public void TestFixtureTearDown() {
-            _conn.Dispose();
+        public void Dispose() {
+            _conn.Dispose();        
         }
 
-
-        [Test]
+        [Fact]
         public void Caching_EnableDisable() {
             var readers = new Func<string, IConvertible>[] { 
                 sql => _db.Cell<string>(true, sql),
@@ -42,47 +37,47 @@ namespace LimeBean.Tests {
             foreach(var reader in readers) {
                 _db.CacheCapacity = 1;
                 var value = reader(SELECT_RANDOM);
-                Assert.AreEqual(value, reader(SELECT_RANDOM));
+                Assert.Equal(value, reader(SELECT_RANDOM));
 
                 _db.CacheCapacity = 0;
-                Assert.AreNotEqual(value, reader(SELECT_RANDOM));
+                Assert.NotEqual(value, reader(SELECT_RANDOM));
             }
         }
 
-        [Test]
+        [Fact]
         public void Caching_SameQueriesDifferByFetchType() {
             var sql = "select 1";
 
-            Assert.DoesNotThrow(delegate() {
+            Assert.Null(Record.Exception(delegate() {
                 _db.Col<int>(true, sql);
                 _db.Cell<int>(true, sql);
                 _db.Row(true, sql);
                 _db.Rows(true, sql);
                 _db.Exec(sql);
                 _db.ColIterator<int>(sql).Last();
-                _db.RowsIterator(sql).Last();
-            });        
+                _db.RowsIterator(sql).Last();            
+            }));
         }
 
-        [Test]
+        [Fact]
         public void Caching_InvalidateByUpdate() {            
             _db.Exec("create table t1(a)");
             _db.Exec("insert into t1(a) values(42)");
             _db.Cell<int>(true, "select a from t1");
             _db.Exec("update t1 set a=82");
-            Assert.AreEqual(82, _db.Cell<int>(true, "select a from t1"));
+            Assert.Equal(82, _db.Cell<int>(true, "select a from t1"));
         }
 
-        [Test]
+        [Fact]
         public void UncachedRead() {
             var uuid = _db.Cell<string>(true, SELECT_RANDOM);
-            Assert.AreEqual(uuid, _db.Cell<string>(true, SELECT_RANDOM));
-            Assert.AreNotEqual(uuid, _db.Cell<string>(false, SELECT_RANDOM));
+            Assert.Equal(uuid, _db.Cell<string>(true, SELECT_RANDOM));
+            Assert.NotEqual(uuid, _db.Cell<string>(false, SELECT_RANDOM));
 
-            Assert.AreNotEqual(uuid, _db.Cell<string>(true, SELECT_RANDOM), "No stale cache");
+            Assert.NotEqual(uuid, _db.Cell<string>(true, SELECT_RANDOM)); // "No stale cache"
         }
 
-        [Test]
+        [Fact]
         public void CacheTrimming() {
             _db.Exec("create table foo(x)");
 
@@ -95,25 +90,25 @@ namespace LimeBean.Tests {
             // fill up: 0, 1, 2
             for(var i = 0; i < 3; i++)
                 _db.Row(true, sql, i);
-            Assert.AreEqual(3, queryCount);
+            Assert.Equal(3, queryCount);
 
             // renew oldest entry: 1, 2, 0
             _db.Row(true, sql, 0);
-            Assert.AreEqual(3, queryCount);
+            Assert.Equal(3, queryCount);
         
             // trim: 2, 0, 9
             _db.Row(true, sql, 9);
-            Assert.AreEqual(4, queryCount);
+            Assert.Equal(4, queryCount);
 
             _db.Row(true, sql, 2);
             _db.Row(true, sql, 0);
-            Assert.AreEqual(4, queryCount);
+            Assert.Equal(4, queryCount);
 
             _db.Row(true, sql, 1);
-            Assert.AreEqual(5, queryCount);
+            Assert.Equal(5, queryCount);
         }
 
-        [Test]
+        [Fact]
         public void Transactions() {
             _db.Exec("create table t(c)");
 
@@ -122,7 +117,7 @@ namespace LimeBean.Tests {
                 return false;
             });
 
-            Assert.AreEqual(0, _db.Cell<int>(true, "select count(*) from t"));
+            Assert.Equal(0, _db.Cell<int>(true, "select count(*) from t"));
 
             Assert.Throws<Exception>(delegate() {
                 _db.Transaction(delegate() {
@@ -131,30 +126,22 @@ namespace LimeBean.Tests {
                 });
             });
 
-            Assert.AreEqual(0, _db.Cell<int>(true, "select count(*) from t"));
+            Assert.Equal(0, _db.Cell<int>(true, "select count(*) from t"));
 
             _db.Transaction(delegate() {
                 _db.Exec("insert into t(c) values(1)");
                 return true;
             });
 
-            Assert.AreEqual(1, _db.Cell<int>(true, "select count(*) from t"));
+            Assert.Equal(1, _db.Cell<int>(true, "select count(*) from t"));
         }
 
-        [Test]
+        [Fact]
         public void InTransaction() {
-            Assert.IsFalse(_db.InTransaction);
+            Assert.False(_db.InTransaction);
 
             _db.Transaction(delegate() {
-                Assert.IsTrue(_db.InTransaction);
-
-                _db.Transaction(delegate() {
-                    Assert.IsTrue(_db.InTransaction);
-                    return true;
-                });
-
-                Assert.IsTrue(_db.InTransaction);
-
+                Assert.True(_db.InTransaction);
                 return true;
             });
 
@@ -162,7 +149,7 @@ namespace LimeBean.Tests {
                 return false;
             });
 
-            Assert.IsFalse(_db.InTransaction);
+            Assert.False(_db.InTransaction);
 
             try {
                 _db.Transaction(delegate() {
@@ -171,10 +158,10 @@ namespace LimeBean.Tests {
             } catch { 
             }
 
-            Assert.IsFalse(_db.InTransaction);
+            Assert.False(_db.InTransaction);
         }
 
-        [Test]
+        [Fact]
         public void RolledBackTransactionClearsCache() {
             _db.Exec("create table foo(x)");
             _db.Exec("insert into foo(x) values(1)");
@@ -185,29 +172,21 @@ namespace LimeBean.Tests {
                 return false;
             });
 
-            Assert.AreEqual(1, _db.Cell<int>(true, "select x from foo"));
+            Assert.Equal(1, _db.Cell<int>(true, "select x from foo"));
         }
 
-        [Test]
+        [Fact]
         public void TransactionAssignedToCommand() {
-            var trace = new List<IDbTransaction>();
+            var trace = new List<DbTransaction>();
 
             _db.QueryExecuting += cmd => trace.Add(cmd.Transaction);
 
             _db.Transaction(delegate() {
                 _db.Exec("select 1");
-                _db.Transaction(delegate() {
-                    _db.Exec("select 2");
-                    return true;
-                });
-                _db.Exec("select 3");
                 return true;
             });
 
-            Assert.AreEqual(3, trace.Count);
-            Assert.IsEmpty(trace.Where(t => t == null));
-            Assert.AreSame(trace[0], trace[2]);
-            Assert.AreNotSame(trace[0], trace[1]);
+            Assert.NotNull(trace[0]);
         }
     }
 }

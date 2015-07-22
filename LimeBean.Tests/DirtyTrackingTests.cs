@@ -1,21 +1,18 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Linq;
 using System.Text;
+using Xunit;
 
 namespace LimeBean.Tests {
 
-    [TestFixture]
-    public class DirtyTrackingTests {
+    public class DirtyTrackingTests : IDisposable {
         BeanApi _api;
         Bean _bean;
         int _queryCount;
 
-        [SetUp]
-        public void SetUp() {
-            _api = new BeanApi("data source=:memory:", SQLiteFactory.Instance);
+        public DirtyTrackingTests() {
+            _api = SQLitePortability.CreateApi();
             _api.Exec("create table foo(id, a, b)");
             _api.Exec("insert into foo values(1, 'initial', 'initial')");
 
@@ -24,42 +21,41 @@ namespace LimeBean.Tests {
             _api.QueryExecuting += cmd => _queryCount++;
         }
 
-        [Test]
+        [Fact]
         public void Default_NoChangedProps() {
             _bean["a"] = "temp";
             _bean["a"] = "initial";
             _api.Store(_bean);
-            Assert.AreEqual(0, _queryCount);
+            Assert.Equal(0, _queryCount);
         }
 
-        [Test]
+        [Fact]
         public void Disabled_NoChangedProps() {
             _api.DirtyTracking = false;
             _bean["a"] = "temp";
             _bean["a"] = "initial";
             _api.Store(_bean);
-            Assert.That(_queryCount, Is.GreaterThan(0));
+            Assert.True(_queryCount > 0);
         }
 
-        [Test]
+        [Fact]
         public void Default_OnlyDirtyPropsWritten() {
             _bean["a"] = "bean change";
             _api.Exec("update foo set b='external change'");
             _api.Store(_bean);
-            Assert.AreEqual("external change", _api.Cell<string>("select b from foo"));
+            Assert.Equal("external change", _api.Cell<string>("select b from foo"));
         }
 
-        [Test]
+        [Fact]
         public void Disabled_AllPropsWritten() {
             _api.DirtyTracking = false;
             _bean["a"] = "bean change";
             _api.Exec("update foo set b='external change'");
             _api.Store(_bean);
-            Assert.AreEqual("initial", _api.Cell<string>("select b from foo"));        
+            Assert.Equal("initial", _api.Cell<string>("select b from foo"));        
         }
 
-        [TearDown]
-        public void TearDown() {
+        public void Dispose() {
             _api.Dispose();
         }
 

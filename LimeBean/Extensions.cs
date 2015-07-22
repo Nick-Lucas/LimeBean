@@ -5,7 +5,7 @@ using System.Text;
 
 namespace LimeBean {
     
-    static class Extensions {
+    static partial class Extensions {
 
         internal static V GetSafe<K, V>(this IDictionary<K, V> dict, K key, V defaultValue = default(V)) {
             V existingValue;

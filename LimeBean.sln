@@ -5,10 +5,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LimeBean", "LimeBean\LimeBe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LimeBean.Tests", "LimeBean.Tests\LimeBean.Tests.csproj", "{9B7B480E-7032-45AD-BA54-C337FCB5C877}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{1732C13C-9A52-4DC3-BED4-4DC7F12CAA42}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{01DCFB9C-87B7-4793-9F04-4AE45BB27F0B}"
 	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.targets = .nuget\NuGet.targets
+		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
 Global

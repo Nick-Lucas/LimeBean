@@ -1,5 +1,4 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
@@ -7,10 +6,8 @@ using System.Text;
 
 namespace LimeBean.Tests.Examples {
 
-    [TestFixture, Explicit]
     public class AutoGuidKeys {
-
-        [Test]
+        
         public void Scenario() {
             using(var api = new BeanApi("data source=:memory:", SQLiteFactory.Instance)) {
                 api.EnterFluidMode();

@@ -8,8 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace LimeBean {
 
-    [Serializable]
-    public class Bean {
+    public partial class Bean {
         public const string ID_PROP_NAME = "id";
 
         static readonly ConcurrentDictionary<Type, string> _kindCache = new ConcurrentDictionary<Type, string>();
@@ -72,11 +71,11 @@ namespace LimeBean {
         object GetCore(string name, Type convertTo) {
             var value = this[name];
 
-            if(value == null || value.GetTypeCode() == Type.GetTypeCode(convertTo))
+            if(value == null || value.GetType() == convertTo)
                 return value;
 
             try {
-                if(convertTo.IsEnum)
+                if(convertTo.IsEnum())
                     return Enum.Parse(convertTo, value.ToString(CultureInfo.InvariantCulture), true);
 
                 return value.ToType(convertTo, CultureInfo.InvariantCulture);

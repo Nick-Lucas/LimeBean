@@ -3,4 +3,4 @@
 bin/
 obj/
 packages/
-.nuget/NuGet.exe
+project.lock.json

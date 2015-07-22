@@ -1,20 +1,17 @@
-﻿using MySql.Data.MySqlClient;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Data.SQLite;
 using System.Linq;
 using System.Text;
+using Xunit;
 
 namespace LimeBean.Tests {
 
-    [TestFixture]
     public class IntegrationTests {
 
-        [Test]
+        [Fact]
         public void ImplicitTransactionsOnStoreAndTrash() {
-            using(var conn = new SQLiteConnection("data source=:memory:")) {
+            using(var conn = SQLitePortability.CreateConnection()) {
                 conn.Open();
 
                 IDatabaseDetails details = new SQLiteDetails();
@@ -33,16 +30,16 @@ namespace LimeBean.Tests {
                 bean["foo"] = "fail";
 
                 try { crud.Store(bean); } catch { }
-                Assert.AreEqual("ok", db.Cell<string>(true, "select foo from test where " + Bean.ID_PROP_NAME + " = ?", id));
+                Assert.Equal("ok", db.Cell<string>(true, "select foo from test where " + Bean.ID_PROP_NAME + " = {0}", id));
 
                 try { crud.Trash(bean); } catch { }
-                Assert.IsTrue(db.Cell<int>(true, "select count(*) from test") > 0);
+                Assert.True(db.Cell<int>(true, "select count(*) from test") > 0);
             }
         }
 
-        [Test]
+        [Fact]
         public void DisableImplicitTransactions() {
-            using(var api = new BeanApi("data source=:memory:", SQLiteFactory.Instance)) {
+            using(var api = SQLitePortability.CreateApi()) {
                 api.EnterFluidMode();
                 api.ImplicitTransactions = false;
 
@@ -50,20 +47,23 @@ namespace LimeBean.Tests {
                 bean.Throw = true;
                 try { api.Store(bean); } catch { }
 
-                Assert.AreEqual(1, api.Count<ThrowingBean>());
+                Assert.Equal(1, api.Count<ThrowingBean>());
             }           
         }
 
-        [Test]
+        [Fact]
         public void Api_DetailsSelection() {
-            Assert.AreEqual("SQLite", new BeanApi(new SQLiteConnection()).CreateDetails().DbName);
-            Assert.AreEqual("MariaDB", new BeanApi(new MySqlConnection()).CreateDetails().DbName);
-            Assert.AreEqual("MsSql", new BeanApi(new SqlConnection()).CreateDetails().DbName);            
+            Assert.Equal("SQLite", new BeanApi(SQLitePortability.CreateConnection()).CreateDetails().DbName);            
+            Assert.Equal("MsSql", new BeanApi(new SqlConnection()).CreateDetails().DbName);
+
+#if !DNX
+            Assert.Equal("MariaDB", new BeanApi(new MySql.Data.MySqlClient.MySqlConnection()).CreateDetails().DbName);
+#endif
         }
 
-        [Test]
+        [Fact]
         public void Regression_NullingExistingProp() {
-            using(var api = new BeanApi("data source=:memory:", SQLiteFactory.Instance)) {
+            using(var api = SQLitePortability.CreateApi()) {
                 api.EnterFluidMode();
 
                 var bean = api.Dispense("kind1");
@@ -75,7 +75,7 @@ namespace LimeBean.Tests {
                 api.Store(bean);
 
                 bean = api.Load("kind1", id);
-                Assert.IsNull(bean["p"]);
+                Assert.Null(bean["p"]);
             }
         }
 

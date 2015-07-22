@@ -1,47 +1,30 @@
-﻿using NUnit.Framework;
+﻿using LimeBean.Tests.Fixtures;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
+using Xunit;
 
 namespace LimeBean.Tests {
 
-    [TestFixture]
-    public class DatabaseStorageTests_MsSql {
-        IDbConnection _conn;        
+    [Trait("db", "mssql")]
+    public class DatabaseStorageTests_MsSql : IClassFixture<MsSqlConnectionFixture> {
         IDatabaseAccess _db;
         DatabaseStorage _storage;
 
-        List<string> _dropList = new List<string>();
-
-        [TestFixtureSetUp]
-        public void TestFixtureSetUp() {
-            _conn = new SqlConnection(TestEnv.MsSqlConnectionString);
-            _conn.Open();
-        }
-
-        [SetUp]
-        public void SetUp() {
+        public DatabaseStorageTests_MsSql(MsSqlConnectionFixture fixture) {
             IDatabaseDetails details = new MsSqlDetails();
-            IDatabaseAccess db = new DatabaseAccess(_conn, details);
+            IDatabaseAccess db = new DatabaseAccess(fixture.Connection, details);
             DatabaseStorage storage = new DatabaseStorage(details, db, new KeyUtil());
 
-            TestEnv.MsSqlSetUp(db, _dropList);
+            TestEnv.MsSqlSetUp(db, fixture.DropList);
 
             _db = db;
             _storage = storage;
         }
 
-        [TestFixtureTearDown]
-        public void TestFixtureTearDown() {
-            TestEnv.MsSqlTearDown(_db, _dropList);
-            _conn.Dispose();
-        }
-
-
-        [Test]
+        [Fact]
         public void Schema() {
             _db.Exec(@"create table foo(
                 id  int,
@@ -65,29 +48,29 @@ namespace LimeBean.Tests {
             )");
 
             var schema = _storage.GetSchema();
-            Assert.AreEqual(1, schema.Count);
+            Assert.Equal(1, schema.Count);
 
             var cols = schema["foo"];
-            Assert.IsFalse(cols.ContainsKey(Bean.ID_PROP_NAME));
+            Assert.False(cols.ContainsKey(Bean.ID_PROP_NAME));
 
-            Assert.AreEqual(MsSqlDetails.RANK_BYTE, cols["b"]);
-            Assert.AreEqual(MsSqlDetails.RANK_INT32, cols["i"]);
-            Assert.AreEqual(MsSqlDetails.RANK_INT64, cols["l"]);
-            Assert.AreEqual(MsSqlDetails.RANK_DOUBLE, cols["d"]);
-            Assert.AreEqual(MsSqlDetails.RANK_TEXT_32, cols["t1"]);
-            Assert.AreEqual(MsSqlDetails.RANK_TEXT_4000, cols["t2"]);
-            Assert.AreEqual(MsSqlDetails.RANK_TEXT_MAX, cols["t3"]);
+            Assert.Equal(MsSqlDetails.RANK_BYTE, cols["b"]);
+            Assert.Equal(MsSqlDetails.RANK_INT32, cols["i"]);
+            Assert.Equal(MsSqlDetails.RANK_INT64, cols["l"]);
+            Assert.Equal(MsSqlDetails.RANK_DOUBLE, cols["d"]);
+            Assert.Equal(MsSqlDetails.RANK_TEXT_32, cols["t1"]);
+            Assert.Equal(MsSqlDetails.RANK_TEXT_4000, cols["t2"]);
+            Assert.Equal(MsSqlDetails.RANK_TEXT_MAX, cols["t3"]);
 
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, cols["x1"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, cols["x2"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, cols["x3"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, cols["x4"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, cols["x5"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, cols["x6"]);
-            Assert.AreEqual(CommonDatabaseDetails.RANK_CUSTOM, cols["x7"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x1"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x2"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x3"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x4"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x5"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x6"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x7"]);
         }
 
-        [Test]
+        [Fact]
         public void CreateTable() {
             _storage.EnterFluidMode();
 
@@ -105,17 +88,17 @@ namespace LimeBean.Tests {
             _storage.Store("foo", data);
 
             var cols = _storage.GetSchema()["foo"];
-            CollectionAssert.DoesNotContain(cols.Keys, "p1");
-            Assert.AreEqual(MsSqlDetails.RANK_BYTE, cols["p2"]);
-            Assert.AreEqual(MsSqlDetails.RANK_INT32, cols["p3"]);
-            Assert.AreEqual(MsSqlDetails.RANK_INT64, cols["p4"]);
-            Assert.AreEqual(MsSqlDetails.RANK_DOUBLE, cols["p5"]);
-            Assert.AreEqual(MsSqlDetails.RANK_TEXT_32, cols["p6"]);
-            Assert.AreEqual(MsSqlDetails.RANK_TEXT_4000, cols["p7"]);
-            Assert.AreEqual(MsSqlDetails.RANK_TEXT_MAX, cols["p8"]);
+            Assert.DoesNotContain("p1", cols.Keys);
+            Assert.Equal(MsSqlDetails.RANK_BYTE, cols["p2"]);
+            Assert.Equal(MsSqlDetails.RANK_INT32, cols["p3"]);
+            Assert.Equal(MsSqlDetails.RANK_INT64, cols["p4"]);
+            Assert.Equal(MsSqlDetails.RANK_DOUBLE, cols["p5"]);
+            Assert.Equal(MsSqlDetails.RANK_TEXT_32, cols["p6"]);
+            Assert.Equal(MsSqlDetails.RANK_TEXT_4000, cols["p7"]);
+            Assert.Equal(MsSqlDetails.RANK_TEXT_MAX, cols["p8"]);
         }
 
-        [Test]
+        [Fact]
         public void AlterTable() {
             _storage.EnterFluidMode();
 
@@ -140,44 +123,46 @@ namespace LimeBean.Tests {
             _storage.Store("foo", data);
 
             var cols = _storage.GetSchema()["foo"];
-            Assert.AreEqual(MsSqlDetails.RANK_INT32, cols["p1"]);
-            Assert.AreEqual(MsSqlDetails.RANK_INT64, cols["p2"]);
-            Assert.AreEqual(MsSqlDetails.RANK_DOUBLE, cols["p3"]);
-            Assert.AreEqual(MsSqlDetails.RANK_TEXT_32, cols["p4"]);
-            Assert.AreEqual(MsSqlDetails.RANK_TEXT_4000, cols["p5"]);
-            Assert.AreEqual(MsSqlDetails.RANK_TEXT_MAX, cols["p6"]);
-            Assert.AreEqual(MsSqlDetails.RANK_TEXT_MAX, cols["p7"]);
-            Assert.AreEqual(MsSqlDetails.RANK_BYTE, cols["p8"]);
+            Assert.Equal(MsSqlDetails.RANK_INT32, cols["p1"]);
+            Assert.Equal(MsSqlDetails.RANK_INT64, cols["p2"]);
+            Assert.Equal(MsSqlDetails.RANK_DOUBLE, cols["p3"]);
+            Assert.Equal(MsSqlDetails.RANK_TEXT_32, cols["p4"]);
+            Assert.Equal(MsSqlDetails.RANK_TEXT_4000, cols["p5"]);
+            Assert.Equal(MsSqlDetails.RANK_TEXT_MAX, cols["p6"]);
+            Assert.Equal(MsSqlDetails.RANK_TEXT_MAX, cols["p7"]);
+            Assert.Equal(MsSqlDetails.RANK_BYTE, cols["p8"]);
         }
 
-        [Test, SetCulture("ru")]
+        [Fact]
         public void Roundtrip() {
-            _storage.EnterFluidMode();
-            var checker = new RoundtripChecker(_db, _storage);
+            AssertExtensions.WithCulture("ru", delegate() {
+                _storage.EnterFluidMode();
+                var checker = new RoundtripChecker(_db, _storage);
 
-            // supported ranks
-            checker.Check(null, null);
-            checker.Check(255, (byte)255);
-            checker.Check(1000, 1000);            
-            checker.Check(0x80000000L, 0x80000000L);
-            checker.Check(3.14, 3.14);
-            checker.Check("hello", "hello");
+                // supported ranks
+                checker.Check(null, null);
+                checker.Check(255, (byte)255);
+                checker.Check(1000, 1000);
+                checker.Check(0x80000000L, 0x80000000L);
+                checker.Check(3.14, 3.14);
+                checker.Check("hello", "hello");
 
-            // extremal vaues
-            SharedChecks.CheckRoundtripOfExtremalValues(checker);
+                // extremal vaues
+                SharedChecks.CheckRoundtripOfExtremalValues(checker);
 
-            // conversion to string
-            SharedChecks.CheckRoundtripForcesString(checker);
+                // conversion to string
+                SharedChecks.CheckRoundtripForcesString(checker);
 
-            // bool            
-            checker.Check(true, (byte)1);
-            checker.Check(false, (byte)0);
+                // bool            
+                checker.Check(true, (byte)1);
+                checker.Check(false, (byte)0);
 
-            // enum
-            checker.Check(TypeCode.DateTime, (byte)16);
+                // enum
+                checker.Check(TypeCode.DateTime, (byte)16);
+            });
         }
 
-        [Test]
+        [Fact]
         public void SchemaReadingKeepsCache() {
             SharedChecks.CheckSchemaReadingKeepsCache(_db, _storage);
         }

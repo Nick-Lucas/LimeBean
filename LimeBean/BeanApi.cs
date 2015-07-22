@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
 
 namespace LimeBean {
 
-    public class BeanApi : IDisposable, IBeanCrud, IBeanFinder, IDatabaseAccess, IValueRelaxations {
-        DbProviderFactory _provider;
-        string _connectionString;
-
-        bool _sharedConnection;
-        IDbConnection _connection;
+    public partial class BeanApi : IDisposable, IBeanCrud, IBeanFinder, IDatabaseAccess, IValueRelaxations {
+        ConnectionContainer _connectionContainer;
         IDatabaseDetails _details;
         IDatabaseAccess _db;
         KeyUtil _keyUtil;
@@ -20,36 +15,24 @@ namespace LimeBean {
         IBeanCrud _crud;
         IBeanFinder _finder;
 
-        public BeanApi(string connectionString, string providerName)
-            : this(connectionString, DbProviderFactories.GetFactory(providerName)) {
+        public BeanApi(string connectionString, DbProviderFactory factory) {
+            _connectionContainer = new ConnectionContainer.LazyImpl(connectionString, factory.CreateConnection);
         }
 
-        public BeanApi(string connectionString, DbProviderFactory provider) {
-            _connectionString = connectionString;
-            _provider = provider;
+        public BeanApi(DbConnection connection) {
+            _connectionContainer = new ConnectionContainer.SimpleImpl(connection);
         }
 
-        public BeanApi(IDbConnection connection) {
-            _sharedConnection = true;
-            _connection = connection;
+        public BeanApi(string connectionString, Type connectionType) {
+            _connectionContainer = new ConnectionContainer.LazyImpl(connectionString, delegate() {
+                return (DbConnection)Activator.CreateInstance(connectionType);
+            });
         }
 
         // Properties
 
-        public IDbConnection Connection {
-            get {
-                if(_connection == null) {
-                    var c = _provider.CreateConnection();
-                    c.ConnectionString = _connectionString;
-                    c.Open();
-
-                    _provider = null;
-                    _connectionString = null;
-
-                    _connection = c;
-                }
-                return _connection;
-            }
+        public DbConnection Connection {
+            get { return _connectionContainer.Connection; }
         }
 
         IDatabaseDetails Details {
@@ -103,6 +86,7 @@ namespace LimeBean {
         internal IDatabaseDetails CreateDetails() { 
             switch(Connection.GetType().FullName) { 
                 case "System.Data.SQLite.SQLiteConnection":
+                case "Microsoft.Data.Sqlite.SqliteConnection":
                     return new SQLiteDetails();
     
                 case "MySql.Data.MySqlClient.MySqlConnection":
@@ -125,8 +109,7 @@ namespace LimeBean {
         }
 
         public void Dispose() {
-            if(!_sharedConnection && _connection != null)
-                _connection.Dispose();
+            _connectionContainer.Dispose();
         }
 
         // IBeanCrud
@@ -212,7 +195,7 @@ namespace LimeBean {
 
         // IDatabaseAccess
 
-        public event Action<IDbCommand> QueryExecuting {
+        public event Action<DbCommand> QueryExecuting {
             add { Db.QueryExecuting += value; }
             remove { Db.QueryExecuting -= value; }
         }

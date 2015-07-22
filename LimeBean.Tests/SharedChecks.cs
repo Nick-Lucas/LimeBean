@@ -1,8 +1,8 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Xunit;
 
 namespace LimeBean.Tests {
 
@@ -21,7 +21,7 @@ namespace LimeBean.Tests {
             var savedQueryCount = queryCount;
             db.Cell<int>(true, "Select * from foo");
 
-            Assert.AreEqual(savedQueryCount, queryCount);        
+            Assert.Equal(savedQueryCount, queryCount);        
         }
 
         public static void CheckRoundtripOfExtremalValues(RoundtripChecker checker) {

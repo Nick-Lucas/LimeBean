@@ -1,5 +1,4 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
@@ -7,10 +6,8 @@ using System.Text;
 
 namespace LimeBean.Tests.Examples {
 
-    [TestFixture, Explicit]
     public class Crud {
 
-        [Test]
         public void Scenario() {
             // Based on https://code.google.com/p/orange-bean/#CRUD
 

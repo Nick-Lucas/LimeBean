@@ -1,5 +1,4 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
@@ -7,24 +6,20 @@ using System.Text;
 
 namespace LimeBean.Tests.Examples {
 
-    [TestFixture, Explicit]
-    public class Stress {
+    public class Stress : IDisposable {
         const string DB_PATH = "c:/temp/lime-stress.db";
         BeanApi R;
         Random _rand = new Random();
 
-        [SetUp]
-        public void SetUp() {
+        public Stress() {
             R = new BeanApi("data source=" + DB_PATH, SQLiteFactory.Instance);            
         }
 
-        [TearDown]
-        public void TearDown() {
+        public void Dispose() {
             R.Dispose();
         }
 
 
-        [Test]
         public void Fill() {
             R.Exec("drop table if exists foo");
             R.EnterFluidMode();
@@ -40,7 +35,6 @@ namespace LimeBean.Tests.Examples {
             });
         }
 
-        [Test]
         public void IteratorRead() {
             foreach(var bean in R.FindIterator("foo")) {
                 var id = bean[Bean.ID_PROP_NAME];

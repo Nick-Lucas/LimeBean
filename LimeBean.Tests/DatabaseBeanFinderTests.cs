@@ -1,22 +1,19 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SQLite;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
+using Xunit;
 
 namespace LimeBean.Tests {
 
-    [TestFixture]
-    class DatabaseBeanFinderTests {
-        IDbConnection _conn;
+    public class DatabaseBeanFinderTests : IDisposable {
+        DbConnection _conn;
         IDatabaseAccess _db;
         IBeanFinder _finder;
 
-        [SetUp]
-        public void SetUp() {
-            _conn = new SQLiteConnection("data source=:memory:");
+        public DatabaseBeanFinderTests() {
+            _conn = SQLitePortability.CreateConnection();
             _conn.Open();
 
             IDatabaseDetails details = new SQLiteDetails();           
@@ -35,36 +32,35 @@ namespace LimeBean.Tests {
             _finder = finder;
         }
 
-        [TearDown]
-        public void TestFixtureTearDown() {
-            _conn.Dispose();
+        public void Dispose() {
+            _conn.Dispose();        
         }
 
-        [Test]
+        [Fact]
         public void Find() {
-            Assert.AreEqual(3, _finder.Find(true, "foo").Count());
-            Assert.AreEqual(3, _finder.Find<Foo>(true).Count());
+            Assert.Equal(3, _finder.Find(true, "foo").Count());
+            Assert.Equal(3, _finder.Find<Foo>(true).Count());
 
-            Assert.AreEqual(2, _finder.Find(true, "foo", "where x in (?, ?)", 1, 3).Count());
-            Assert.AreEqual(1, _finder.Find<Foo>(true, "where x={0}", 3).Count());
+            Assert.Equal(2, _finder.Find(true, "foo", "where x in ({0}, {1})", 1, 3).Count());
+            Assert.Equal(1, _finder.Find<Foo>(true, "where x={0}", 3).Count());
 
-            Assert.IsEmpty(_finder.Find(true, "foo", "where x is null"));
-            Assert.IsEmpty(_finder.Find<Foo>(true, "where x is ?", null));
+            Assert.Empty(_finder.Find(true, "foo", "where x is null"));
+            Assert.Empty(_finder.Find<Foo>(true, "where x is {0}", null));
         }
 
-        [Test]
+        [Fact]
         public void FindOne() {
-            Assert.AreEqual(1, _finder.FindOne(true, "foo", "order by x")["x"]);
-            Assert.AreEqual(3, _finder.FindOne<Foo>(true, "order by x desc")["x"]);
+            Assert.Equal(1L, _finder.FindOne(true, "foo", "order by x")["x"]);
+            Assert.Equal(3L, _finder.FindOne<Foo>(true, "order by x desc")["x"]);
 
-            Assert.AreEqual(2, _finder.FindOne(true, "foo", "where x=?", 2)["x"]);
-            Assert.AreEqual(2, _finder.FindOne<Foo>(true, "where x > {0} and x < {1}", 1, 3)["x"]);
+            Assert.Equal(2L, _finder.FindOne(true, "foo", "where x={0}", 2)["x"]);
+            Assert.Equal(2L, _finder.FindOne<Foo>(true, "where x > {0} and x < {1}", 1, 3)["x"]);
 
-            Assert.IsNull(_finder.FindOne(true, "foo", "where 0"));
-            Assert.IsNull(_finder.FindOne<Foo>(true, "where x > ?", 100));
+            Assert.Null(_finder.FindOne(true, "foo", "where 0"));
+            Assert.Null(_finder.FindOne<Foo>(true, "where x > {0}", 100));
         }
 
-        [Test]
+        [Fact]
         public void Caching() {
             var queryCount = 0;
             _db.QueryExecuting += cmd => queryCount++;
@@ -74,45 +70,45 @@ namespace LimeBean.Tests {
             _finder.Find(true, "foo", "where x > 2");
             _finder.Find<Foo>(true, "where x > 2");
 
-            Assert.AreEqual(1, queryCount);
+            Assert.Equal(1, queryCount);
 
             _finder.Find(false, "foo", "where x > 2");
             _finder.Find<Foo>(false, "where x > 2");
 
-            Assert.AreEqual(3, queryCount);
+            Assert.Equal(3, queryCount);
 
             queryCount = 0;
 
-            _finder.FindOne(true, "foo", "where x=?", 1);
-            _finder.FindOne<Foo>(true, "where x=?", 1);
-            _finder.FindOne(true, "foo", "where x=?", 1);
-            _finder.FindOne<Foo>(true, "where x=?", 1);
+            _finder.FindOne(true, "foo", "where x={0}", 1);
+            _finder.FindOne<Foo>(true, "where x={0}", 1);
+            _finder.FindOne(true, "foo", "where x={0}", 1);
+            _finder.FindOne<Foo>(true, "where x={0}", 1);
 
 
-            Assert.AreEqual(1, queryCount);
+            Assert.Equal(1, queryCount);
 
-            _finder.FindOne(false, "foo", "where x=?", 1);
-            _finder.FindOne<Foo>(false, "where x=?", 1);
+            _finder.FindOne(false, "foo", "where x={0}", 1);
+            _finder.FindOne<Foo>(false, "where x={0}", 1);
 
-            Assert.AreEqual(3, queryCount);
+            Assert.Equal(3, queryCount);
         }
 
-        [Test]
+        [Fact]
         public void Iterators() {
-            CollectionAssert.AreEquivalent(new[] { 1, 3 }, _finder.FindIterator("foo", "where x <> ?", 2).Select(b => b["x"]));
-            CollectionAssert.AreEquivalent(new[] { 1, 3 }, _finder.FindIterator<Foo>("where x <> ?", 2).Select(b => b["x"]));
+            AssertExtensions.Equivalent(new IConvertible[] { 1L, 3L }, _finder.FindIterator("foo", "where x <> {0}", 2).Select(b => b["x"]));
+            AssertExtensions.Equivalent(new IConvertible[] { 1L, 3L }, _finder.FindIterator<Foo>("where x <> {0}", 2).Select(b => b["x"]));
         }
 
-        [Test]
+        [Fact]
         public void Count() {
             var queryCount = 0;
             _db.QueryExecuting += cmd => queryCount++;
 
-            Assert.AreEqual(2, _finder.Count(true, "foo", "where x <> ?", 2));
-            Assert.AreEqual(2, _finder.Count<Foo>(true, "where x <> ?", 2));
-            Assert.AreEqual(2, _finder.Count(false, "foo", "where x <> ?", 2));
-            Assert.AreEqual(2, _finder.Count<Foo>(false, "where x <> ?", 2));
-            Assert.AreEqual(3, queryCount);
+            Assert.Equal(2, _finder.Count(true, "foo", "where x <> {0}", 2));
+            Assert.Equal(2, _finder.Count<Foo>(true, "where x <> {0}", 2));
+            Assert.Equal(2, _finder.Count(false, "foo", "where x <> {0}", 2));
+            Assert.Equal(2, _finder.Count<Foo>(false, "where x <> {0}", 2));
+            Assert.Equal(3, queryCount);
         }
 
         

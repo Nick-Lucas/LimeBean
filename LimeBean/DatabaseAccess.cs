@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -9,12 +9,12 @@ using System.Text.RegularExpressions;
 namespace LimeBean {
 
     class DatabaseAccess : IDatabaseAccess {
-        IDbConnection _connection;
+        DbConnection _connection;
         IDatabaseDetails _details;
-        Stack<IDbTransaction> _txStack = new Stack<IDbTransaction>();
+        Stack<DbTransaction> _txStack = new Stack<DbTransaction>();
         Cache<DbCommandDescriptor, object> _cache = new Cache<DbCommandDescriptor, object>();
 
-        public DatabaseAccess(IDbConnection connection, IDatabaseDetails details) {
+        public DatabaseAccess(DbConnection connection, IDatabaseDetails details) {
             _connection = connection;
             _details = details;
             ImplicitTransactions = true;
@@ -22,7 +22,7 @@ namespace LimeBean {
 
         public bool ImplicitTransactions { get; set; }
         public bool InTransaction { get { return _txStack.Count > 0; } }
-        public event Action<IDbCommand> QueryExecuting;
+        public event Action<DbCommand> QueryExecuting;
 
         public int CacheCapacity {
             get { return _cache.Capacity; }
@@ -114,7 +114,7 @@ namespace LimeBean {
 
         // Internals
 
-        IDbCommand CreateCommand(DbCommandDescriptor descriptor) {
+        DbCommand CreateCommand(DbCommandDescriptor descriptor) {
             var cmd = _connection.CreateCommand();
             var parameters = descriptor.Parameters;
 
@@ -142,7 +142,7 @@ namespace LimeBean {
             return cmd;
         }
 
-        IEnumerable<T> EnumerateRecords<T>(DbCommandDescriptor descriptor, Func<IDataRecord, T> converter) {
+        IEnumerable<T> EnumerateRecords<T>(DbCommandDescriptor descriptor, Func<DbDataReader, T> converter) {
             using(var cmd = CreateCommand(descriptor)) {
                 QueryWillExecute(cmd);
                 using(var reader = cmd.ExecuteReader()) {
@@ -152,22 +152,22 @@ namespace LimeBean {
             }
         }
 
-        static IDictionary<string, IConvertible> RecordToDict(IDataRecord record) {
-            var count = record.FieldCount;
+        static IDictionary<string, IConvertible> RecordToDict(DbDataReader reader) {
+            var count = reader.FieldCount;
             var result = new Dictionary<string, IConvertible>();
 
             for(var i = 0; i < count; i++)
-                result[record.GetName(i)] = GetCellValue<IConvertible>(record, i);
+                result[reader.GetName(i)] = GetCellValue<IConvertible>(reader, i);
 
             return result;
         }
 
-        static T GetFirstCellValue<T>(IDataRecord record) where T : IConvertible {
-            return GetCellValue<T>(record, 0);
+        static T GetFirstCellValue<T>(DbDataReader reader) where T : IConvertible {
+            return GetCellValue<T>(reader, 0);
         }
 
-        static T GetCellValue<T>(IDataRecord record, int index) where T : IConvertible {
-            var value = record.GetValue(index) as IConvertible;
+        static T GetCellValue<T>(DbDataReader reader, int index) where T : IConvertible {
+            var value = reader.GetValue(index) as IConvertible;
             if(value == null || value is DBNull)
                 return default(T);
 
@@ -177,7 +177,7 @@ namespace LimeBean {
             return (T)value.ToType(typeof(T), CultureInfo.InvariantCulture);
         }
 
-        void QueryWillExecute(IDbCommand cmd) {
+        void QueryWillExecute(DbCommand cmd) {
             if(_cache.Count > 0 && !_details.IsReadOnlyCommand(cmd.CommandText))
                 _cache.Clear();
 

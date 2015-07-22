@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 
@@ -8,7 +8,7 @@ namespace LimeBean {
     using Row = IDictionary<string, IConvertible>;
 
     interface IDatabaseAccess : ITransactionSupport {
-        event Action<IDbCommand> QueryExecuting;
+        event Action<DbCommand> QueryExecuting;
         int CacheCapacity { get; set; }        
 
         int Exec(string sql, params object[] parameters);
