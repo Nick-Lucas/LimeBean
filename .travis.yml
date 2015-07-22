@@ -1,7 +1,8 @@
 language: csharp
-sudo: false
+sudo: required
 
 install:
+    - ./travis-update-sqlite.sh
     - curl -sSL https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.sh | DNX_BRANCH=dev sh && source ~/.dnx/dnvm/dnvm.sh
     - dnvm install latest -r mono
     - dnu restore
