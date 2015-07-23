@@ -5,7 +5,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/o9p20n4k2ndya0w2?svg=true&passingText=LimeBean.Tests.DNX.CoreCLR)](https://ci.appveyor.com/project/AlekseyMartynov/limebean-ra69c)
 [![Build Status](https://travis-ci.org/AlekseyMartynov/LimeBean.svg)](https://travis-ci.org/AlekseyMartynov/LimeBean)
 
-[RedBeanPHP](http://redbeanphp.com/)-inspired data access layer for .NET, .NET Core and Mono.
+[RedBeanPHP](http://redbeanphp.com/)-inspired data access layer for .NET, .NET Core (DNX/DNXCore) and Mono.
 
 ## Supported Databases
 * MySQL/MariaDB

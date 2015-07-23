@@ -1,4 +1,12 @@
 {
+    "version": "0.2.0",
+    "authors": [ "Aleksey Martynov" ],
+    "description": "RedBeanPHP-inspired data access layer for .NET, .NET Core (DNX/DNXCore) and Mono",
+    "tags": [ "orm", "sqlite", "mysql" ],
+
+    "projectUrl": "https://github.com/AlekseyMartynov/LimeBean",
+    "licenseUrl": "https://raw.githubusercontent.com/AlekseyMartynov/LimeBean/master/LimeBean/LICENSE.txt",
+
     "frameworks": {      
         "dotnet": {
             "dependencies": {
