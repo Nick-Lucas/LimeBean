@@ -1,5 +1,5 @@
 {
-    "version": "0.2.0",
+    "version": "0.3.0",
     "authors": [ "Aleksey Martynov" ],
     "description": "RedBeanPHP-inspired data access layer for .NET, .NET Core (DNX/DNXCore) and Mono",
     "tags": [ "orm", "sqlite", "mysql" ],
