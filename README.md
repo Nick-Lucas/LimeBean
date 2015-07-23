@@ -7,6 +7,12 @@
 
 [RedBeanPHP](http://redbeanphp.com/)-inspired data access layer for .NET, .NET Core (DNX/DNXCore) and Mono.
 
+## Available on NuGet Gallery
+
+[![NuGet](https://img.shields.io/nuget/v/LimeBean.svg)](https://www.nuget.org/packages/LimeBean)
+
+    PM> Install-Package LimeBean
+
 ## Supported Databases
 * MySQL/MariaDB
 * SQLite
