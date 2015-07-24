@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LimeBean.Tests {
 
-#if USE_MS_SQLITE
+#if SQLITE_MODE_MS
 
     using Microsoft.Data.Sqlite;
 
@@ -16,6 +16,22 @@ namespace LimeBean.Tests {
 
         public static BeanApi CreateApi(string connectionString = IN_MEMORY_CONNECTION_STRING) {
             return new BeanApi(connectionString, typeof(SqliteConnection));
+        }
+
+        public static DbConnection CreateConnection(string connectionString = IN_MEMORY_CONNECTION_STRING) {
+            return new SqliteConnection(connectionString);
+        }
+    }
+
+#elif SQLITE_MODE_MONO
+
+    using Mono.Data.Sqlite;
+
+    static partial class SQLitePortability {
+        public static readonly Type ExceptionType = typeof(SqliteException);
+
+        public static BeanApi CreateApi(string connectionString = IN_MEMORY_CONNECTION_STRING) {
+            return new BeanApi(connectionString, SqliteFactory.Instance);
         }
 
         public static DbConnection CreateConnection(string connectionString = IN_MEMORY_CONNECTION_STRING) {

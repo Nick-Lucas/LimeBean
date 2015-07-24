@@ -87,6 +87,7 @@ namespace LimeBean {
             switch(Connection.GetType().FullName) { 
                 case "System.Data.SQLite.SQLiteConnection":
                 case "Microsoft.Data.Sqlite.SqliteConnection":
+                case "Mono.Data.Sqlite.SqliteConnection":
                     return new SQLiteDetails();
     
                 case "MySql.Data.MySqlClient.MySqlConnection":

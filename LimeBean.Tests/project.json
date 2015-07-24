@@ -1,6 +1,6 @@
 {   
     "compilationOptions" : {
-        "define": [ "USE_MS_SQLITE" ]
+        "define": [ "SQLITE_MODE_MS" ]
     },
     "exclude": [ 
         "Examples/*.cs"
