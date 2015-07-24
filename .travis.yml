@@ -1,11 +1,20 @@
 language: csharp
 sudo: required
 
+env:
+    - XUNIT=./packages/xunit.runner.console.2.1.0-beta4-build3050/tools/xunit.console.exe
+
 install:
     - ./travis-update-sqlite.sh
     - curl -sSL https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.sh | DNX_BRANCH=dev sh && source ~/.dnx/dnvm/dnvm.sh
     - dnvm install latest -r mono
+    - wget https://nuget.org/nuget.exe
     - dnu restore
+    - mono ./nuget.exe restore -verbosity detailed
 
 script:
+    - xbuild LimeBean.sln /t:Rebuild /p:SQLiteMode=DEFAULT
+    - mono $XUNIT ./bin/LimeBean.Tests.dll -noappdomain -notrait db=mssql
+    - xbuild LimeBean.sln /t:Rebuild /p:SQLiteMode=MONO
+    - mono $XUNIT ./bin/LimeBean.Tests.dll -noappdomain -notrait db=mssql
     - dnx LimeBean.Tests xunit.runner.dnx -notrait db=mssql
