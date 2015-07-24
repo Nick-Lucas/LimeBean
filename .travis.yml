@@ -13,8 +13,8 @@ install:
     - mono ./nuget.exe restore -verbosity detailed
 
 script:
-    - xbuild LimeBean.sln /t:Rebuild /p:SQLiteMode=DEFAULT
+    - xbuild LimeBean.sln /nologo /v:q /t:Rebuild /p:SQLiteMode=DEFAULT
     - mono $XUNIT ./bin/LimeBean.Tests.dll -noappdomain -notrait db=mssql
-    - xbuild LimeBean.sln /t:Rebuild /p:SQLiteMode=MONO
+    - xbuild LimeBean.sln /nologo /v:q /t:Rebuild /p:SQLiteMode=MONO
     - mono $XUNIT ./bin/LimeBean.Tests.dll -noappdomain -notrait db=mssql
     - dnx LimeBean.Tests xunit.runner.dnx -notrait db=mssql
