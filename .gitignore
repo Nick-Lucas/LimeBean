@@ -1,5 +1,6 @@
 *.suo
 *.*proj.user
+*.userprefs
 bin/
 obj/
 packages/

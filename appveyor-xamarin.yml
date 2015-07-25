@@ -1,0 +1,18 @@
+version: '{build}'
+
+environment:
+  xamarin_email:
+    secure: kL/cVcUNflEwgA/OdInDYcLDzP+Mkz6oW/7t+Ai5Qz8=
+  xamarin_password:
+    secure: 9c9Ztu7sauVS592t0pbCdQ==
+
+before_build:
+    - appveyor RegisterXamarinLicense -Email %xamarin_email% -Password %xamarin_password% -Product Android
+    - appveyor RegisterXamarinLicense -Email %xamarin_email% -Password %xamarin_password% -Product iOS
+
+build:
+  project: LimeBean.Xamarin.sln
+  verbosity: minimal
+
+on_finish:
+    - appveyor UnregisterXamarinLicense -Email %xamarin_email% -Password %xamarin_password%

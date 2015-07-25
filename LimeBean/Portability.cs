@@ -20,11 +20,13 @@ namespace LimeBean {
     public partial class Bean {
     }
 
+#if !XAMARIN
     public partial class BeanApi {
         public BeanApi(string connectionString, string providerName)
             : this(connectionString, DbProviderFactories.GetFactory(providerName)) {
         }
     }
+#endif
 
     static partial class Extensions {
         internal static bool IsEnum(this Type type) {
