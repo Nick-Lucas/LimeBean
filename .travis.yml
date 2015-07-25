@@ -10,7 +10,7 @@ install:
     - dnvm install latest -r mono
     - wget https://nuget.org/nuget.exe
     - dnu restore
-    - mono ./nuget.exe restore -verbosity detailed
+    - mono ./nuget.exe restore LimeBean.sln -verbosity detailed
 
 script:
     - xbuild LimeBean.sln /nologo /v:q /t:Rebuild /p:SQLiteMode=DEFAULT

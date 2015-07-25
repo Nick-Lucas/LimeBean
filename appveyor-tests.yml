@@ -9,7 +9,7 @@ services:
     - mysql56
 
 before_build:
-    - nuget restore
+    - nuget restore LimeBean.sln -verbosity detailed
 
 build:
   project: LimeBean.sln
