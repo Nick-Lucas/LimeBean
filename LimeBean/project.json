@@ -1,20 +1,21 @@
 {
-    "version": "0.3.0",
-    "authors": [ "Aleksey Martynov" ],
-    "description": "RedBeanPHP-inspired data access layer for .NET, .NET Core (DNX/DNXCore) and Mono",
-    "tags": [ "orm", "sqlite", "mysql" ],
+    "version": "0.0",
+    "authors": [ "%lime_author%" ],
+    "copyright": "%lime_copyright%",
+    "description": "%lime_description%",
+    "tags": [ "%lime_tags_json%" ],
 
-    "projectUrl": "https://github.com/AlekseyMartynov/LimeBean",
-    "licenseUrl": "https://raw.githubusercontent.com/AlekseyMartynov/LimeBean/master/LimeBean/LICENSE.txt",
+    "projectUrl": "%lime_project_url%",
+    "licenseUrl": "%lime_license_url%",
 
     "frameworks": {      
         "dotnet": {
             "dependencies": {
-                "System.Collections.Concurrent": "4.0-*",
-                "System.Data.Common": "4.0-*",
-                "System.Linq": "4.0-*",
-                "System.Reflection.Primitives": "4.0-*",
-                "System.Text.RegularExpressions": "4.0-*"            
+                "System.Collections.Concurrent": "4.0-beta-*",
+                "System.Data.Common": "4.0-beta-*",
+                "System.Linq": "4.0-beta-*",
+                "System.Reflection.Primitives": "4.0-beta-*",
+                "System.Text.RegularExpressions": "4.0-beta-*"            
             }        
         },
         "net40": {

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package >
+    <metadata>
+        <id>LimeBean.Xamarin</id>
+        <title>LimeBean for Xamarin</title>
+        <version>0.0</version>
+        <authors>%lime_author%</authors>
+        <licenseUrl>%lime_license_url%</licenseUrl>
+        <projectUrl>%lime_project_url%</projectUrl>
+        <description>%lime_description%</description>
+        <copyright>%lime_copyright%</copyright>
+        <tags>%lime_tags%</tags>
+    </metadata>
+    <files>
+        <file src="..\bin\MonoAndroid\LimeBean.dll" target="lib\MonoAndroid\" />
+        <file src="..\bin\MonoTouch\LimeBean.dll" target="lib\MonoTouch\" />
+        <file src="..\bin\Xamarin.iOS\LimeBean.dll" target="lib\Xamarin.iOS\" />
+    </files>
+</package>

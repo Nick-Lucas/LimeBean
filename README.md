@@ -6,7 +6,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/40h3xt123ol98h9o?svg=true&passingText=Xamarin)](https://ci.appveyor.com/project/AlekseyMartynov/limebean-xqi6d)
 [![Build Status](https://travis-ci.org/AlekseyMartynov/LimeBean.svg)](https://travis-ci.org/AlekseyMartynov/LimeBean)
 
-[RedBeanPHP](http://redbeanphp.com/)-inspired data access layer for .NET, .NET Core (DNX/DNXCore) and Mono.
+[RedBeanPHP](http://redbeanphp.com/)-inspired data access layer for .NET, .NET Core (DNX/DNXCore), Mono and Xamarin.
 
 ## Available on NuGet Gallery
 
@@ -40,8 +40,3 @@ All available properties and methods are exposed via the [BeanApi facade class](
 
 * Non thread-safe: use one API instance per thread, or maintain thread synchronization with locks. Read-only access is not thread-safe either because of the internal LRU cache.
 * Property values must be `IConvertible`. Any other values have to be stored as strings.
-
-## License
-
-* The contents of the [LimeBean directory](https://github.com/AlekseyMartynov/LimeBean/tree/master/LimeBean) and the produced assembly **bin/LimeBean.dll** are licensed under the [MIT license](https://github.com/AlekseyMartynov/LimeBean/blob/master/LimeBean/LICENSE.txt).
-* Any other files (unit tests, etc) are for development and testing purposes only.

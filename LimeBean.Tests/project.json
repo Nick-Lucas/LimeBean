@@ -14,7 +14,7 @@
     "frameworks": {        
         "dnxcore50": { 
             "dependencies": {
-                "System.Data.SqlClient": "4.0-*"
+                "System.Data.SqlClient": "4.0-beta-*"
             }
         },
         "dnx451": {

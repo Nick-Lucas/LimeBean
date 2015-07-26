@@ -5,6 +5,7 @@
     <NoStdLib>True</NoStdLib>
     <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkMoniker>Xamarin.iOS,Version=v1.0</TargetFrameworkMoniker>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -20,7 +21,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\bin\Xamarin\Xamarin.iOS\</OutputPath>
+    <OutputPath>..\..\bin\Xamarin.iOS\</OutputPath>
     <DefineConstants>TRACE;DEBUG;XAMARIN</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -28,7 +29,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\bin\Xamarin\Xamarin.iOS\</OutputPath>
+    <OutputPath>..\..\bin\Xamarin.iOS\</OutputPath>
     <DefineConstants>TRACE;XAMARIN</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -37,19 +38,19 @@
     <Compile Include="..\..\LimeBean\*.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="mscorlib, Version=2.0.5.0">
+    <Reference Include="mscorlib">
       <HintPath>..\..\packages\mscorlib.2.0.5.0\lib\Xamarin.iOS\mscorlib.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System, Version=2.0.5.0">
+    <Reference Include="System">
       <HintPath>..\..\packages\System.2.0.5.0\lib\Xamarin.iOS\System.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.Core, Version=2.0.5.0">
+    <Reference Include="System.Core">
       <HintPath>..\..\packages\System.Core.2.0.5.0\lib\Xamarin.iOS\System.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.Data, Version=2.0.5.0">
+    <Reference Include="System.Data">
       <HintPath>..\..\packages\System.Data.2.0.5.0\lib\Xamarin.iOS\System.Data.dll</HintPath>
       <Private>False</Private>
     </Reference>
