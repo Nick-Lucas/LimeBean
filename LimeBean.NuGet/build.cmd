@@ -5,6 +5,7 @@ set MSBUILD=c:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe /p:Configu
 set META_FILES=..\LimeBean\AssemblyInfo.cs ..\LimeBean\project.json LimeBean.Xamarin.nuspec
 set RESULT=ok
 
+rd /s/q ..\LimeBean\bin
 del *.nupkg
 
 for %%f in (%META_FILES%) do (

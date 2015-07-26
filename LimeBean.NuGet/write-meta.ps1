@@ -1,6 +1,6 @@
 param ([string]$path)
 
-$meta_version = "0.3.0"
+$meta_version = "0.3.1"
 $meta_description = "RedBeanPHP-inspired data access layer for .NET, .NET Core (DNX/DNXCore), Mono and Xamarin"
 $meta_author = "Aleksey Martynov"
 $meta_copyright = "Copyright (c) 2014-$(get-date -format yyyy) $meta_author"
@@ -11,6 +11,7 @@ $meta_tags = "orm", "sqlite", "mysql", "dnx", "monoandroid", "monotouch", "xamar
 (Get-Content $path) | Foreach-Object {
     $_  -replace '(AssemblyVersion.+?)[\d.]+', "`${1}%lime_version%" `
         -replace '("version":.+?)[\d.]+', "`${1}%lime_version%" `
+        -replace '(\<version\>)[\d.]+', "`${1}%lime_version%" `
         -replace '%lime_version%', $meta_version `
         -replace '%lime_description%', $meta_description `
         -replace '%lime_author%', $meta_author `
