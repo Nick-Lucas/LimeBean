@@ -40,3 +40,5 @@ All available properties and methods are exposed via the [BeanApi facade class](
 
 * Non thread-safe: use one API instance per thread, or maintain thread synchronization with locks. Read-only access is not thread-safe either because of the internal LRU cache.
 * Property values must be `IConvertible`. Any other values have to be stored as strings.
+
+![MIT License](https://img.shields.io/github/license/alekseymartynov/limebean.svg)
