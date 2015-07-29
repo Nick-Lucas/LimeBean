@@ -9,7 +9,7 @@
         <projectUrl>%lime_project_url%</projectUrl>
         <description>%lime_description%</description>
         <copyright>%lime_copyright%</copyright>
-        <tags>%lime_tags%</tags>
+        <tags>orm sqlite xamarin monoandroid monotouch</tags>
     </metadata>
     <files>
         <file src="..\bin\MonoAndroid\LimeBean.dll" target="lib\MonoAndroid\" />
