@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LimeBean.Xamarin.MonoAndroid", "LimeBean.Xamarin\MonoAndroid\LimeBean.Xamarin.MonoAndroid.csproj", "{3779266B-2B0E-489F-85B0-8021879D5F3E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LimeBean.MonoAndroid", "LimeBean.Xamarin\LimeBean.MonoAndroid\LimeBean.MonoAndroid.csproj", "{3779266B-2B0E-489F-85B0-8021879D5F3E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LimeBean.Xamarin.MonoTouch", "LimeBean.Xamarin\MonoTouch\LimeBean.Xamarin.MonoTouch.csproj", "{7D7D71A9-FE89-4A79-9574-1C77A1BD7C6A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LimeBean.MonoTouch", "LimeBean.Xamarin\LimeBean.MonoTouch\LimeBean.MonoTouch.csproj", "{7D7D71A9-FE89-4A79-9574-1C77A1BD7C6A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LimeBean.Xamarin.Xamarin.IOS", "LimeBean.Xamarin\Xamarin.iOS\LimeBean.Xamarin.Xamarin.IOS.csproj", "{B9639EFA-B5DC-4CC6-9BD9-101784E421FB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LimeBean.Xamarin.IOS", "LimeBean.Xamarin\LimeBean.Xamarin.iOS\LimeBean.Xamarin.IOS.csproj", "{B9639EFA-B5DC-4CC6-9BD9-101784E421FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
