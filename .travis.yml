@@ -1,6 +1,6 @@
 language: csharp
 sudo: required
-mono: alpha
+mono: nightly
 
 env:
     - XUNIT=./packages/xunit.runner.console.2.1.0-beta4-build3050/tools/xunit.console.exe
