@@ -14,10 +14,14 @@
 
     PM> Install-Package LimeBean
 
-## Supported Databases
-* MySQL/MariaDB
-* SQLite
-* SQL Server
+## Supported Frameworks and Databases
+
+              | .NET | [.NET Core](http://dotnet.github.io/core/) | Mono | Xamarin 
+--------------|------|--------------------------------------------|------|---------
+SQLite *      | +    | +                                          | +    | +
+MySQL/MariaDB | +    | future                                     | +    | -
+SQL Server    | +    | +                                          | +    | -
+\* including System.Data.SQLite, Mono.Data.Sqlite and Microsoft.Data.Sqlite
 
 ## Synopsis
 
