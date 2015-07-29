@@ -13,6 +13,9 @@
     },
     "frameworks": {        
         "dnxcore50": { 
+            "compilationOptions" : {
+                "define": [ "NO_MARIADB" ]
+            },
             "dependencies": {
                 "System.Data.SqlClient": "4.0-beta-*"
             }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NO_MSSQL
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -22,3 +23,4 @@ namespace LimeBean.Tests.Fixtures {
     }
 
 }
+#endif

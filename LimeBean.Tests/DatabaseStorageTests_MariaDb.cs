@@ -1,4 +1,4 @@
-﻿#if !DNXCORE50
+﻿#if !NO_MARIADB
 using LimeBean.Tests.Fixtures;
 using System;
 using System.Collections.Generic;

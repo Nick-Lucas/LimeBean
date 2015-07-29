@@ -1,4 +1,4 @@
-﻿#if !DNXCORE50
+﻿#if !NO_MARIADB
 using System;
 using System.Data.Common;
 using MySql.Data.MySqlClient;

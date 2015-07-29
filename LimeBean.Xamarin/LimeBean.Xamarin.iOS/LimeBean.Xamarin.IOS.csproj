@@ -22,7 +22,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\Xamarin.iOS\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;XAMARIN</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;XAMARIN;NO_MARIADB;NO_MSSQL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -30,7 +30,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\bin\Xamarin.iOS\</OutputPath>
-    <DefineConstants>TRACE;XAMARIN</DefineConstants>
+    <DefineConstants>TRACE;XAMARIN;NO_MARIADB;NO_MSSQL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>

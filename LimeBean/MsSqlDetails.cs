@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NO_MSSQL
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -188,3 +189,4 @@ namespace LimeBean {
     }
 
 }
+#endif

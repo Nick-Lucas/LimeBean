@@ -1,4 +1,5 @@
-﻿using LimeBean.Tests.Fixtures;
+﻿#if !NO_MSSQL
+using LimeBean.Tests.Fixtures;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -170,3 +171,4 @@ namespace LimeBean.Tests {
     }
 
 }
+#endif

@@ -89,12 +89,16 @@ namespace LimeBean {
                 case "Microsoft.Data.Sqlite.SqliteConnection":
                 case "Mono.Data.Sqlite.SqliteConnection":
                     return new SQLiteDetails();
-    
+
+#if !NO_MARIADB
                 case "MySql.Data.MySqlClient.MySqlConnection":
                     return new MariaDbDetails();
+#endif
 
+#if !NO_MSSQL
                 case "System.Data.SqlClient.SqlConnection":
                     return new MsSqlDetails();
+#endif
             }
 
             throw new NotSupportedException();
