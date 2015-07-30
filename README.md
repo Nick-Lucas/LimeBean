@@ -1,6 +1,6 @@
 # LimeBean
 
-[![Build status](https://ci.appveyor.com/api/projects/status/o3lauspwhfk898o7?svg=true)](https://ci.appveyor.com/project/AlekseyMartynov/limebean)
+[![Build status](https://ci.appveyor.com/api/projects/status/g7x988f9jv0pov4c?svg=true)](https://ci.appveyor.com/project/AlekseyMartynov/limebean)
 [![Build Status](https://travis-ci.org/AlekseyMartynov/LimeBean.svg)](https://travis-ci.org/AlekseyMartynov/LimeBean)
 
 [RedBeanPHP](http://redbeanphp.com/)-inspired data access layer for .NET, .NET Core (DNX/DNXCore), Mono and Xamarin.
