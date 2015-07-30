@@ -2,12 +2,12 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/g7x988f9jv0pov4c/branch/master?svg=true)](https://ci.appveyor.com/project/AlekseyMartynov/limebean)
 [![Build Status](https://travis-ci.org/AlekseyMartynov/LimeBean.svg?branch=master)](https://travis-ci.org/AlekseyMartynov/LimeBean)
+[![NuGet](https://img.shields.io/nuget/v/LimeBean.svg)](https://www.nuget.org/packages/LimeBean)
+[![MIT License](https://img.shields.io/github/license/alekseymartynov/limebean.svg)](https://raw.githubusercontent.com/AlekseyMartynov/LimeBean/master/LICENSE.txt)
 
 [RedBeanPHP](http://redbeanphp.com/)-inspired data access layer for .NET, .NET Core (DNX/DNXCore), Mono and Xamarin.
 
 ## Available on NuGet Gallery
-
-[![NuGet](https://img.shields.io/nuget/v/LimeBean.svg)](https://www.nuget.org/packages/LimeBean)
 
     PM> Install-Package LimeBean
 
@@ -41,5 +41,3 @@ All available properties and methods are exposed via the [BeanApi facade class](
 
 * Non thread-safe: use one API instance per thread, or maintain thread synchronization with locks. Read-only access is not thread-safe either because of the internal LRU cache.
 * Property values must be `IConvertible`. Any other values have to be stored as strings.
-
-![MIT License](https://img.shields.io/github/license/alekseymartynov/limebean.svg)
