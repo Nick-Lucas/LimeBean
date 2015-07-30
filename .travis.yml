@@ -2,10 +2,6 @@ language: csharp
 sudo: required
 mono: nightly
 
-branches:
-  only:
-    - master
-
 env:
   global:
     - LIME_TEST_MARIA_HOST=127.0.0.1

@@ -1,10 +1,6 @@
 version: '{build}'
 
 clone_depth: 1
-skip_tags: true
-branches:
-  only:
-    - master
 
 environment:
   LIME_TEST_MARIA_PWD: Password12!
