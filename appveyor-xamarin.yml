@@ -1,8 +1,0 @@
-version: '{build}'
-
-before_build:
-    - nuget restore LimeBean.Xamarin.sln
-
-build:
-  project: LimeBean.Xamarin.sln
-  verbosity: minimal

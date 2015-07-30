@@ -2,20 +2,37 @@ language: csharp
 sudo: required
 mono: nightly
 
+branches:
+  only:
+    - master
+
 env:
-    - XUNIT=./packages/xunit.runner.console.2.1.0-beta4-build3050/tools/xunit.console.exe
+  global:
+    - LIME_TEST_MARIA_HOST=127.0.0.1
+    - LIME_TEST_MARIA_USER=root
+    - LIME_TEST_MARIA_PWD=""
+    - LIME_DNX_VERSION=1.0.0-beta6
+    - LIME_XUNIT_CONSOLE_VERSION=2.1.0-beta4-build3050
 
 install:
-    - ./travis-update-sqlite.sh
-    - curl -sSL https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.sh | DNX_BRANCH=dev sh && source ~/.dnx/dnvm/dnvm.sh
-    - dnvm install latest -r mono
-    - wget https://nuget.org/nuget.exe
-    - dnu restore
-    - mono ./nuget.exe restore LimeBean.sln -verbosity detailed
+  - ./travis-update-sqlite.sh
+
+  # Install DNX
+  - curl -sSL https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.sh | DNX_BRANCH=dev sh && source ~/.dnx/dnvm/dnvm.sh
+  - dnvm install $LIME_DNX_VERSION -r mono
+
+  # Install NuGet
+  - wget https://nuget.org/nuget.exe
+
+  # Restore packages
+  - dnu restore
+  - mono ./nuget.exe restore LimeBean.sln -verbosity detailed
 
 script:
-    - xbuild LimeBean.sln /nologo /v:q /t:Rebuild /p:SQLiteMode=DEFAULT
-    - mono $XUNIT ./bin/LimeBean.Tests.dll -noappdomain -notrait db=mssql
-    - xbuild LimeBean.sln /nologo /v:q /t:Rebuild /p:SQLiteMode=MONO
-    - mono $XUNIT ./bin/LimeBean.Tests.dll -noappdomain -notrait db=mssql
-    - dnx LimeBean.Tests xunit.runner.dnx -notrait db=mssql
+  # Build 
+  - xbuild LimeBean.sln /nologo /v:q /t:Rebuild /p:SQLiteMode=MONO
+  - dnu build LimeBean/project.json LimeBean.Tests/project.json --quiet
+
+  # Test
+  - mono ./packages/xunit.runner.console.$LIME_XUNIT_CONSOLE_VERSION/tools/xunit.console.exe ./bin/LimeBean.Tests.dll -noappdomain -notrait db=mssql
+  - dnx LimeBean.Tests xunit.runner.dnx -notrait db=mssql

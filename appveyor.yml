@@ -1,0 +1,47 @@
+version: '{build}'
+
+clone_depth: 1
+skip_tags: true
+branches:
+  only:
+    - master
+
+environment:
+  LIME_TEST_MARIA_PWD: Password12!
+  LIME_TEST_MSSQL_NAME: (local)\SQL2008R2SP2
+  LIME_DNX_VERSION: 1.0.0-beta6
+
+services:
+  - mssql2008r2sp2
+  - mysql56
+
+before_build:
+  # Install DNX
+  - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.ps1'))
+  - dnvm install %LIME_DNX_VERSION% -r coreclr
+  - dnvm install %LIME_DNX_VERSION% -r clr
+
+  # Restore packages
+  - dnu restore --quiet
+  - nuget restore LimeBean.sln
+  - nuget restore LimeBean.Xamarin.sln
+
+build_script:
+  - msbuild LimeBean.sln /v:m
+  - msbuild LimeBean.Xamarin.sln /v:m
+  - dnu build LimeBean\project.json LimeBean.Tests\project.json --quiet
+
+test_script:
+  # .NET
+  - '%xunit20%\xunit.console bin\LimeBean.Tests.dll -appveyor'
+
+  # Copy SQLite binaries
+  - xcopy /Y /I /S System.Data.SQLite\sqlite*.dll LimeBean.Tests
+
+  # DNXCore
+  - dnvm use %LIME_DNX_VERSION% -r coreclr
+  - dnx LimeBean.Tests xunit.runner.dnx
+
+  # DNX
+  - dnvm use %LIME_DNX_VERSION% -r clr
+  - dnx LimeBean.Tests xunit.runner.dnx
