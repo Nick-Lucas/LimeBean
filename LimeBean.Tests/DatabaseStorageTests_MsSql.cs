@@ -168,6 +168,10 @@ namespace LimeBean.Tests {
             SharedChecks.CheckSchemaReadingKeepsCache(_db, _storage);
         }
 
+        [Fact]
+        public void DateTimeQueries() {
+            SharedChecks.CheckDateTimeQueries(_db, _storage);
+        }
     }
 
 }

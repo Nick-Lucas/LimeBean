@@ -104,6 +104,9 @@ namespace LimeBean {
                     }
 
                     return number;
+
+                case TypeCode.DateTime:
+                    return value.ToDateTime(null).ToString("yyyy-MM-dd HH:mm:ss");
             }
 
             var text = value.ToString(CultureInfo.InvariantCulture);
