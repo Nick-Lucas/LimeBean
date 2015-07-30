@@ -17,7 +17,7 @@
                 "define": [ "NO_MARIADB" ]
             },
             "dependencies": {
-                "System.Data.SqlClient": "4.0-beta-*",
+                "System.Data.SqlClient": "4.0.0-*",
                 "System.Runtime.Serialization.Primitives": "4.0.10-*"
             }
         },
