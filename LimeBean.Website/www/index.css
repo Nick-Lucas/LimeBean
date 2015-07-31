@@ -1,0 +1,59 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed:700);
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+body {
+    font-family: "Open Sans", sans-serif;
+    font-size: 15px;
+    padding-top: 50px;
+    min-width: 480px;
+}
+
+h1, h2, h3, h4 {
+  font-family: "Roboto Condensed", sans-serif;
+  font-weight: bold;
+}
+
+pre {
+    padding: 0;
+}
+
+pre code.hljs {
+    padding: 1.2em;
+}
+
+.starter-template {
+    padding: 20px 15px;
+    text-align: center;
+}
+
+.lime-hero {
+    background: #8fb800;
+    color: white;
+    width: inherit;
+}
+
+.btn-nuget { 
+  color: #ffffff; 
+  background-color: #FFA71A; 
+  border-color: #FB9902; 
+} 
+ 
+.btn-nuget:hover, 
+.btn-nuget:focus, 
+.btn-nuget:active, 
+.btn-nuget.active
+{ 
+  color: #ffffff; 
+  background-color: #F09D18; 
+  border-color: #FB9902; 
+}
+
+.lime-social-buttons {
+    display: inline-block;
+    margin-top: 20px;
+}
+
+.lime-footer {
+    text-align: center;
+    padding-bottom: 50px;
+}

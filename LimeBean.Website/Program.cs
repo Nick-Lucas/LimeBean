@@ -1,0 +1,87 @@
+﻿using MarkdownDeep;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace LimeBean.Website {
+
+    class Program {
+
+        static void Main(string[] args) {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en");
+
+            var layout = File.ReadAllText("../layout.html");
+            layout = layout.Replace("{{description}}", "RedBeanPHP-inspired data access layer for .NET");
+            layout = layout.Replace("{{updated_on}}", DateTime.Now.ToString("MMM d, yyyy"));
+
+            var body = new Markdown().Transform(PreprocessBody());
+            body = AddHeaderAnchors(body);            
+
+            layout = layout.Replace("{{body}}", body);
+            File.WriteAllText("../www/index.html", layout);
+        }
+
+
+        static string PreprocessBody() {
+            var source = File.ReadAllLines("../Body.cs");
+            var result = new List<string>();
+            List<string> currentCode = null;
+
+            foreach(var line in source) {
+                if(currentCode == null && Regex.IsMatch(line, "#if CODE")) {
+                    result.Add("");
+                    currentCode = new List<string>();
+                    continue;
+                }
+
+                if(currentCode != null && Regex.IsMatch(line, "#endif")) {
+                    var minIndent = currentCode
+                        .Where(c => !String.IsNullOrEmpty(c))
+                        .Min(s => Regex.Match(s, "^\\s*").Length) - 4;
+
+                    result.AddRange(currentCode.Select(c => {
+                        if(String.IsNullOrWhiteSpace(c))
+                            return "";
+                        return c.Substring(minIndent);
+                    }));
+
+                    result.Add("");
+
+                    currentCode = null;
+                    continue;
+                }
+
+                if(currentCode != null) {
+                    currentCode.Add(line);
+                    continue;
+                }
+
+                var trimmed = line.Trim();
+                if(!trimmed.StartsWith("///"))
+                    continue;
+
+                if(trimmed.Length < 4)
+                    result.Add("");
+                else
+                    result.Add(trimmed.Substring(4));
+            }
+
+            return String.Join("\n", result);
+        }
+    
+        static string AddHeaderAnchors(string html) {
+            return Regex.Replace(html, @"(\<h2)([^>]*\>(.+?)\</h2\>)", m => {
+                return m.Groups[1].Value + " id=\"" 
+                    + Regex.Replace(m.Groups[3].Value.ToLower(), "\\W+", "-")
+                    + "\"" + m.Groups[2].Value;
+            });        
+        }
+    }
+
+}
