@@ -13,6 +13,10 @@ h1, h2, h3, h4 {
   font-weight: bold;
 }
 
+code {
+    color: #6f7c4c;
+}
+
 pre {
     padding: 0;
 }

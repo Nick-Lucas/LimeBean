@@ -20,10 +20,12 @@ namespace LimeBean.Website {
             layout = layout.Replace("{{description}}", "RedBeanPHP-inspired data access layer for .NET");
             layout = layout.Replace("{{updated_on}}", DateTime.Now.ToString("MMM d, yyyy"));
 
+            var headerIdList = new List<string>();
             var body = new Markdown().Transform(PreprocessBody());
-            body = AddHeaderAnchors(body);            
+            body = AddHeaderAnchors(body, headerIdList);            
 
             layout = layout.Replace("{{body}}", body);
+            ValidateHeaderAnchors(headerIdList, layout);
             File.WriteAllText("../www/index.html", layout);
         }
 
@@ -34,15 +36,15 @@ namespace LimeBean.Website {
             List<string> currentCode = null;
 
             foreach(var line in source) {
-                if(currentCode == null && Regex.IsMatch(line, "#if CODE")) {
+                if(currentCode == null && line.Trim() == "#if CODE") {
                     result.Add("");
                     currentCode = new List<string>();
                     continue;
                 }
 
-                if(currentCode != null && Regex.IsMatch(line, "#endif")) {
+                if(currentCode != null && line.Trim() == "#endif") {
                     var minIndent = currentCode
-                        .Where(c => !String.IsNullOrEmpty(c))
+                        .Where(c => !String.IsNullOrWhiteSpace(c))
                         .Min(s => Regex.Match(s, "^\\s*").Length) - 4;
 
                     result.AddRange(currentCode.Select(c => {
@@ -75,12 +77,19 @@ namespace LimeBean.Website {
             return String.Join("\n", result);
         }
     
-        static string AddHeaderAnchors(string html) {
+        static string AddHeaderAnchors(string html, List<string> idList) {
             return Regex.Replace(html, @"(\<h2)([^>]*\>(.+?)\</h2\>)", m => {
-                return m.Groups[1].Value + " id=\"" 
-                    + Regex.Replace(m.Groups[3].Value.ToLower(), "\\W+", "-")
-                    + "\"" + m.Groups[2].Value;
+                var id = Regex.Replace(m.Groups[3].Value.ToLower(), "\\W+", "-").Trim('-');
+                idList.Add(id);
+                return m.Groups[1].Value + " id=\"" + id + "\"" + m.Groups[2].Value;
             });        
+        }
+
+        static void ValidateHeaderAnchors(List<string> knownIdList, string html) {
+            var refs = Regex.Matches(html, "href=\"#(.+?)\"").Cast<Match>().Select(m => m.Groups[1].Value);
+            var wrong = refs.Except(knownIdList);
+            if(wrong.Any())
+                throw new Exception("Wrong header refs found: " + String.Join(" ", wrong));
         }
     }
 
