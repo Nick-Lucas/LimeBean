@@ -1,6 +1,6 @@
 param ([string]$path)
 
-$meta_version = "0.3.2"
+$meta_version = "0.3.3"
 $meta_description = "RedBeanPHP-inspired data access layer"
 $meta_author = "Aleksey Martynov"
 $meta_copyright = "Copyright (c) 2014-$(get-date -format yyyy) $meta_author"
