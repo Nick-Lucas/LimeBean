@@ -84,7 +84,7 @@ namespace LimeBean {
             }
         }
 
-        public Bean Put<T>(string name, T value) where T : IConvertible { 
+        public Bean Put(string name, IConvertible value) { 
             this[name] = value;
             return this;
         }

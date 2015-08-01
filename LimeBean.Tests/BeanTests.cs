@@ -32,7 +32,7 @@ namespace LimeBean.Tests {
             Assert.Equal(0, bean.Get<int>("x"));
             Assert.Equal(0, bean.GetNullable<int>("x"));
 
-            bean.Put<int>("x", null);
+            bean.Put("x", null);
             Assert.Equal(0, bean.Get<int>("x"));
             Assert.Null(bean.GetNullable<int>("x"));
 
