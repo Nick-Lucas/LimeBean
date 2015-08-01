@@ -20,11 +20,11 @@ before_build:
   # Restore packages
   - dnu restore --quiet
   - nuget restore LimeBean.sln
-  - nuget restore LimeBean.Xamarin.sln
+  - nuget restore LimeBean.Xamarin\LimeBean.Xamarin.sln
 
 build_script:
   - msbuild LimeBean.sln /v:m
-  - msbuild LimeBean.Xamarin.sln /v:m
+  - msbuild LimeBean.Xamarin\LimeBean.Xamarin.sln /v:m
   - dnu build LimeBean\project.json LimeBean.Tests\project.json --quiet
 
 test_script:
