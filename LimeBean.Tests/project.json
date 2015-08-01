@@ -2,9 +2,6 @@
     "compilationOptions" : {
         "define": [ "SQLITE_MODE_MS" ]
     },
-    "exclude": [ 
-        "Examples/*.cs"
-    ],        
     "dependencies": {
         "LimeBean": "",
         "Microsoft.Data.SQLite": "1.0.0-beta7-10957",
