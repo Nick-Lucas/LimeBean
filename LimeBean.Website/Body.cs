@@ -9,7 +9,7 @@ namespace LimeBean.Website {
     class Body {
         /// ## About LimeBean
         /// LimeBean provides simple and concise API for accessing ADO.NET data sources.
-        /// It' compatible with .NET framework, ASP.NET 5 (DNX / DNXCore), Mono and Xamarin.
+        /// It' compatible with **.NET framework**, **ASP.NET 5 (DNX / DNXCore)**, **Mono** and **Xamarin**.
         /// Supported databases include **SQLite**, **MySQL/MariaDB** and **SQL Server**.
         /// 
         /// The library is inspired by [RedBeanPHP](http://redbeanphp.com).
@@ -38,38 +38,44 @@ namespace LimeBean.Website {
             /// * [MySql.Data](https://www.nuget.org/packages/MySql.Data/) for MySQL or MariaDB
             /// * [System.Data.SqlClient](https://msdn.microsoft.com/en-us/library/System.Data.SqlClient.aspx) for SQL Server
             /// 
-            /// Create an instance of the `BeanApi` class:
+            /// To start using LimeBean, create an instance of the `BeanApi` class:
 #if CODE
             // Using a connection string and an ADO.NET provider factory
-            api = new BeanApi("data source=/path/to/db", SQLiteFactory.Instance);
+            new BeanApi("data source=/path/to/db", SQLiteFactory.Instance);
 
             // Using a connection string and a connection type
-            api = new BeanApi("data source=/path/to/db", typeof(SQLiteConnection));
+            new BeanApi("data source=/path/to/db", typeof(SQLiteConnection));
 
             // Using a shared opened connection
-            api = new BeanApi(connection);
+            new BeanApi(connection);
 #endif
-            /// **NOTE:** `BeanApi` class is `IDisposable`.
+            /// **NOTE:** `BeanApi` is `IDisposable`.
             /// 
-            /// When `BeanApi` is created from a connection string, the underlying connection is initiated on the first usage and closed on dispose.
+            /// When `BeanApi` is created from a connection string (two first cases), the underlying connection is initiated on the first usage and closed on dispose.
             /// Shared connections are used as-is, their state it not changed.
             /// 
             /// See also: [BeanApi Object Lifetime](#beanapi-object-lifetime)
         }
 
-        void CRUD(BeanApi api) {
+        void CRUD() {
             /// ## CRUD 
-            /// For basic usage, LimeBean is ready to go. Zero configuration and no additional code!
-            /// When operating in [fluid mode](#fluid-mode), 
-            /// database schema is maintained on-the-fly, behind the scenes: 
-            /// you don't need to create tables and columns by yourself.
+            /// (Create / Read / Update / Delete)
             /// 
-            /// Take a look at the following example:
+            /// For basic usage, LimeBean requires zero configuration and no additional code!
+            /// Database schema is maintained on-the-fly (see [Fluid Mode](#fluid-mode)): 
+            /// no need to create tables and columns by yourself.
+            /// 
+            /// Take a look at the following sample scenario:
             /// 
 #if CODE
-            // Enter the fluid mode (use during development only!)
-            api.EnterFluidMode();
+            // Use a temporary in-memory SQLite database
+            var api = new BeanApi("Data Source=:memory:", SQLiteFactory.Instance);
 
+            // Enter the fluid mode
+            api.EnterFluidMode();
+#endif
+            /// **Create**
+#if CODE
             // Create a bean. "Bean" means "data record", "dispense" means "instantiate new".
             var bean = api.Dispense("book");
 
@@ -87,10 +93,14 @@ namespace LimeBean.Website {
 
             // Each saved bean has an ID, or primary key
             Console.WriteLine(id);
-
-            // Load back
+#endif
+            /// **Read**
+#if CODE
+            // Load by id
             bean = api.Load("book", id);
-
+#endif
+            /// **Update**
+#if CODE
             // Make some edits
             bean["title"] = "Learn LimeBean";
             bean["release_date"] = new DateTime(2015, 7, 30);
@@ -100,11 +110,12 @@ namespace LimeBean.Website {
             // One new column ("release_date") will be added
             // The type of column "rating" will be expanded from integer to string
             api.Store(bean);
-
-            // Or delete it
+#endif
+            /// **Delete**
+#if CODE
             api.Trash(bean);
 
-            // Close the connection
+            // Don't forget to close the connection
             api.Dispose();
 #endif
         }
@@ -136,7 +147,7 @@ namespace LimeBean.Website {
 
         void FluidMode(BeanApi api) { 
             /// ## Fluid Mode
-            /// LimeBean tries to mitigate the common inconvenience associated with relational databases,
+            /// LimeBean is committed to mitigate the common inconvenience associated with relational databases,
             /// that is necessity to manually create tables, columns and adjust their data types. 
             /// In this sense, LimeBean takes SQL databases a little closer to NoSQL ones like MongoDB.
             /// 
@@ -157,7 +168,7 @@ namespace LimeBean.Website {
             /// Automatically generated schema is usually sub-optimal and lacks indexes which are essential
             /// for performance. When most of planned tables are already in place, 
             /// and only minor changes are expected, 
-            /// it is recommended to turn fluid mode off, audit the database structure and make further schema
+            /// it is recommended to turn the fluid mode off, audit the database structure, add indexes, and make further schema
             /// changes with a dedicated database management tool (like HeidiSQL, SSMS, etc).
             /// 
         }
@@ -172,7 +183,7 @@ namespace LimeBean.Website {
                 var list = api.Find("book", "WHERE rating > 7");
 #endif
             }
-            /// Instead of embedding values into SQL code, it is recommended to use parameters:
+            /// Instead of embedding values into SQL code, it is recommended to use **parameters**:
             {
 #if CODE
                 var list = api.Find("book", "WHERE rating > {0}", 7);
@@ -202,7 +213,7 @@ namespace LimeBean.Website {
 #if CODE
             var count = api.Count("book", "WHERE rating > {0}", 7);
 #endif
-            /// It is also possible to perform unbuffered load for processing in a foreach-loop:
+            /// It is also possible to perform unbuffered (memory-optimized) load for processing in a foreach-loop:
 #if CODE
             foreach(var bean in api.FindIterator("book", "ORDER BY rating")) {
                 // do something with bean
@@ -248,7 +259,7 @@ namespace LimeBean.Website {
 
         class LifecycleHooks { 
             /// ## Lifecycle Hooks
-            /// In [custom Bean classes](#custom-bean-classes) you can override lifecycle hook methods to receive 
+            /// In [custom bean classes](#custom-bean-classes) you can override lifecycle hook methods to receive 
             /// notifications about [CRUD operations](#crud) occurring to this bean:
             /// 
 #if CODE
@@ -297,10 +308,12 @@ namespace LimeBean.Website {
             // Custom non-autoincrement key
             api.Key("book", "book_id", false);
             
-            // Compound key `(order_id, product_id)`
+            // Compound key (order_id, product_id)
             api.Key("order_item", "order_id", "product_id");
 #endif
             /// **NOTE:** non auto-increment keys must be assigned manually prior to saving.
+            /// 
+            /// The [Bean Observers](#bean-observers) section contains an example of using GUID keys for all beans.
         }
 
         void GenericSqlQueries(BeanApi api) {
@@ -316,7 +329,12 @@ namespace LimeBean.Website {
                 var rows = api.Rows("SELECT author, COUNT(*) FROM book WHERE rating > {0} GROUP BY author", 7);
       
                 // Load a single row
-                var row = api.Row("SELECT author, COUNT(*) FROM book GROUP BY author ORDER BY COUNT(*) DESC LIMIT 1");
+                var row = api.Row(@"SELECT author, COUNT(*) 
+                                    FROM book 
+                                    WHERE rating > {0}
+                                    GROUP BY author 
+                                    ORDER BY COUNT(*) DESC 
+                                    LIMIT 1", 7);
       
                 // Load a column
                 var col = api.Col<string>("SELECT DISTINCT author FROM book ORDER BY author");
@@ -325,7 +343,7 @@ namespace LimeBean.Website {
                 var count = api.Cell<int>("SELECT COUNT(*) FROM book");
 #endif
             }
-            /// For `Rows` and `Col`, there are unbuffered counterparts:
+            /// For `Rows` and `Col`, there are unbuffered (memory-optimized) counterparts:
             {
 #if CODE
                 foreach(var row in api.RowsIterator("...")) {
@@ -337,11 +355,11 @@ namespace LimeBean.Website {
                 }
 #endif
             }
-            /// To execute a non-query SQL command, use the `Exec` function:
+            /// To execute a non-query SQL command, use the `Exec` method:
 #if CODE
             api.Exec("SET autocommit = 0");
 #endif
-            /// All methods accept parameters in the same form as [finder methods](#finding-beans-with-sql) do.
+            /// **NOTE:** all described functions accept parameters in the same form as [finder methods](#finding-beans-with-sql) do.
         }
 
         class DataValidation {
@@ -389,7 +407,7 @@ namespace LimeBean.Website {
             class Globals {
                 public static BeanApi LimeBean { get; set; }
             }
-            /// Let's link them so that a product knows its category, and a category can list all its products. 
+            /// We are going to link them so that a product knows its category, and a category can list all its products. 
             /// Assume that we can access the `BeanApi` object via the globally available `Globals.LimeBean` property
             /// ([read how to accomplish that](#beanapi-object-lifetime)).
             /// 
@@ -409,7 +427,7 @@ namespace LimeBean.Website {
                 }
             }
 #endif
-            /// **NOTE:** LimeBean uses the [internal query cache](#internal-query-cache), therefore repeated `Load` and `Find` calls will not hit the database.
+            /// **NOTE:** LimeBean uses the [internal query cache](#internal-query-cache), therefore repeated `Load` and `Find` calls don't hit the database.
             /// 
             /// Now let's add some [validation logic](#data-validation) to prevent saving a product without a category and to prevent deletion of 
             /// a non-empty category:
@@ -443,19 +461,82 @@ namespace LimeBean.Website {
             /// therefore even if something goes wrong inside the cascading deletion loop, database will remain in a consistent state!
         }
 
-        
-        /// ## Bean Observers      
-        /// TODO
-        
-        /// ## Transactions
-        /// TODO
-        
-        /// ## Implicit Transactions
-        /// TODO
+
+        void Transactions(BeanApi api) {
+            /// ## Transactions
+            /// To execute a block of code in a transaction, wrap it in a delegate and pass to the `Transaction` method:
+#if CODE
+            api.Transaction(delegate() { 
+                // do some work
+            });
+#endif
+            /// Transaction is automatically rolled back if:
+            /// 
+            /// * An unhandled exception is thrown during the execution
+            /// * The delegate returns `false`
+            ///
+            /// Otherwise it's committed.
+            /// 
+            /// Transactions can be nested (if the underlying ADO.NET provider allows it):
+#if CODE
+            api.Transaction(delegate() {
+                // outer transaction
+
+                api.Transaction(delegate() { 
+                    // nested transaction
+                });
+            });
+#endif
+            /// ## Implicit Transactions
+            /// When you invoke `Store` or `Trash` (see [CRUD](#crud)) outside a transaction, then an implicit transaction
+            /// is initiated behind the scenes. This is done to enforce database integrity in case of advanced logic executed in 
+            /// [hooks](#lifecycle-hooks) and [observers](#bean-observers) (such as cascading delete, etc).
+            /// 
+            /// There are special cases when you may need to turn this behavior off 
+            /// (for example when using [LOCK TABLES with InnoDB](https://dev.mysql.com/doc/refman/5.0/en/lock-tables-and-transactions.html)):
+#if CODE
+            api.ImplicitTransactions = false;
+#endif
+        }
+
+        class BeanObservers {
+            /// ## Bean Observers      
+            /// Bean observers have the same purpose as [lifecycle hooks](#lifecycle-hooks) with the difference that former
+            /// are invoked for all beans. With observers you can implement plugins and extensions.
+            /// 
+            /// For example, let's make so that all beans have GUID keys insted of integer auto-increments:
+#if CODE
+            class GuidKeyObserver : BeanObserver {
+                public override void BeforeStore(Bean bean) {
+                    if(bean["id"] == null)
+                        bean["id"] = Guid.NewGuid().ToString();                    
+                }
+            }
+#endif
+            void Snippet1(BeanApi api) { 
+#if CODE
+                api.Key(false); // turn off auto-increment keys
+                api.AddObserver(new GuidKeyObserver());
+
+                // but beware of http://www.informit.com/articles/printerfriendly/25862
+#endif
+            }
+            /// Another example is adding automatic timestamps:
+#if CODE
+            class TimestampObserver : BeanObserver {
+                public override void AfterDispense(Bean bean) {
+                    bean["created_at"] = DateTime.Now;
+                }
+                public override void BeforeStore(Bean bean) {
+                    bean["updated_at"] = DateTime.Now;
+                }
+            }
+#endif
+        }
 
         class BeanApiObjectLifetime { 
             /// ## BeanApi Object Lifetime
-            /// The `BeanApi` class is `IDisposable` (because it holds a `DbConnection`) and is not thread-safe.
+            /// The `BeanApi` class is `IDisposable` (because it holds the `DbConnection`) and is not thread-safe.
             /// Care should be taken to ensure that the same `BeanApi` is not used from multiple threads without
             /// synchronization, and that it is properly disposed. Let's consider some common usage scenarios.
             /// 
@@ -502,9 +583,32 @@ namespace LimeBean.Website {
             }
 #endif
         }
-    
-        /// ## Internal Query Cache
-        /// TODO
+
+        void InternalQueryCache(BeanApi api) {
+            /// ## Internal Query Cache
+            /// Results of all recent read-only SQL queries initiated by 
+            /// [finder](#finding-beans-with-sql) and [generic query](#generic-sql-queries) functions are cached internally 
+            /// on the *least recently used* (LRU) basis. This saves database round trips during repeated reads.
+            /// 
+            /// The number of cached results can be adjusted by setting the `CacheCapacity` property:
+#if CODE
+            // increase
+            api.CacheCapacity = 500;
+
+            // turn off completely
+            api.CacheCapacity = 0;
+#endif
+            /// Cache is fully invalidated (cleared) on:
+            /// 
+            /// * any non-readonly query (UPDATE, etc)
+            /// * failed [transaction](#transactions) 
+            /// 
+            /// In rare special cases you may need to **bypass** the cache. 
+            /// For this purpose, query functions provide overloads with the `useCache` argument:
+#if CODE
+            var uid = api.Cell<string>(false, "select hex(randomblob(16))");
+#endif
+        }
     }
 
 }
