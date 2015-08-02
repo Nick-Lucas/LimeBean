@@ -31,4 +31,4 @@ script:
 
   # Test
   - mono ./packages/xunit.runner.console.$LIME_XUNIT_CONSOLE_VERSION/tools/xunit.console.exe ./bin/LimeBean.Tests.dll -noappdomain -notrait db=mssql
-  - dnx LimeBean.Tests xunit.runner.dnx -notrait db=mssql
+#  - dnx LimeBean.Tests xunit.runner.dnx -notrait db=mssql
