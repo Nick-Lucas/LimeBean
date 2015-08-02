@@ -27,7 +27,8 @@ install:
 script:
   # Build 
   - xbuild LimeBean.sln /nologo /v:q /t:Rebuild /p:SQLiteMode=MONO
-  - dnu build LimeBean/project.json LimeBean.Tests/project.json --quiet
+  - dnu build LimeBean/project.json --quiet
+#  - dnu build LimeBean.Tests/project.json --quiet
 
   # Test
   - mono ./packages/xunit.runner.console.$LIME_XUNIT_CONSOLE_VERSION/tools/xunit.console.exe ./bin/LimeBean.Tests.dll -noappdomain -notrait db=mssql
