@@ -18,7 +18,7 @@
                 "System.Runtime.Serialization.Primitives": "4.0.10-*"
             }
         },
-        "dnx46": {
+        "dnx451": {
             "dependencies": {
                 "MySql.Data": "6.9.7"
             }
