@@ -21,15 +21,15 @@ install:
   - wget https://nuget.org/nuget.exe
 
   # Restore packages
-  - dnu restore
+  - dnu restore LimeBean.Dnx
   - mono ./nuget.exe restore LimeBean.sln -verbosity detailed
 
 script:
   # Build 
   - xbuild LimeBean.sln /nologo /v:q /t:Rebuild /p:SQLiteMode=MONO
-  - dnu build LimeBean/project.json --quiet
-  - dnu build LimeBean.Tests/project.json --quiet
+  - dnu build LimeBean.Dnx/LimeBean --quiet
+  - dnu build LimeBean.Dnx/LimeBean.Tests --quiet
 
   # Test
   - mono ./packages/xunit.runner.console.$LIME_XUNIT_CONSOLE_VERSION/tools/xunit.console.exe ./bin/LimeBean.Tests.dll -noappdomain -notrait db=mssql
-  - dnx LimeBean.Tests xunit.runner.dnx -notrait db=mssql
+  - dnx LimeBean.Dnx/LimeBean.Tests xunit.runner.dnx -notrait db=mssql

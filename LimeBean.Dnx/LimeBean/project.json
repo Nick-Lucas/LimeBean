@@ -8,6 +8,8 @@
     "projectUrl": "%lime_project_url%",
     "licenseUrl": "%lime_license_url%",
 
+    "compile": "../../LimeBean/**/*.cs",    
+
     "frameworks": {      
         "dotnet": {
             "dependencies": {

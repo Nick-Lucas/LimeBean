@@ -18,26 +18,27 @@ before_build:
   - dnvm install %LIME_DNX_VERSION% -r clr
 
   # Restore packages
-  - dnu restore --quiet
+  - dnu restore LimeBean.Dnx --quiet
   - nuget restore LimeBean.sln
   - nuget restore LimeBean.Xamarin\LimeBean.Xamarin.sln
 
 build_script:
   - msbuild LimeBean.sln /v:m
   - msbuild LimeBean.Xamarin\LimeBean.Xamarin.sln /v:m
-  - dnu build LimeBean\project.json LimeBean.Tests\project.json --quiet
+  - dnu build LimeBean.Dnx\LimeBean --quiet
+  - dnu build LimeBean.Dnx\LimeBean.Tests --quiet
 
 test_script:
   # .NET
   - '%xunit20%\xunit.console bin\LimeBean.Tests.dll -appveyor'
 
-  # Copy SQLite binaries
-  - xcopy /Y /I /S System.Data.SQLite\sqlite*.dll LimeBean.Tests
+  # Copy SQLite binaries for DNX
+  - xcopy /Y /I /S System.Data.SQLite\sqlite*.dll LimeBean.Dnx\LimeBean.Tests
 
   # DNXCore
   - dnvm use %LIME_DNX_VERSION% -r coreclr
-  - dnx LimeBean.Tests xunit.runner.dnx
+  - dnx LimeBean.Dnx\LimeBean.Tests xunit.runner.dnx
 
   # DNX
   - dnvm use %LIME_DNX_VERSION% -r clr
-  - dnx LimeBean.Tests xunit.runner.dnx
+  - dnx LimeBean.Dnx\LimeBean.Tests xunit.runner.dnx
