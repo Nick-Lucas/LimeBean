@@ -101,10 +101,10 @@ namespace LimeBean.Tests {
         [Fact]
         public void Export() {
             var bean = new Bean();
-            bean[Bean.ID_PROP_NAME] = 123;
+            bean["id"] = 123;
             bean.Put("a", 1).Put("b", "abc");
             AssertExtensions.Equivalent(bean.Export(), new Dictionary<string, IConvertible> { 
-                { Bean.ID_PROP_NAME, 123 }, { "a", 1 }, { "b", "abc" }
+                { "id", 123 }, { "a", 1 }, { "b", "abc" }
             });
             Assert.NotSame(bean.Export(), bean.Export());
         }

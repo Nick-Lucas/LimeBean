@@ -40,7 +40,7 @@ namespace LimeBean.Tests {
 
             var id = crud.Store(bean);
             Assert.Equal(0L, id);
-            Assert.Equal(0L, bean[Bean.ID_PROP_NAME]);
+            Assert.Equal(0L, bean["id"]);
             Assert.Equal("ad: bs: as:" + id, bean.TraceLog);
             Assert.Equal("ad: bs: as:" + id, observer.TraceLog);
         }
@@ -65,8 +65,8 @@ namespace LimeBean.Tests {
             bean = crud.Load<Tracer>(id);
             Assert.Equal("ad: bl: al:" + id, bean.TraceLog);
             Assert.Equal("ad: bl: al:" + id, observer.TraceLog);
-            Assert.NotNull(bean[Bean.ID_PROP_NAME]);
-            Assert.Equal(id, bean[Bean.ID_PROP_NAME]);
+            Assert.NotNull(bean["id"]);
+            Assert.Equal(id, bean["id"]);
             Assert.Equal("test", bean["p1"]);
         }
 
@@ -89,7 +89,7 @@ namespace LimeBean.Tests {
             crud.Trash(bean);
             Assert.Equal("bt:" + id + " at:" + id, bean.TraceLog);
             Assert.Equal("bt:" + id + " at:" + id, observer.TraceLog);
-            Assert.Equal(id, bean[Bean.ID_PROP_NAME]);
+            Assert.Equal(id, bean["id"]);
 
             Assert.Null(crud.Load<Tracer>(id));
         }
@@ -104,7 +104,7 @@ namespace LimeBean.Tests {
                 { "s", "hello" }
             });
 
-            Assert.Null(bean[Bean.ID_PROP_NAME]);
+            Assert.Null(bean["id"]);
             Assert.Equal("hello", bean["s"]);
             Assert.Equal("ad: bl: al:", bean.TraceLog);
             Assert.Equal("ad: bl: al:", observer.TraceLog);
@@ -112,11 +112,11 @@ namespace LimeBean.Tests {
             observer.TraceLog = "";
 
             bean = crud.RowToBean<Tracer>(new Dictionary<string, IConvertible> { 
-                { Bean.ID_PROP_NAME, 123 },
+                { "id", 123 },
                 { "s", "see you" }
-            });            
+            });
 
-            Assert.Equal(123, bean[Bean.ID_PROP_NAME]);
+            Assert.Equal(123, bean["id"]);
             Assert.Equal("see you", bean["s"]);
             Assert.Equal("ad: bl: al:123", bean.TraceLog);
             Assert.Equal("ad: bl: al:123", observer.TraceLog);
@@ -149,7 +149,7 @@ namespace LimeBean.Tests {
             void Trace(string subject) {
                 if(TraceLog.Length > 0)
                     TraceLog += " ";
-                TraceLog += subject + ":" + this[Bean.ID_PROP_NAME];
+                TraceLog += subject + ":" + this["id"];
             }
 
             protected internal override void AfterDispense() {

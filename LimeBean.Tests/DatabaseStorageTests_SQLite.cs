@@ -51,7 +51,7 @@ namespace LimeBean.Tests {
             Assert.Equal(1, schema.Count);
 
             var t = schema["t"];
-            Assert.False(t.ContainsKey(Bean.ID_PROP_NAME));
+            Assert.False(t.ContainsKey("id"));
 
             Assert.Equal(SQLiteDetails.RANK_ANY, t["a1"]);
             Assert.Equal(SQLiteDetails.RANK_ANY, t["a2"]);
@@ -70,7 +70,7 @@ namespace LimeBean.Tests {
 
         [Fact]
         public void StoreToGoodTable() {
-            _db.Exec("create table kind1 (" + Bean.ID_PROP_NAME + " integer primary key, p1 numeric, p2 text)");
+            _db.Exec("create table kind1 (id integer primary key, p1 numeric, p2 text)");
             var id = _storage.Store("kind1", new Dictionary<string, IConvertible> { 
                 { "p1", 123 },
                 { "p2", "hello" }
@@ -79,10 +79,10 @@ namespace LimeBean.Tests {
             var row = _db.Row(true, "select * from kind1");
             Assert.Equal(123, row["p1"].ToInt32(null));
             Assert.Equal("hello", row["p2"]);
-            Assert.Equal(id, row[Bean.ID_PROP_NAME]);
+            Assert.Equal(id, row["id"]);
 
             Assert.Equal(id, _storage.Store("kind1", new Dictionary<string, IConvertible> { 
-                { Bean.ID_PROP_NAME, id },
+                { "id", id },
                 { "p1", -1 },
                 { "p2", "see you" }            
             }));
@@ -117,7 +117,7 @@ namespace LimeBean.Tests {
 
         [Fact]
         public void ChangeSchemaOnStore() {
-            _db.Exec("create table kind1 (" + Bean.ID_PROP_NAME + " integer primary key)");
+            _db.Exec("create table kind1 (id integer primary key)");
             _storage.EnterFluidMode();
 
             _storage.Store("kind1", new Dictionary<string, IConvertible> { 
@@ -136,7 +136,7 @@ namespace LimeBean.Tests {
             Assert.Equal(SQLiteDetails.RANK_TEXT, schema["kind1"]["x"]);
             Assert.DoesNotContain("y", schema["kind1"].Keys);
 
-            var rows = _db.Rows(true, "select * from kind1 order by " + Bean.ID_PROP_NAME);
+            var rows = _db.Rows(true, "select * from kind1 order by id");
             Assert.Equal("1", rows[0]["x"]);
             Assert.Equal("hello", rows[1]["x"]);
         }
@@ -156,7 +156,7 @@ namespace LimeBean.Tests {
             Assert.Equal(1, _db.Cell<int>(true, "select count(*) from kind1"));
 
             Assert.Null(Record.Exception(delegate() {
-                _storage.Store("kind1", new Dictionary<string, IConvertible>() { { Bean.ID_PROP_NAME, id } });
+                _storage.Store("kind1", new Dictionary<string, IConvertible>() { { "id", id } });
             }));
         }
 
@@ -165,7 +165,7 @@ namespace LimeBean.Tests {
             _storage.EnterFluidMode();
 
             var error = Record.Exception(delegate() {
-                _storage.Store("foo", new Dictionary<string, IConvertible> { { Bean.ID_PROP_NAME, 123 }, { "a", 1 } });
+                _storage.Store("foo", new Dictionary<string, IConvertible> { { "id", 123 }, { "a", 1 } });
             });
             Assert.Equal("Row not found", error.Message);
         }
@@ -182,17 +182,17 @@ namespace LimeBean.Tests {
 
         [Fact]
         public void LoadMissingRow() {
-            _db.Exec("create table kind1 (" + Bean.ID_PROP_NAME + " integer primary key)");
+            _db.Exec("create table kind1 (id integer primary key)");
             Assert.Null(_storage.Load("kind1", 1));
         }
 
         [Fact]
         public void Load() {
-            _db.Exec("create table kind1 (" + Bean.ID_PROP_NAME + " integer primary key, p1 numeric, p2 text)");
-            _db.Exec("insert into kind1 (" + Bean.ID_PROP_NAME + ", p1, p2) values (5, 123, 'hello')");
+            _db.Exec("create table kind1 (id integer primary key, p1 numeric, p2 text)");
+            _db.Exec("insert into kind1 (id, p1, p2) values (5, 123, 'hello')");
 
             var data = _storage.Load("kind1", 5);
-            Assert.Equal(5L, data[Bean.ID_PROP_NAME]);
+            Assert.Equal(5L, data["id"]);
             Assert.Equal(123, data["p1"].ToInt32(null));
             Assert.Equal("hello", data["p2"]);
         }
@@ -312,9 +312,9 @@ namespace LimeBean.Tests {
                 _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", "" } })
             };
 
-            AssertExtensions.Equivalent(trueKeys, _db.Col<IConvertible>(true, "select " + Bean.ID_PROP_NAME + " from foo where x"));
-            AssertExtensions.Equivalent(falseKeys, _db.Col<IConvertible>(true, "select " + Bean.ID_PROP_NAME + " from foo where not x"));
-            AssertExtensions.Equivalent(nullKeys, _db.Col<IConvertible>(true, "select " + Bean.ID_PROP_NAME + " from foo where x is null"));
+            AssertExtensions.Equivalent(trueKeys, _db.Col<IConvertible>(true, "select id from foo where x"));
+            AssertExtensions.Equivalent(falseKeys, _db.Col<IConvertible>(true, "select id from foo where not x"));
+            AssertExtensions.Equivalent(nullKeys, _db.Col<IConvertible>(true, "select id from foo where x is null"));
         }
 
         [Fact]

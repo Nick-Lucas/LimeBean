@@ -9,8 +9,6 @@ using System.Text.RegularExpressions;
 namespace LimeBean {
 
     public partial class Bean {
-        public const string ID_PROP_NAME = "id";
-
         static readonly ConcurrentDictionary<Type, string> _kindCache = new ConcurrentDictionary<Type, string>();
 
         internal static string GetKind<T>() where T : Bean, new() {

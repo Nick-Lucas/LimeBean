@@ -5,7 +5,7 @@ using System.Text;
 
 namespace LimeBean {
     class KeyUtil : IKeyAccess {
-        static readonly string[] DEFAULT_NAMES = new[] { Bean.ID_PROP_NAME };
+        static readonly string[] DEFAULT_NAMES = new[] { "id" };
 
         IDictionary<string, ICollection<string>> _names = new Dictionary<string, ICollection<string>>();
         IDictionary<string, bool> _autoIncrements = new Dictionary<string, bool>();

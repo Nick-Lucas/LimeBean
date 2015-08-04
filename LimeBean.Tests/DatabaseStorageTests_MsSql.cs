@@ -52,7 +52,7 @@ namespace LimeBean.Tests {
             Assert.Equal(1, schema.Count);
 
             var cols = schema["foo"];
-            Assert.False(cols.ContainsKey(Bean.ID_PROP_NAME));
+            Assert.False(cols.ContainsKey("id"));
 
             Assert.Equal(MsSqlDetails.RANK_BYTE, cols["b"]);
             Assert.Equal(MsSqlDetails.RANK_INT32, cols["i"]);

@@ -76,7 +76,7 @@ namespace LimeBean.Tests {
             Assert.Equal(1, schema.Count);
 
             var t = schema["t"];
-            Assert.False(t.ContainsKey(Bean.ID_PROP_NAME));
+            Assert.False(t.ContainsKey("id"));
 
             Assert.Equal(MariaDbDetails.RANK_INT8, t["ti1"]);
             Assert.Equal(MariaDbDetails.RANK_INT8, t["ti2"]);

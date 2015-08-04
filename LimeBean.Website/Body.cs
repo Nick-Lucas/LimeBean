@@ -423,7 +423,7 @@ namespace LimeBean.Website {
 #if CODE
             partial class Category {
                 public Product[] GetProducts() {
-                    return Globals.LimeBean.Find<Product>("where category_id = {0}", this[ID_PROP_NAME]);
+                    return Globals.LimeBean.Find<Product>("where category_id = {0}", this["id"]);
                 }
             }
 #endif

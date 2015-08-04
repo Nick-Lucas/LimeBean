@@ -13,7 +13,7 @@ namespace LimeBean.Tests {
             LastBean = bean;
             if(TraceLog.Length > 0)
                 TraceLog += " ";
-            TraceLog += subject + ":" + bean[Bean.ID_PROP_NAME];
+            TraceLog += subject + ":" + bean["id"];
         }
 
         public override void AfterDispense(Bean bean) {
