@@ -297,20 +297,35 @@ namespace LimeBean.Website {
             /// See also: [Bean Observers](#bean-observers)
         }
 
-        void PrimaryKeys(BeanApi api) { 
+        class PrimaryKeys {
             /// ## Primary Keys
             /// By default, all beans have auto-increment integer key named `"id"`. It is possible 
             /// to customize keys in all aspects:
+
+            class Book : Bean {
+                public Book()
+                    : base("") {
+                }
+            }
+
+            void Samples(BeanApi api) {
 #if CODE
-            // Custom key name for beans of kind "book"
-            api.Key("book", "book_id");
-            
-            // Custom non-autoincrement key
-            api.Key("book", "book_id", false);
-            
-            // Compound key (order_id, product_id)
-            api.Key("order_item", "order_id", "product_id");
+                // Custom key name for beans of kind "book"
+                api.Key("book", "book_id");
+
+                // Strongly-typed fashion (see Custom Bean Classes)
+                api.Key<Book>("book_id");
+
+                // Custom non-autoincrement key
+                api.Key("book", "book_id", false);
+
+                // Compound key (order_id, product_id)
+                api.Key("order_item", "order_id", "product_id");
+
+                // Change defaults for all beans
+                api.DefaultKey("Oid", false);
 #endif
+            }
             /// **NOTE:** non auto-increment keys must be assigned manually prior to saving.
             /// 
             /// The [Bean Observers](#bean-observers) section contains an example of using GUID keys for all beans.
@@ -515,7 +530,7 @@ namespace LimeBean.Website {
 #endif
             void Snippet1(BeanApi api) { 
 #if CODE
-                api.Key(false); // turn off auto-increment keys
+                api.DefaultKey(false); // turn off auto-increment keys
                 api.AddObserver(new GuidKeyObserver());
 
                 // but beware of http://www.informit.com/articles/printerfriendly/25862

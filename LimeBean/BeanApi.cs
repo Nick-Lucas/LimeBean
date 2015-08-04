@@ -345,8 +345,13 @@ namespace LimeBean {
             Key(Bean.GetKind<T>(), names);
         }
 
-        public void Key(bool autoIncrementByDefault) {
-            KeyUtil.AutoIncrementByDefault = autoIncrementByDefault;
+        public void DefaultKey(bool autoIncrement) {
+            KeyUtil.DefaultAutoIncrement = autoIncrement;
+        }
+
+        public void DefaultKey(string name, bool autoIncrement = true) {
+            KeyUtil.DefaultName = name;
+            KeyUtil.DefaultAutoIncrement = autoIncrement;
         }
 
     }
