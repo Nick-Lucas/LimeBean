@@ -167,14 +167,22 @@ namespace LimeBean {
         }
 
         static T GetCellValue<T>(DbDataReader reader, int index) where T : IConvertible {
-            var value = reader.GetValue(index) as IConvertible;
-            if(value == null || value is DBNull)
+            var value = GetCellValue(reader, index);
+            if(value == null)
                 return default(T);
 
             if(value is T)
                 return (T)value;
 
             return (T)value.ToType(typeof(T), CultureInfo.InvariantCulture);
+        }
+
+        static IConvertible GetCellValue(DbDataReader reader, int index) {
+            var value = reader.GetValue(index);
+            if(value is DBNull)
+                return null;
+
+            return value as IConvertible;
         }
 
         void QueryWillExecute(DbCommand cmd) {
