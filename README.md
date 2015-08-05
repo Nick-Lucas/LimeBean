@@ -15,7 +15,7 @@
 
               | .NET | [.NET Core](http://dotnet.github.io/core/) | Mono | Xamarin 
 --------------|------|--------------------------------------------|------|---------
-SQLite *      | +    | +                                          | +    | +
+SQLite        | +    | +                                          | +    | +
 MySQL/MariaDB | +    | future                                     | +    | -
 SQL Server    | +    | +                                          | +    | -
 
