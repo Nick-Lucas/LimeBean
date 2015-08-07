@@ -172,6 +172,11 @@ namespace LimeBean.Tests {
         public void DateTimeQueries() {
             SharedChecks.CheckDateTimeQueries(_db, _storage);
         }
+
+        [Fact]
+        public void Blobs() {
+            SharedChecks.CheckBlobs(_db, "varbinary(16)");
+        }
     }
 
 }

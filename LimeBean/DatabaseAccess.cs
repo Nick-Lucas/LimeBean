@@ -182,6 +182,10 @@ namespace LimeBean {
             if(value is DBNull)
                 return null;
 
+            var bytes = value as byte[];
+            if(bytes != null)
+                return Convert.ToBase64String(bytes);
+
             return value as IConvertible;
         }
 

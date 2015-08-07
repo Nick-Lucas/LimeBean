@@ -64,6 +64,15 @@ namespace LimeBean.Tests {
             Assert.Equal(date, db.Cell<DateTime>(false, "select d from foo where d = {0}", date));        
         }
 
+        public static void CheckBlobs(IDatabaseAccess db, string type) {
+            var data = new byte[] { 46, 41, 158 };
+
+            db.Exec("create table foo(f " + type + ")");
+            db.Exec("insert into foo(f) values({0})", data);
+
+            Assert.Equal("Lime", db.Cell<string>(false, "select f from foo"));
+        }
+
     }
 
 }
