@@ -2,7 +2,9 @@
 using LimeBean.Tests.Fixtures;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using Xunit;
@@ -186,6 +188,25 @@ namespace LimeBean.Tests {
             _db.Exec("insert into foo(f) values({0})", guid);
 
             Assert.Equal(guid.ToString(), _db.Cell<string>(false, "select f from foo"));
+        }
+
+        [Fact]
+        public void TransactionIsolation() {
+            Assert.Equal(IsolationLevel.Unspecified, _db.TransactionIsolation);
+
+            using(var otherConnection = new SqlConnection(TestEnv.MsSqlConnectionString)) {
+                otherConnection.Open();                
+                
+                var dbName = _db.Cell<string>(false, "select db_name()");
+                var otherDb = new DatabaseAccess(otherConnection, null);
+
+                otherDb.Exec("use " + dbName);
+                try {
+                    SharedChecks.CheckReadUncommitted(_db, otherDb);
+                } finally {
+                    otherDb.Exec("use master");
+                }
+            }
         }
     }
 

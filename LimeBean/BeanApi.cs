@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
@@ -247,6 +248,11 @@ namespace LimeBean {
 
         public bool InTransaction {
             get { return Db.InTransaction; }
+        }
+
+        public IsolationLevel TransactionIsolation {
+            get { return Db.TransactionIsolation; }
+            set { Db.TransactionIsolation = value; }
         }
 
         public void Transaction(Func<bool> action) {

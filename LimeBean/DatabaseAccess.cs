@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
@@ -18,10 +19,12 @@ namespace LimeBean {
             _connection = connection;
             _details = details;
             ImplicitTransactions = true;
+            TransactionIsolation = IsolationLevel.Unspecified;
         }
 
         public bool ImplicitTransactions { get; set; }
         public bool InTransaction { get { return _txStack.Count > 0; } }
+        public IsolationLevel TransactionIsolation { get; set; }
         public event Action<DbCommand> QueryExecuting;
 
         public int CacheCapacity {
@@ -90,7 +93,7 @@ namespace LimeBean {
         // Transactions
 
         public void Transaction(Func<bool> action) {
-            using(var tx = _connection.BeginTransaction()) {
+            using(var tx = _connection.BeginTransaction(TransactionIsolation)) {
                 var shouldRollback = false;
 
                 _txStack.Push(tx);

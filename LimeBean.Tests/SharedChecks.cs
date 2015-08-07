@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using Xunit;
@@ -71,6 +72,23 @@ namespace LimeBean.Tests {
             db.Exec("insert into foo(f) values({0})", data);
 
             Assert.Equal("Lime", db.Cell<string>(false, "select f from foo"));
+        }
+
+        public static void CheckReadUncommitted(IDatabaseAccess db1, IDatabaseAccess db2) {
+            db1.Exec("create table foo(f text)");
+            db1.Exec("insert into foo(f) values('initial')");
+
+            db1.Transaction(delegate() {
+                db1.Exec("update foo set f='dirty'");
+
+                db2.TransactionIsolation = IsolationLevel.ReadUncommitted;
+                db2.Transaction(delegate() {
+                    Assert.Equal("dirty", db2.Cell<string>(false, "select f from foo"));
+                    return true;
+                });
+
+                return true;
+            });
         }
 
     }

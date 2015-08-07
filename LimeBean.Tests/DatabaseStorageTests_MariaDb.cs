@@ -1,7 +1,9 @@
 ﻿#if !NO_MARIADB
 using LimeBean.Tests.Fixtures;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
@@ -226,6 +228,21 @@ namespace LimeBean.Tests {
         [Fact]
         public void Blobs() {
             SharedChecks.CheckBlobs(_db, "varbinary(16)");
+        }
+
+        [Fact]
+        public void TransactionIsolation() {
+            Assert.Equal(IsolationLevel.Unspecified, _db.TransactionIsolation);
+
+            using(var otherConnection = new MySqlConnection(TestEnv.MariaConnectionString)) {
+                otherConnection.Open();
+
+                var dbName = _db.Cell<string>(false, "select database()");
+                var otherDb = new DatabaseAccess(otherConnection, null);
+
+                otherDb.Exec("use " + dbName);
+                SharedChecks.CheckReadUncommitted(_db, otherDb);
+            }
         }
     }
 
