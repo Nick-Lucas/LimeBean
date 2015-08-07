@@ -314,6 +314,10 @@ namespace LimeBean {
             return Cell<T>(true, sql, parameters);
         }
 
+        public string Cell(string sql, params object[] parameters) {
+            return Cell<string>(sql, parameters);
+        }
+
         public T[] Col<T>(string sql, params object[] parameters) where T : IConvertible {
             return Col<T>(true, sql, parameters);
         }
