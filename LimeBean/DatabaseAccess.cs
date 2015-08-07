@@ -182,11 +182,15 @@ namespace LimeBean {
             if(value is DBNull)
                 return null;
 
+            var convertible = value as IConvertible;
+            if(convertible != null)
+                return convertible;
+
             var bytes = value as byte[];
             if(bytes != null)
                 return Convert.ToBase64String(bytes);
 
-            return value as IConvertible;
+            return Convert.ToString(value);
         }
 
         void QueryWillExecute(DbCommand cmd) {

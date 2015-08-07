@@ -177,6 +177,16 @@ namespace LimeBean.Tests {
         public void Blobs() {
             SharedChecks.CheckBlobs(_db, "varbinary(16)");
         }
+
+        [Fact]
+        public void ReadNonConvertibles() {
+            var guid = Guid.NewGuid();
+
+            _db.Exec("create table foo(f uniqueidentifier)");
+            _db.Exec("insert into foo(f) values({0})", guid);
+
+            Assert.Equal(guid.ToString(), _db.Cell<string>(false, "select f from foo"));
+        }
     }
 
 }
