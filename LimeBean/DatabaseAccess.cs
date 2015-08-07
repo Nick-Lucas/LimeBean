@@ -29,7 +29,7 @@ namespace LimeBean {
             set { _cache.Capacity = value; }
         }
 
-        public int Exec(string sql, object[] parameters) {
+        public int Exec(string sql, params object[] parameters) {
             using(var cmd = CreateCommand(new DbCommandDescriptor(sql, parameters))) {
                 QueryWillExecute(cmd);
                 return cmd.ExecuteNonQuery();
@@ -38,17 +38,17 @@ namespace LimeBean {
 
         // Iterators
 
-        public IEnumerable<T> ColIterator<T>(string sql, object[] parameters) where T : IConvertible {
+        public IEnumerable<T> ColIterator<T>(string sql, params object[] parameters) where T : IConvertible {
             return EnumerateRecords(new DbCommandDescriptor(sql, parameters), GetFirstCellValue<T>);
         }
 
-        public IEnumerable<IDictionary<string, IConvertible>> RowsIterator(string sql, object[] parameters) {
+        public IEnumerable<IDictionary<string, IConvertible>> RowsIterator(string sql, params object[] parameters) {
             return EnumerateRecords(new DbCommandDescriptor(sql, parameters), RecordToDict).ToArray();
         }
 
         // Cell
 
-        public T Cell<T>(bool useCache, string sql, object[] parameters) where T : IConvertible {
+        public T Cell<T>(bool useCache, string sql, params object[] parameters) where T : IConvertible {
             return CacheableRead(true, true, useCache, sql, parameters, Cell<T>);
         }
 
@@ -59,7 +59,7 @@ namespace LimeBean {
 
         // Col
 
-        public T[] Col<T>(bool useCache, string sql, object[] parameters) where T : IConvertible {
+        public T[] Col<T>(bool useCache, string sql, params object[] parameters) where T : IConvertible {
             return CacheableRead(true, false, useCache, sql, parameters, Col<T>);
         }
 
@@ -69,7 +69,7 @@ namespace LimeBean {
 
         // Row
 
-        public IDictionary<string, IConvertible> Row(bool useCache, string sql, object[] parameters) {
+        public IDictionary<string, IConvertible> Row(bool useCache, string sql, params object[] parameters) {
             return CacheableRead(false, true, useCache, sql, parameters, Row);
         }
 
@@ -79,7 +79,7 @@ namespace LimeBean {
 
         // Rows
 
-        public IDictionary<string, IConvertible>[] Rows(bool useCache, string sql, object[] parameters) {
+        public IDictionary<string, IConvertible>[] Rows(bool useCache, string sql, params object[] parameters) {
             return CacheableRead(false, false, useCache, sql, parameters, Rows);
         }
 
