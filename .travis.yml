@@ -8,7 +8,7 @@ env:
     - LIME_TEST_MARIA_USER=root
     - LIME_TEST_MARIA_PWD=""
     - LIME_DNX_VERSION=1.0.0-beta6
-    - LIME_XUNIT_CONSOLE_VERSION=2.1.0-beta4-build3050
+    - LIME_XUNIT_CONSOLE_VERSION=2.1.0-rc1-build3124
 
 install:
   - ./travis-update-sqlite.sh

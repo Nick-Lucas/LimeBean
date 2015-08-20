@@ -4,8 +4,8 @@
     },
     "dependencies": {
         "LimeBean": "",
-        "Microsoft.Data.SQLite": "1.0.0-beta7-10957",
-        "xunit": "2.1-beta4-*",
+        "Microsoft.Data.SQLite": "1.0.0-beta6",
+        "xunit": "2.1-rc1-*",
         "xunit.runner.dnx": "2.1-beta4-*"            
     },
     
