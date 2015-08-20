@@ -6,5 +6,6 @@ obj/
 packages/
 project.lock.json
 LimeBean.NuGet/*.nupkg
+LimeBean.NuGet/nuget.exe
 LimeBean.Website/www/index.html
 LimeBean.Dnx/LimeBean.Tests/x??/sqlite3.dll
