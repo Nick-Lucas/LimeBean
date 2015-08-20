@@ -8,9 +8,26 @@ namespace LimeBean.Website {
 
     class Body {
         /// ## About LimeBean
-        /// LimeBean provides simple and concise API for accessing ADO.NET data sources.
-        /// It' compatible with **.NET framework**, **ASP.NET 5 (DNX / DNXCore)**, **Mono** and **Xamarin**.
-        /// Supported databases include **SQLite**, **MySQL/MariaDB** and **SQL Server**.
+        /// LimeBean provides a simple and concise API for accessing **ADO.NET** data sources.
+        /// It's halfway between a **micro-ORM** and **direct SQL**.
+        /// With LimeBean, you can look at your data as **objects** or as plain **records**, depending on a situation.
+        /// 
+        /// Compatible with:
+        /// 
+        /// * **.NET Framework 4.x**
+        /// * **Mono**
+        /// * **ASP.NET 5** (DNX, DNXCore)
+        /// * **Windows 10 Universal App Platform** (UAP / UWP / .NETCore 5.0)
+        /// * **Xamarin** (MonoAndroid, MonoTouch, Xamarin.iOS)
+        /// 
+        /// Supported databases include:
+        /// 
+        /// * **SQLite** 
+        /// * **MySQL/MariaDB** 
+        /// * **SQL Server**
+        /// 
+        /// LimeBean doesn't rely on Reflection, IL emitting, etc. It's perfectly compatible with **Mono/Xamarin
+        /// Ahead of Time (AOT)** and **Microsoft .NET Native**.
         /// 
         /// The library is inspired by [RedBeanPHP](http://redbeanphp.com).
         /// 
@@ -19,36 +36,44 @@ namespace LimeBean.Website {
         /// 
         ///     PM> Install-Package LimeBean
         ///     
-        /// For ASP.NET 5 projects, add a dependency to the project.json file:
+        /// **For Xamarin**, use a dedicated package [LimeBean.Xamarin](https://www.nuget.org/packages/LimeBean.Xamarin).
+        /// 
+        /// **For ASP.NET 5 (DNX) projects**, add a dependency to the project.json file:
         /// 
         ///     {
         ///         "dependencies": {
-        ///             "LimeBean": "0.3"
+        ///             "LimeBean": "1.0"
         ///         }
         ///     }
 
-        void ConnectToDatabase(BeanApi api, DbConnection connection) {
+        void ConnectToDatabase(DbConnection connection) {
             /// ## Connect to Database
             /// LimeBean needs an ADO.NET driver to work with. Use one of the following:
             /// 
-            /// * [System.Data.SQLite](https://www.nuget.org/packages/System.Data.SQLite), 
-            ///   [Mono.Data.Sqlite](http://www.mono-project.com/download/) or
-            ///   [Microsoft.Data.Sqlite](https://www.nuget.org/packages/Microsoft.Data.SQLite/)
-            ///   for SQLite
+            /// * [System.Data.SQLite](https://www.nuget.org/packages/System.Data.SQLite) for SQLite on .NET
+            /// * [Mono.Data.Sqlite](http://www.mono-project.com/download/) for SQLite on Mono and Xamarin
+            /// * [Microsoft.Data.Sqlite](https://www.nuget.org/packages/Microsoft.Data.SQLite) for SQLite in ASP.NET 5 and Windows 10 Universal projects
             /// * [MySql.Data](https://www.nuget.org/packages/MySql.Data/) for MySQL or MariaDB
             /// * [System.Data.SqlClient](https://msdn.microsoft.com/en-us/library/System.Data.SqlClient.aspx) for SQL Server
             /// 
             /// To start using LimeBean, create an instance of the `BeanApi` class:
-#if CODE
-            // Using a connection string and an ADO.NET provider factory
-            new BeanApi("data source=/path/to/db", SQLiteFactory.Instance);
-
-            // Using a connection string and a connection type
-            new BeanApi("data source=/path/to/db", typeof(SQLiteConnection));
-
-            // Using a shared opened connection
-            new BeanApi(connection);
+            {
+#if CODE                
+                var api = new BeanApi("data source=/path/to/db", SQLiteFactory.Instance);
 #endif
+            }
+            {
+#if CODE
+                // Using a connection string and a connection type
+                var api = new BeanApi("data source=/path/to/db", typeof(SQLiteConnection));
+#endif
+            }
+            {
+#if CODE
+                // Using a shared pre-opened connection
+                var api = new BeanApi(connection);
+#endif
+            }
             /// **NOTE:** `BeanApi` is `IDisposable`.
             /// 
             /// When `BeanApi` is created from a connection string (two first cases), the underlying connection is initiated on the first usage and closed on dispose.
