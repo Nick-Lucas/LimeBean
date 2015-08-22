@@ -58,7 +58,8 @@ namespace LimeBean.Website {
             /// 
             /// To start using LimeBean, create an instance of the `BeanApi` class:
             {
-#if CODE                
+#if CODE     
+                // Using a connection string and an ADO.NET provider factory
                 var api = new BeanApi("data source=/path/to/db", SQLiteFactory.Instance);
 #endif
             }
@@ -270,7 +271,7 @@ namespace LimeBean.Website {
             /// - You take advantage of compile-time checks, IDE assistance and [strong-typed properties](#typed-accessors).
             /// - With [lifecycle hooks](#lifecycle-hooks), it is easy to implement [data validation](#data-validation) and [relations](#relations).
             /// 
-            /// For custom beans classes, use method overloads with a generic parameter:
+            /// For [custom beans classes](#custom-bean-classes), use method overloads with a generic parameter:
             /// 
             void Overloads(BeanApi api) {
 #if CODE
@@ -280,6 +281,30 @@ namespace LimeBean.Website {
                 // and so on
 #endif
             }
+        }
+
+        class CustomBeanClasses_nameof {
+            /// ### Using `nameof()`
+            /// With the help of the [nameof](https://msdn.microsoft.com/en-us/library/dn986596.aspx) operator
+            /// (introduced in C# 6 / Visual Studio 2015),
+            /// you can eliminate the use of strings completely:
+            
+            public class Book : Bean {
+                static string __csharp6_nameof__(object o) { return null; }
+                static object __csharp6_Title__ = null;
+
+                public Book()
+                    : base("") {
+                }
+#if CODE
+                public string Title {
+                    get { return Get<string>(__csharp6_nameof__(__csharp6_Title__)); }
+                    set { Put(__csharp6_nameof__(__csharp6_Title__), value); }
+                }
+#endif
+
+                // ...
+            }        
         }
 
         class LifecycleHooks { 
@@ -344,7 +369,7 @@ namespace LimeBean.Website {
                 // Custom non-autoincrement key
                 api.Key("book", "book_id", false);
 
-                // Compound key (order_id, product_id)
+                // Compound key (order_id, product_id) for beans of kind "order_item"
                 api.Key("order_item", "order_id", "product_id");
 
                 // Change defaults for all beans
@@ -366,7 +391,10 @@ namespace LimeBean.Website {
             {
 #if CODE
                 // Load multiple rows
-                var rows = api.Rows("SELECT author, COUNT(*) FROM book WHERE rating > {0} GROUP BY author", 7);
+                var rows = api.Rows(@"SELECT author, COUNT(*) 
+                                      FROM book 
+                                      WHERE rating > {0} 
+                                      GROUP BY author", 7);
       
                 // Load a single row
                 var row = api.Row(@"SELECT author, COUNT(*) 
@@ -598,7 +626,7 @@ namespace LimeBean.Website {
 #endif
             /// In case of multi-threading, synchronize operations with `lock` or other techniques.
             /// 
-            /// ### Web Applications
+            /// ### Web Applications (classic)
             /// In a web app (ASP.NET, etc) use one `BeanApi` per web request. 
             /// You can use a Dependency Injection framework which supports per-request scoping,
             /// or do it manually like shown below:
@@ -622,6 +650,58 @@ namespace LimeBean.Website {
 
             }
 #endif
+            class DNX {
+                /// ### ASP.NET 5 Applications (DNX)
+                /// Register `BeanApi` as a **scoped** service in the Startup.cs file:
+
+                #region Fake MVC
+                public interface IServiceProvider { }
+                public interface IServiceCollection {
+                    void AddScoped<T>(Func<IServiceProvider, T> f);
+                }
+                public interface IActionResult { }
+                public class ViewResult : IActionResult { 
+                }
+                public class Controller {
+                    protected dynamic ViewBag = null;
+                }
+                #endregion
+
+                interface SqliteConnection { }
+#if CODE
+                public class Startup {
+
+                    public void ConfigureServices(IServiceCollection services) {
+                        // . . .
+
+                        services.AddScoped<BeanApi>(CreateBeans);
+                    }
+
+                    BeanApi CreateBeans(IServiceProvider provider) {
+                        var api = new BeanApi("data source=data.db", typeof(SqliteConnection));
+                        api.EnterFluidMode();
+                        return api;
+                    }
+
+                }
+#endif
+                /// Then inject it into any controller:
+#if CODE
+                public class HomeController : Controller {
+                    BeanApi _beans;
+
+                    public HomeController(BeanApi beans) {
+                        _beans = beans;
+                    }
+
+                    public IActionResult Index() {
+                        ViewBag.Books = _beans.Find("book", "ORDER BY title");
+                        return new ViewResult();
+                    }
+                }
+#endif
+            
+            }
         }
 
         void InternalQueryCache(BeanApi api) {

@@ -50,7 +50,7 @@ namespace LimeBean.Website {
                     result.AddRange(currentCode.Select(c => {
                         if(String.IsNullOrWhiteSpace(c))
                             return "";
-                        return c.Substring(minIndent);
+                        return UnwrapCSharp6(c.Substring(minIndent));
                     }));
 
                     result.Add("");
@@ -75,6 +75,10 @@ namespace LimeBean.Website {
             }
 
             return String.Join("\n", result);
+        }
+
+        static string UnwrapCSharp6(string text) { 
+            return Regex.Replace(text, "__csharp6_(.+?)__", "$1");
         }
     
         static string AddHeaderAnchors(string html, List<string> idList) {
