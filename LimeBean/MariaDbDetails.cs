@@ -40,16 +40,23 @@ namespace LimeBean {
             db.Exec("set names utf8");
         }
 
-        public long GetLastInsertID(IDatabaseAccess db) {
-            return db.Cell<long>(false, "select last_insert_id()");
+        public IConvertible ExecInsert(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, IConvertible> data) {
+            db.Exec(
+                CommonDatabaseDetails.FormatInsertCommand(this, tableName, data.Keys, defaultsExpr: "values ()"),
+                data.Values.ToArray()
+            );
+
+            if(String.IsNullOrEmpty(autoIncrementName))
+                return null;
+
+            // per-connection, http://stackoverflow.com/q/21185666
+            // robust to triggers, http://dba.stackexchange.com/a/25141
+
+            return db.Cell<IConvertible>(false, "select last_insert_id()");
         }
 
         public string GetCreateTableStatementPostfix() {
             return "engine=InnoDB default charset=utf8 collate=utf8_unicode_ci";
-        }
-
-        public string GetInsertDefaultsPostfix() {
-            return "values ()";
         }
 
         public int GetRankFromValue(IConvertible value) {

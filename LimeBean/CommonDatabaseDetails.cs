@@ -42,6 +42,39 @@ namespace LimeBean {
             return sql.ToString();
         }
 
+        public static string FormatInsertCommand(IDatabaseDetails details, string tableName, ICollection<string> fieldNames, string valuesPrefix = null, string defaultsExpr = "default values"/*, string postfix = null*/) {
+            var builder = new StringBuilder("insert into ")
+                .Append(details.QuoteName(tableName))
+                .Append(" ");
+
+            if(fieldNames.Count > 0) {
+                builder
+                    .Append("(")
+                    .Append(String.Join(", ", fieldNames.Select(details.QuoteName)))
+                    .Append(") ");
+            }
+                
+            if(!String.IsNullOrEmpty(valuesPrefix))
+                builder.Append(valuesPrefix).Append(" ");
+
+            if(fieldNames.Count > 0) {
+                builder.Append("values (");
+                for(var i = 0; i < fieldNames.Count; i++) {
+                    if(i > 0)
+                        builder.Append(", ");
+                    builder.Append("{").Append(i).Append("}");
+                }
+                builder.Append(")");
+            } else {
+                builder.Append(defaultsExpr);
+            }
+
+            //if(!String.IsNullOrEmpty(postfix))
+            //    builder.Append(" ").Append(postfix);
+
+            return builder.ToString();
+        }
+
     }
 
 }

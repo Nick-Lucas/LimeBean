@@ -5,7 +5,7 @@ using MySql.Data.MySqlClient;
 
 namespace LimeBean.Tests.Fixtures {
 
-    public class MariaDbConnectionFixture {
+    public class MariaDbConnectionFixture : IDisposable {
         public readonly DbConnection Connection;
 
         public MariaDbConnectionFixture() {

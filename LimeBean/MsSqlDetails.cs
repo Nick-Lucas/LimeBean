@@ -41,16 +41,25 @@ namespace LimeBean {
         public void ExecInitCommands(IDatabaseAccess db) {
         }
 
-        public long GetLastInsertID(IDatabaseAccess db) {
-            return db.Cell<long>(false, "select @@IDENTITY");
+        public IConvertible ExecInsert(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, IConvertible> data) {
+            var hasAutoIncrement = !String.IsNullOrEmpty(autoIncrementName);
+
+            var valuesPrefix = hasAutoIncrement
+                ? "output inserted." + QuoteName(autoIncrementName)
+                : null;
+
+            var sql = CommonDatabaseDetails.FormatInsertCommand(this, tableName, data.Keys, valuesPrefix: valuesPrefix);
+            var values = data.Values.ToArray();
+
+            if(hasAutoIncrement)
+                return db.Cell<IConvertible>(false, sql, values);
+
+            db.Exec(sql, values);
+            return null;
         }
 
         public string GetCreateTableStatementPostfix() {
             return null;
-        }
-
-        public string GetInsertDefaultsPostfix() {
-            return "default values";
         }
 
         public int GetRankFromValue(IConvertible value) {

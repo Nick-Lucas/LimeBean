@@ -155,19 +155,12 @@ namespace LimeBean {
                 CheckSchema(kind, data);
             }
 
-            if(isNew)
-                ExecInsert(kind, data);
-            else if(data.Count > 0)
+            if(isNew) {
+                var insertResult = _details.ExecInsert(_db, kind, _keyAccess.GetAutoIncrementName(kind), data);
+                if(autoIncrement)
+                    return insertResult;
+            } else if(data.Count > 0) {
                 ExecUpdate(kind, key, data);
-
-            if(isNew && autoIncrement) {
-                // NOTE on concurrency
-                // "last insert id" is connection-aware, but not thread-safe
-                // http://stackoverflow.com/q/21185666
-                // http://stackoverflow.com/q/9313205
-                // http://www.sqlite.org/lang_corefunc.html
-
-                return _details.GetLastInsertID(_db);
             }
 
             return key;
@@ -195,28 +188,6 @@ namespace LimeBean {
 
             var args = CreateSimpleByKeyArguments("select count(*)", kind, key);
             return _db.Cell<int>(false, args.Item1, args.Item2) > 0;
-        }
-
-        void ExecInsert(string kind, IDictionary<string, IConvertible> data) {
-            var propNames = new string[data.Count];
-            var propValues = new object[data.Count];
-            var placeholders = new string[data.Count];
-
-            var index = 0;
-            foreach(var entry in data) {
-                propNames[index] = QuoteName(entry.Key);
-                propValues[index] = entry.Value;
-                placeholders[index] = "{" + index + "}";
-                index++;
-            }
-
-            var sql = "insert into " + QuoteName(kind) + " ";
-            if(data.Count > 0)
-                sql += "(" + String.Join(", ", propNames) + ") values (" + String.Join(", ", placeholders) + ")";
-            else
-                sql += _details.GetInsertDefaultsPostfix();
-
-            _db.Exec(sql, propValues);
         }
 
         void ExecUpdate(string kind, IConvertible key, IDictionary<string, IConvertible> data) {

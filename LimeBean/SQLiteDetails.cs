@@ -33,16 +33,23 @@ namespace LimeBean {
         public void ExecInitCommands(IDatabaseAccess db) {            
         }
 
-        public long GetLastInsertID(IDatabaseAccess db) {
+        public IConvertible ExecInsert(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, IConvertible> data) {
+            db.Exec(
+                CommonDatabaseDetails.FormatInsertCommand(this, tableName, data.Keys),
+                data.Values.ToArray()
+            );
+
+            if(String.IsNullOrEmpty(autoIncrementName))
+                return null;
+
+            // per-connection, robust to triggers
+            // http://www.sqlite.org/c3ref/last_insert_rowid.html
+
             return db.Cell<long>(false, "select last_insert_rowid()");
         }
 
         public string GetCreateTableStatementPostfix() {
             return null;
-        }
-
-        public string GetInsertDefaultsPostfix() {
-            return "default values";
         }
 
         public int GetRankFromValue(IConvertible value) {
