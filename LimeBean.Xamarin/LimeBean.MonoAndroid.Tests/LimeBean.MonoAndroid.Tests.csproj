@@ -28,7 +28,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NO_MARIADB;NO_MSSQL;SQLITE_MODE_MONO</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NO_MARIADB;NO_MSSQL;NO_PGSQL;SQLITE_MODE_MONO</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidUseSharedRuntime>True</AndroidUseSharedRuntime>
@@ -38,7 +38,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;NO_MARIADB;NO_MSSQL;SQLITE_MODE_MONO</DefineConstants>
+    <DefineConstants>TRACE;NO_MARIADB;NO_MSSQL;NO_PGSQL;SQLITE_MODE_MONO</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>

@@ -120,11 +120,11 @@ namespace LimeBean {
         }
 
         public string GetColumnName(IDictionary<string, IConvertible> column) {
-            return column["name"].ToString(CultureInfo.InvariantCulture);
+            return (string)column["name"];
         }
 
         public string GetColumnType(IDictionary<string, IConvertible> column) {
-            return column["type"].ToString(CultureInfo.InvariantCulture);
+            return (string)column["type"];
         }
 
         public void UpdateSchema(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, int> oldColumns, IDictionary<string, int> changedColumns, IDictionary<string, int> addedColumns) {
@@ -160,7 +160,7 @@ namespace LimeBean {
         }
 
         public bool IsReadOnlyCommand(string text) {
-            return Regex.IsMatch(text, @"^\s*(select\s|pragma table_info)", RegexOptions.IgnoreCase);            
+            return Regex.IsMatch(text, @"^\s*(select\W|pragma table_info)", RegexOptions.IgnoreCase);            
         }
     }
 

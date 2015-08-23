@@ -22,6 +22,18 @@ namespace LimeBean {
             return keyAccess.GetKeyNames(kind).First();
         }
 
+        internal static bool IsSignedByteRange(this Int64 value) {
+            return -128L <= value && value <= 127L;
+        }
+
+        internal static bool IsUnsignedByteRange(this Int64 value) {
+            return 0L <= value && value <= 255L;
+        }
+
+        internal static bool IsInt32Range(this Int64 value) {
+            return -0x80000000L <= value && value <= 0x7FFFFFFFL;
+        }
+
     }
 
 }

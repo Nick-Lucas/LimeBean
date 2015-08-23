@@ -156,11 +156,11 @@ namespace LimeBean {
         }
 
         public IConvertible ConvertLongValue(long value) {
-            if(-128L <= value && value <= 127L)
-                return Convert.ToSByte(value);
+            if(value.IsSignedByteRange())
+                return (sbyte)value;
 
-            if(-0x80000000L <= value && value <= 0x7FFFFFFFL)
-                return Convert.ToInt32(value);
+            if(value.IsInt32Range())
+                return (int)value;
 
             return value;
         }
@@ -182,11 +182,11 @@ namespace LimeBean {
         }
 
         public string GetColumnName(IDictionary<string, IConvertible> column) {
-            return column["Field"].ToString(CultureInfo.InvariantCulture);
+            return (string)column["Field"];
         }
 
         public string GetColumnType(IDictionary<string, IConvertible> column) {
-            return column["Type"].ToString(CultureInfo.InvariantCulture);
+            return (string)column["Type"];
         }
 
         public void UpdateSchema(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, int> oldColumns, IDictionary<string, int> changedColumns, IDictionary<string, int> addedColumns) {
@@ -202,7 +202,7 @@ namespace LimeBean {
         }
 
         public bool IsReadOnlyCommand(string text) {
-            return Regex.IsMatch(text, @"^\s*(select|show)\s", RegexOptions.IgnoreCase);
+            return Regex.IsMatch(text, @"^\s*(select|show)\W", RegexOptions.IgnoreCase);
         }
     }
 

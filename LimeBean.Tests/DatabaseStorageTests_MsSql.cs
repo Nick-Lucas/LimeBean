@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using Xunit;
@@ -12,19 +11,25 @@ using Xunit;
 namespace LimeBean.Tests {
 
     [Trait("db", "mssql")]
-    public class DatabaseStorageTests_MsSql : IClassFixture<MsSqlConnectionFixture> {
+    public class DatabaseStorageTests_MsSql : IDisposable, IClassFixture<MsSqlConnectionFixture> {
+        ConnectionFixture _fixture;
         IDatabaseAccess _db;
         DatabaseStorage _storage;
 
         public DatabaseStorageTests_MsSql(MsSqlConnectionFixture fixture) {
-            IDatabaseDetails details = new MsSqlDetails();
-            IDatabaseAccess db = new DatabaseAccess(fixture.Connection, details);
-            DatabaseStorage storage = new DatabaseStorage(details, db, new KeyUtil());
+            _fixture = fixture;
+            _fixture.SetUpDatabase();
 
-            TestEnv.MsSqlSetUp(db, fixture.DropList);
+            IDatabaseDetails details = new MsSqlDetails();
+            IDatabaseAccess db = new DatabaseAccess(_fixture.Connection, details);
+            DatabaseStorage storage = new DatabaseStorage(details, db, new KeyUtil());
 
             _db = db;
             _storage = storage;
+        }
+
+        public void Dispose() {
+            _fixture.TearDownDatabase();
         }
 
         [Fact]
@@ -194,11 +199,9 @@ namespace LimeBean.Tests {
         public void TransactionIsolation() {
             Assert.Equal(IsolationLevel.Unspecified, _db.TransactionIsolation);
 
-            using(var otherConnection = new SqlConnection(TestEnv.MsSqlConnectionString)) {
-                otherConnection.Open();                
-                
+            using(var otherFixture = new MsSqlConnectionFixture()) {
                 var dbName = _db.Cell<string>(false, "select db_name()");
-                var otherDb = new DatabaseAccess(otherConnection, null);
+                var otherDb = new DatabaseAccess(otherFixture.Connection, null);
 
                 otherDb.Exec("use " + dbName);
                 try {

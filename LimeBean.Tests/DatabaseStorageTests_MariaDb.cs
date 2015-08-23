@@ -1,6 +1,5 @@
 ﻿#if !NO_MARIADB
 using LimeBean.Tests.Fixtures;
-using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -12,22 +11,24 @@ using Xunit;
 namespace LimeBean.Tests {
 
     public class DatabaseStorageTests_MariaDb : IDisposable, IClassFixture<MariaDbConnectionFixture> {
+        ConnectionFixture _fixture;
         IDatabaseAccess _db;
         DatabaseStorage _storage;
 
         public DatabaseStorageTests_MariaDb(MariaDbConnectionFixture fixture) {
-            IDatabaseDetails details = new MariaDbDetails();
-            IDatabaseAccess db = new DatabaseAccess(fixture.Connection, details);            
-            DatabaseStorage storage = new DatabaseStorage(details, db, new KeyUtil());
+            _fixture = fixture;
+            _fixture.SetUpDatabase();
 
-            TestEnv.MariaSetUp(db);
+            IDatabaseDetails details = new MariaDbDetails();
+            IDatabaseAccess db = new DatabaseAccess(_fixture.Connection, details);            
+            DatabaseStorage storage = new DatabaseStorage(details, db, new KeyUtil());
 
             _db = db;
             _storage = storage;
         }
 
         public void Dispose() {
-            TestEnv.MariaTearDown(_db);
+            _fixture.TearDownDatabase();
         }
 
         [Fact]
@@ -234,11 +235,9 @@ namespace LimeBean.Tests {
         public void TransactionIsolation() {
             Assert.Equal(IsolationLevel.Unspecified, _db.TransactionIsolation);
 
-            using(var otherConnection = new MySqlConnection(TestEnv.MariaConnectionString)) {
-                otherConnection.Open();
-
+            using(var otherFixture = new MariaDbConnectionFixture()) {
                 var dbName = _db.Cell<string>(false, "select database()");
-                var otherDb = new DatabaseAccess(otherConnection, null);
+                var otherDb = new DatabaseAccess(otherFixture.Connection, null);
 
                 otherDb.Exec("use " + dbName);
                 SharedChecks.CheckReadUncommitted(_db, otherDb);

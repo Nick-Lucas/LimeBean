@@ -149,11 +149,11 @@ namespace LimeBean {
         }
 
         public IConvertible ConvertLongValue(long value) {
-            if(0L <= value && value <= 255L)
-                return Convert.ToByte(value);
+            if(value.IsUnsignedByteRange())
+                return (byte)value;
 
-            if(-0x80000000L <= value && value <= 0x7FFFFFFFL)
-                return Convert.ToInt32(value);
+            if(value.IsInt32Range())
+                return (int)value;
 
             return value;
         }
@@ -175,7 +175,7 @@ namespace LimeBean {
         }
 
         public string GetColumnName(IDictionary<string, IConvertible> column) {
-            return column["name"].ToString(CultureInfo.InvariantCulture);
+            return (string)column["name"];
         }
 
         public string GetColumnType(IDictionary<string, IConvertible> column) {
@@ -193,7 +193,7 @@ namespace LimeBean {
         }
 
         public bool IsReadOnlyCommand(string text) {
-            return Regex.IsMatch(text, @"^\s*select\s", RegexOptions.IgnoreCase);
+            return Regex.IsMatch(text, @"^\s*select\W", RegexOptions.IgnoreCase);
         }
     }
 

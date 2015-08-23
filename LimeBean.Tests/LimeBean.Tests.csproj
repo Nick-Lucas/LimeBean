@@ -84,6 +84,7 @@
     <Compile Include="CacheTests.cs" />
     <Compile Include="DatabaseAccessTests.cs" />
     <Compile Include="DbCommandDescriptorTests.cs" />
+    <Compile Include="Fixtures\ConnectionFixture.cs" />
     <Compile Include="Fixtures\MariaDbConnectionFixture.cs" />
     <Compile Include="Fixtures\MsSqlConnectionFixture.cs" />
     <Compile Include="InMemoryStorage.cs" />
@@ -94,7 +95,6 @@
     <Compile Include="DatabaseStorageTests_SQLite.cs" />
     <Compile Include="SharedChecks.cs" />
     <Compile Include="SQLitePortability.cs" />
-    <Compile Include="TestEnv.cs" />
     <Compile Include="TracingObserver.cs" />
   </ItemGroup>
   <ItemGroup>
