@@ -62,6 +62,10 @@ namespace LimeBean.Tests {
 #if !NO_MARIADB
             Assert.Equal("MariaDB", new BeanApi(new MySql.Data.MySqlClient.MySqlConnection()).CreateDetails().DbName);
 #endif
+
+#if !NO_PGSQL
+            Assert.Equal("PgSql", new BeanApi(new Npgsql.NpgsqlConnection()).CreateDetails().DbName);
+#endif
         }
 
         [Fact]

@@ -8,6 +8,7 @@ namespace LimeBean {
     static class CommonDatabaseDetails {
         public const int 
             RANK_NULL = Int32.MinValue,
+            RANK_STATIC_BASE = 100,
             RANK_CUSTOM = Int32.MaxValue;
 
         public static string QuoteWithBackticks(string text) {
@@ -42,7 +43,7 @@ namespace LimeBean {
             return sql.ToString();
         }
 
-        public static string FormatInsertCommand(IDatabaseDetails details, string tableName, ICollection<string> fieldNames, string valuesPrefix = null, string defaultsExpr = "default values"/*, string postfix = null*/) {
+        public static string FormatInsertCommand(IDatabaseDetails details, string tableName, ICollection<string> fieldNames, string valuesPrefix = null, string defaultsExpr = "default values", string postfix = null) {
             var builder = new StringBuilder("insert into ")
                 .Append(details.QuoteName(tableName))
                 .Append(" ");
@@ -69,8 +70,8 @@ namespace LimeBean {
                 builder.Append(defaultsExpr);
             }
 
-            //if(!String.IsNullOrEmpty(postfix))
-            //    builder.Append(" ").Append(postfix);
+            if(!String.IsNullOrEmpty(postfix))
+                builder.Append(" ").Append(postfix);
 
             return builder.ToString();
         }

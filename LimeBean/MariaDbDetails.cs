@@ -28,6 +28,18 @@ namespace LimeBean {
             get { return "bigint not null auto_increment primary key"; }
         }
 
+        public bool SupportsBoolean {
+            get { return false; }
+        }
+
+        public bool SupportsDecimal {
+            get { return false; }
+        }
+
+        public bool SupportsDateTime {
+            get { return false; }
+        }
+
         public string GetParamName(int index) {
             return "@p" + index;
         }

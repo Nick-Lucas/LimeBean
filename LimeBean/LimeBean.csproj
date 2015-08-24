@@ -50,6 +50,7 @@
     <Compile Include="Bean.cs" />
     <Compile Include="BeanObserver.cs" />
     <Compile Include="Cache.cs" />
+    <Compile Include="PgSqlDetails.cs" />
     <Compile Include="Portability.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="IBeanCrud.cs" />

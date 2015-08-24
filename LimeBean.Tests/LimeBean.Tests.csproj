@@ -43,6 +43,10 @@
       <HintPath>..\packages\MySql.Data.6.9.7\lib\net45\MySql.Data.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Npgsql">
+      <HintPath>..\packages\Npgsql.3.0.1\lib\net45\Npgsql.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -66,6 +70,7 @@
     <Compile Include="AssertExtensions.cs" />
     <Compile Include="CustomKeysTests.cs" />
     <Compile Include="DatabaseStorageTests_MsSql.cs" />
+    <Compile Include="DatabaseStorageTests_PgSql.cs" />
     <Compile Include="DirtyTrackingTests.cs" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -87,6 +92,7 @@
     <Compile Include="Fixtures\ConnectionFixture.cs" />
     <Compile Include="Fixtures\MariaDbConnectionFixture.cs" />
     <Compile Include="Fixtures\MsSqlConnectionFixture.cs" />
+    <Compile Include="Fixtures\PgSqlConnectionFixture.cs" />
     <Compile Include="InMemoryStorage.cs" />
     <Compile Include="BeanCrudTests.cs" />
     <Compile Include="IntegrationTests.cs" />

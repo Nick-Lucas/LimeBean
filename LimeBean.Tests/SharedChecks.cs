@@ -25,21 +25,34 @@ namespace LimeBean.Tests {
             Assert.Equal(savedQueryCount, queryCount);        
         }
 
-        public static void CheckRoundtripOfExtremalValues(RoundtripChecker checker) {
+        public static void CheckRoundtripOfExtremalValues(RoundtripChecker checker, bool checkDecimal = false, bool checkDateTime = false) {
             checker.Check(Int64.MinValue, Int64.MinValue);
             checker.Check(Int64.MaxValue, Int64.MaxValue);
             checker.Check(Double.Epsilon, Double.Epsilon);
             checker.Check(Double.MinValue, Double.MinValue);
             checker.Check(Double.MaxValue, Double.MaxValue);
 
+            if(checkDecimal) {
+                checker.Check(Decimal.MinValue, decimal.MinValue);
+                checker.Check(Decimal.MaxValue, decimal.MaxValue);
+            }
+
+            if(checkDateTime) {
+                checker.Check(DateTime.MinValue, DateTime.MinValue);
+                checker.Check(DateTime.MaxValue.Date, DateTime.MaxValue.Date);            
+            }
+
             var text = String.Empty.PadRight(84 * 1000, 'x');
             checker.Check(text, text);
         }
 
-        public static void CheckRoundtripForcesString(RoundtripChecker checker) {
+        public static void CheckDateRoundtripForcesString(RoundtripChecker checker) {
+            checker.Check(new DateTime(1984, 6, 14, 13, 14, 15), "1984-06-14 13:14:15");
+        }
+
+        public static void CheckBigNumberRoundtripForcesString(RoundtripChecker checker) {
             checker.Check(9223372036854775808, "9223372036854775808");
             checker.Check(9223372036854775808M, "9223372036854775808");
-            checker.Check(new DateTime(1984, 6, 14, 13, 14, 15), "1984-06-14 13:14:15");        
         }
 
         public static void CheckDateTimeQueries(IDatabaseAccess db, DatabaseStorage storage) {

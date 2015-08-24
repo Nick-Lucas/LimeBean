@@ -8,6 +8,9 @@ namespace LimeBean {
     interface IDatabaseDetails {
         string DbName { get; }
         string AutoIncrementSqlType { get; }
+        bool SupportsBoolean { get; }
+        bool SupportsDecimal { get; }
+        bool SupportsDateTime { get; }
 
         string GetParamName(int index);
         string QuoteName(string name);

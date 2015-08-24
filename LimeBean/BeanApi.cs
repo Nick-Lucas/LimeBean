@@ -100,6 +100,11 @@ namespace LimeBean {
                 case "System.Data.SqlClient.SqlConnection":
                     return new MsSqlDetails();
 #endif
+
+#if !NO_PGSQL
+                case "Npgsql.NpgsqlConnection":
+                    return new PgSqlDetails();
+#endif
             }
 
             throw new NotSupportedException();

@@ -79,6 +79,18 @@ namespace LimeBean {
             if(value == null)
                 return null;
 
+            if(value is UInt64)
+                value = ConvertUnsignedLong((ulong)value);
+
+            if(value is Boolean &&_details.SupportsBoolean)
+                return value;
+
+            if(value is Decimal && _details.SupportsDecimal)
+                return value;
+
+            if(value is DateTime && _details.SupportsDateTime)
+                return value;
+
             switch(value.GetTypeCode()) {
                 case TypeCode.Boolean:
                 case TypeCode.SByte:
@@ -88,11 +100,11 @@ namespace LimeBean {
                 case TypeCode.Int32:
                 case TypeCode.UInt32:
                 case TypeCode.Int64:
-                    return _details.ConvertLongValue(value.ToInt64(CultureInfo.InvariantCulture));
+                    return _details.ConvertLongValue(value.ToInt64(null));
 
                 case TypeCode.Single:
                 case TypeCode.Double:
-                    var number = value.ToDouble(CultureInfo.InvariantCulture);
+                    var number = (double)value;
 
                     if(RecognizeIntegers) {
                         const double
@@ -106,7 +118,7 @@ namespace LimeBean {
                     return number;
 
                 case TypeCode.DateTime:
-                    return value.ToDateTime(null).ToString("yyyy-MM-dd HH:mm:ss");
+                    return ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss");
             }
 
             var text = value.ToString(CultureInfo.InvariantCulture);
@@ -126,6 +138,13 @@ namespace LimeBean {
             }
 
             return text;
+        }
+
+        IConvertible ConvertUnsignedLong(ulong value) {
+            if(value <= Int64.MaxValue)
+                return (long)value;
+
+            return (decimal)value;
         }
 
         public IConvertible Store(string kind, IDictionary<string, IConvertible> data) {
@@ -259,10 +278,18 @@ namespace LimeBean {
                 var addedColumns = new Dictionary<string, int>();
 
                 foreach(var name in newColumns.Keys) {
-                    if(!oldColumns.ContainsKey(name))
+                    if(!oldColumns.ContainsKey(name)) {
                         addedColumns[name] = newColumns[name];
-                    else if(newColumns[name] > oldColumns[name])
-                        changedColumns[name] = newColumns[name];
+                    } else {
+                        var oldRank = oldColumns[name];
+                        var newRank = newColumns[name];
+
+                        if(newRank != oldRank) {
+                            CheckForStaticRanks(name, oldRank, newRank);
+                            if(newRank > oldRank)
+                                changedColumns[name] = newRank;                        
+                        }
+                    }
                 }
 
                 if(changedColumns.Count > 0 || addedColumns.Count > 0) {
@@ -270,6 +297,18 @@ namespace LimeBean {
                     InvalidateSchema();
                 }
             }
+        }
+
+        void CheckForStaticRanks(string columnName, int oldRank, int newRank) {
+            if(Math.Max(oldRank, newRank) < CommonDatabaseDetails.RANK_STATIC_BASE)
+                return;
+
+            var text = String.Format(
+                "Cannot automatically convert column '{0}' from '{1}' to '{2}'",
+                columnName, _details.GetSqlTypeFromRank(oldRank), _details.GetSqlTypeFromRank(newRank)
+            );
+
+            throw new InvalidOperationException(text);
         }
 
         void AppendKeyCriteria(string kind, IConvertible key, StringBuilder sql, ICollection<object> parameters) {

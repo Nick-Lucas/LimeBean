@@ -213,7 +213,8 @@ namespace LimeBean.Tests {
                 SharedChecks.CheckRoundtripOfExtremalValues(checker);
 
                 // conversion to string
-                SharedChecks.CheckRoundtripForcesString(checker);
+                SharedChecks.CheckDateRoundtripForcesString(checker);
+                SharedChecks.CheckBigNumberRoundtripForcesString(checker);
 
                 // upscale to long
                 checker.Check(0, 0L);

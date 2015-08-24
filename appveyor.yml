@@ -4,6 +4,7 @@ clone_depth: 1
 
 environment:
   LIME_TEST_MARIA_PWD: Password12!
+  LIME_TEST_PGSQL_PWD: Password12!
   LIME_TEST_MSSQL_NAME: (local)\SQL2008R2SP2
   LIME_DNX_VERSION: 1.0.0-beta6
 
@@ -15,6 +16,7 @@ cache:
 services:
   - mssql2008r2sp2
   - mysql56
+  - postgresql
 
 before_build:
   # Install DNX

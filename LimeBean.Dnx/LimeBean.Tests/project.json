@@ -2,10 +2,11 @@
     "compilationOptions" : {
         "define": [ "SQLITE_MODE_MS" ]
     },
+
     "dependencies": {
         "LimeBean": "",
         "Microsoft.Data.SQLite": "1.0.0-beta6",
-        "xunit": "2.1-rc1-*",
+        "xunit": "2.1-beta4-*",
         "xunit.runner.dnx": "2.1-beta4-*"            
     },
     
@@ -14,7 +15,7 @@
     "frameworks": {        
         "dnxcore50": { 
             "compilationOptions" : {
-                "define": [ "NO_MARIADB" ]
+                "define": [ "NO_MARIADB", "NO_PGSQL" ]
             },
             "dependencies": {
                 "System.Data.SqlClient": "4.0.0-*",
@@ -23,7 +24,8 @@
         },
         "dnx451": {
             "dependencies": {
-                "MySql.Data": "6.9.7"
+                "MySql.Data": "6.9.7",
+                "Npgsql": "3.0.1"
             }
         }        
     }

@@ -22,6 +22,18 @@ namespace LimeBean {
             get { return "integer primary key"; }
         }
 
+        public bool SupportsBoolean {
+            get { return false; }
+        }
+
+        public bool SupportsDecimal {
+            get { return false; }
+        }
+
+        public bool SupportsDateTime {
+            get { return false; }
+        }
+
         public string GetParamName(int index) {
             return ":p" + index;
         }
@@ -112,7 +124,7 @@ namespace LimeBean {
         }
 
         public bool IsNullableColumn(IDictionary<string, IConvertible> column) {
-            return !column["notnull"].ToBoolean(CultureInfo.InvariantCulture);            
+            return !column["notnull"].ToBoolean(null);            
         }
 
         public IConvertible GetColumnDefaultValue(IDictionary<string, IConvertible> column) {
