@@ -41,52 +41,52 @@ namespace LimeBean {
 
         // Iterators
 
-        public IEnumerable<T> ColIterator<T>(string sql, params object[] parameters) where T : IConvertible {
+        public IEnumerable<T> ColIterator<T>(string sql, params object[] parameters) {
             return EnumerateRecords(new DbCommandDescriptor(sql, parameters), GetFirstCellValue<T>);
         }
 
-        public IEnumerable<IDictionary<string, IConvertible>> RowsIterator(string sql, params object[] parameters) {
+        public IEnumerable<IDictionary<string, object>> RowsIterator(string sql, params object[] parameters) {
             return EnumerateRecords(new DbCommandDescriptor(sql, parameters), RecordToDict).ToArray();
         }
 
         // Cell
 
-        public T Cell<T>(bool useCache, string sql, params object[] parameters) where T : IConvertible {
+        public T Cell<T>(bool useCache, string sql, params object[] parameters) {
             return CacheableRead(true, true, useCache, sql, parameters, Cell<T>);
         }
 
-        T Cell<T>(DbCommandDescriptor descriptor) where T : IConvertible {
+        T Cell<T>(DbCommandDescriptor descriptor) {
             return EnumerateRecords(descriptor, GetFirstCellValue<T>).FirstOrDefault();
         }
 
 
         // Col
 
-        public T[] Col<T>(bool useCache, string sql, params object[] parameters) where T : IConvertible {
+        public T[] Col<T>(bool useCache, string sql, params object[] parameters) {
             return CacheableRead(true, false, useCache, sql, parameters, Col<T>);
         }
 
-        T[] Col<T>(DbCommandDescriptor descriptor) where T : IConvertible {
+        T[] Col<T>(DbCommandDescriptor descriptor) {
             return EnumerateRecords(descriptor, GetFirstCellValue<T>).ToArray();
         }
 
         // Row
 
-        public IDictionary<string, IConvertible> Row(bool useCache, string sql, params object[] parameters) {
+        public IDictionary<string, object> Row(bool useCache, string sql, params object[] parameters) {
             return CacheableRead(false, true, useCache, sql, parameters, Row);
         }
 
-        IDictionary<string, IConvertible> Row(DbCommandDescriptor descriptor) {
+        IDictionary<string, object> Row(DbCommandDescriptor descriptor) {
             return EnumerateRecords(descriptor, RecordToDict).FirstOrDefault();
         }
 
         // Rows
 
-        public IDictionary<string, IConvertible>[] Rows(bool useCache, string sql, params object[] parameters) {
+        public IDictionary<string, object>[] Rows(bool useCache, string sql, params object[] parameters) {
             return CacheableRead(false, false, useCache, sql, parameters, Rows);
         }
 
-        IDictionary<string, IConvertible>[] Rows(DbCommandDescriptor descriptor) {
+        IDictionary<string, object>[] Rows(DbCommandDescriptor descriptor) {
             return EnumerateRecords(descriptor, RecordToDict).ToArray();
         }
 
@@ -131,6 +131,7 @@ namespace LimeBean {
                     var p = cmd.CreateParameter();
                     p.ParameterName = name;
                     p.Value = parameters[i] ?? DBNull.Value;
+                    _details.CustomizeParam(p);
                     cmd.Parameters.Add(p);
                 }
 
@@ -155,45 +156,24 @@ namespace LimeBean {
             }
         }
 
-        static IDictionary<string, IConvertible> RecordToDict(DbDataReader reader) {
+        static IDictionary<string, object> RecordToDict(DbDataReader reader) {
             var count = reader.FieldCount;
-            var result = new Dictionary<string, IConvertible>();
+            var result = new Dictionary<string, object>();
 
             for(var i = 0; i < count; i++)
-                result[reader.GetName(i)] = GetCellValue<IConvertible>(reader, i);
+                result[reader.GetName(i)] = StripDbNull(reader.GetValue(i));
 
             return result;
         }
 
-        static T GetFirstCellValue<T>(DbDataReader reader) where T : IConvertible {
-            return GetCellValue<T>(reader, 0);
+        static T GetFirstCellValue<T>(DbDataReader reader) {
+            return StripDbNull(reader.GetValue(0)).ConvertSafe<T>();
         }
 
-        static T GetCellValue<T>(DbDataReader reader, int index) where T : IConvertible {
-            var value = GetCellValue(reader, index);
-            if(value == null)
-                return default(T);
-
-            if(value is T)
-                return (T)value;
-
-            return (T)value.ToType(typeof(T), CultureInfo.InvariantCulture);
-        }
-
-        static IConvertible GetCellValue(DbDataReader reader, int index) {
-            var value = reader.GetValue(index);
-            if(value is DBNull)
+        static object StripDbNull(object value) {
+            if(value == DBNull.Value)
                 return null;
-
-            var convertible = value as IConvertible;
-            if(convertible != null)
-                return convertible;
-
-            var bytes = value as byte[];
-            if(bytes != null)
-                return Convert.ToBase64String(bytes);
-
-            return Convert.ToString(value);
+            return value;
         }
 
         void QueryWillExecute(DbCommand cmd) {

@@ -71,31 +71,31 @@ namespace LimeBean.Tests {
         [Fact]
         public void StoreToGoodTable() {
             _db.Exec("create table kind1 (id integer primary key, p1 numeric, p2 text)");
-            var id = _storage.Store("kind1", new Dictionary<string, IConvertible> { 
+            var id = _storage.Store("kind1", new Dictionary<string, object> { 
                 { "p1", 123 },
                 { "p2", "hello" }
             });
 
             var row = _db.Row(true, "select * from kind1");
-            Assert.Equal(123, row["p1"].ToInt32(null));
+            Assert.Equal(123, Convert.ToInt32(row["p1"]));
             Assert.Equal("hello", row["p2"]);
             Assert.Equal(id, row["id"]);
 
-            Assert.Equal(id, _storage.Store("kind1", new Dictionary<string, IConvertible> { 
+            Assert.Equal(id, _storage.Store("kind1", new Dictionary<string, object> { 
                 { "id", id },
                 { "p1", -1 },
                 { "p2", "see you" }            
             }));
 
             row = _db.Row(true, "select * from kind1");
-            Assert.Equal(-1, row["p1"].ToInt32(null));
+            Assert.Equal(-1, Convert.ToInt32(row["p1"]));
             Assert.Equal("see you", row["p2"]);
         }
 
         [Fact]
         public void StoreToMissingTable() {
             _storage.EnterFluidMode();
-            _storage.Store("kind1", new Dictionary<string, IConvertible> { 
+            _storage.Store("kind1", new Dictionary<string, object> { 
                 { "p1", 123 },
                 { "p2", 3.14 },
                 { "p3", "hello" },
@@ -120,14 +120,14 @@ namespace LimeBean.Tests {
             _db.Exec("create table kind1 (id integer primary key)");
             _storage.EnterFluidMode();
 
-            _storage.Store("kind1", new Dictionary<string, IConvertible> { 
+            _storage.Store("kind1", new Dictionary<string, object> { 
                 { "x", 1 } 
             });
 
             var schema = _storage.GetSchema();
             Assert.Equal(SQLiteDetails.RANK_ANY, schema["kind1"]["x"]);
 
-            _storage.Store("kind1", new Dictionary<string, IConvertible> { 
+            _storage.Store("kind1", new Dictionary<string, object> { 
                 { "x", "hello" },
                 { "y", null }
             });
@@ -144,7 +144,7 @@ namespace LimeBean.Tests {
         [Fact]
         public void ChangeSchemaWhenFrozen() {
             Assert.Throws(SQLitePortability.ExceptionType, delegate() {
-                _storage.Store("unlucky", new Dictionary<string, IConvertible> { { "a", 1 } });
+                _storage.Store("unlucky", new Dictionary<string, object> { { "a", 1 } });
             });
         }
 
@@ -152,11 +152,11 @@ namespace LimeBean.Tests {
         public void InsertUpdateWithoutValues() {
             _storage.EnterFluidMode();
 
-            var id = _storage.Store("kind1", new Dictionary<string, IConvertible>());
+            var id = _storage.Store("kind1", new Dictionary<string, object>());
             Assert.Equal(1, _db.Cell<int>(true, "select count(*) from kind1"));
 
             Assert.Null(Record.Exception(delegate() {
-                _storage.Store("kind1", new Dictionary<string, IConvertible>() { { "id", id } });
+                _storage.Store("kind1", new Dictionary<string, object>() { { "id", id } });
             }));
         }
 
@@ -165,7 +165,7 @@ namespace LimeBean.Tests {
             _storage.EnterFluidMode();
 
             var error = Record.Exception(delegate() {
-                _storage.Store("foo", new Dictionary<string, IConvertible> { { "id", 123 }, { "a", 1 } });
+                _storage.Store("foo", new Dictionary<string, object> { { "id", 123 }, { "a", 1 } });
             });
             Assert.Equal("Row not found", error.Message);
         }
@@ -193,7 +193,7 @@ namespace LimeBean.Tests {
 
             var data = _storage.Load("kind1", 5);
             Assert.Equal(5L, data["id"]);
-            Assert.Equal(123, data["p1"].ToInt32(null));
+            Assert.Equal(123, Convert.ToInt32(data["p1"]));
             Assert.Equal("hello", data["p2"]);
         }
 
@@ -213,7 +213,7 @@ namespace LimeBean.Tests {
                 SharedChecks.CheckRoundtripOfExtremalValues(checker);
 
                 // conversion to string
-                SharedChecks.CheckDateRoundtripForcesString(checker);
+                checker.Check(new DateTime(1984, 6, 14, 13, 14, 15), "1984-06-14 13:14:15");
                 SharedChecks.CheckBigNumberRoundtripForcesString(checker);
 
                 // upscale to long
@@ -221,7 +221,7 @@ namespace LimeBean.Tests {
                 checker.Check(1, 1L);
                 checker.Check(true, 1L);
                 checker.Check(false, 0L);
-                checker.Check(TypeCode.DateTime, 16L);
+                checker.Check(DayOfWeek.Thursday, 4L);
             });
         }
 
@@ -279,7 +279,7 @@ namespace LimeBean.Tests {
 
         [Fact]
         public void Trash() {
-            var emptiness = new Dictionary<string, IConvertible>();
+            var emptiness = new Dictionary<string, object>();
 
             _storage.EnterFluidMode();
 
@@ -297,32 +297,32 @@ namespace LimeBean.Tests {
             _storage.EnterFluidMode();
 
             var trueKeys = new[] { 
-                _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", true } }),
-                _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", 1 } }),
-                _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", "1" } })
+                _storage.Store("foo", new Dictionary<string, object> { { "x", true } }),
+                _storage.Store("foo", new Dictionary<string, object> { { "x", 1 } }),
+                _storage.Store("foo", new Dictionary<string, object> { { "x", "1" } })
             };
 
             var falseKeys = new[] {
-                _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", false } }),
-                _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", 0 } }),
-                _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", "0" } })
+                _storage.Store("foo", new Dictionary<string, object> { { "x", false } }),
+                _storage.Store("foo", new Dictionary<string, object> { { "x", 0 } }),
+                _storage.Store("foo", new Dictionary<string, object> { { "x", "0" } })
             };
 
             var nullKeys = new[] { 
-                _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", null } }),
-                _storage.Store("foo", new Dictionary<string, IConvertible> { { "x", "" } })
+                _storage.Store("foo", new Dictionary<string, object> { { "x", null } }),
+                _storage.Store("foo", new Dictionary<string, object> { { "x", "" } })
             };
 
-            AssertExtensions.Equivalent(trueKeys, _db.Col<IConvertible>(true, "select id from foo where x"));
-            AssertExtensions.Equivalent(falseKeys, _db.Col<IConvertible>(true, "select id from foo where not x"));
-            AssertExtensions.Equivalent(nullKeys, _db.Col<IConvertible>(true, "select id from foo where x is null"));
+            AssertExtensions.Equivalent(trueKeys, _db.Col<object>(true, "select id from foo where x"));
+            AssertExtensions.Equivalent(falseKeys, _db.Col<object>(true, "select id from foo where not x"));
+            AssertExtensions.Equivalent(nullKeys, _db.Col<object>(true, "select id from foo where x is null"));
         }
 
         [Fact]
         public void Numbers() {
             _storage.EnterFluidMode();
 
-            var id = _storage.Store("foo", new Dictionary<string, IConvertible> { { "long", 42 }, { "double", 3.14 } });
+            var id = _storage.Store("foo", new Dictionary<string, object> { { "long", 42 }, { "double", 3.14 } });
 
             var row = _storage.Load("foo", id);
             Assert.IsType<long>(row["long"]);
@@ -364,9 +364,15 @@ namespace LimeBean.Tests {
         }
 
         [Fact]
-        public void Blobs() {
-            SharedChecks.CheckBlobs(_db, "blob");
+        public void CustomRankInFluidMode() {
+            SharedChecks.CheckCustomRankInFluidMode(_db, _storage, true);
         }
+
+        [Fact]
+        public void CustomRankWithExistingTable() {
+            SharedChecks.CheckCustomRankWithExistingTable(_db, _storage, "blob");
+        }
+
     }
 
 }

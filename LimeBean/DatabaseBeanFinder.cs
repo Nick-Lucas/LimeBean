@@ -59,15 +59,15 @@ namespace LimeBean {
 
         // Internals
 
-        IDictionary<string, IConvertible> Row(bool useCache, string kind, string expr, object[] parameters) {
+        IDictionary<string, object> Row(bool useCache, string kind, string expr, object[] parameters) {
             return _db.Row(useCache, FormatSelectQuery(kind, expr), parameters);
         }
 
-        IDictionary<string, IConvertible>[] Rows(bool useCache, string kind, string expr, object[] parameters) {
+        IDictionary<string, object>[] Rows(bool useCache, string kind, string expr, object[] parameters) {
             return _db.Rows(useCache, FormatSelectQuery(kind, expr), parameters);
         }
 
-        IEnumerable<IDictionary<string, IConvertible>> RowsIterator(string kind, string expr, object[] parameters) {
+        IEnumerable<IDictionary<string, object>> RowsIterator(string kind, string expr, object[] parameters) {
             return _db.RowsIterator(FormatSelectQuery(kind, expr), parameters);
         }
 

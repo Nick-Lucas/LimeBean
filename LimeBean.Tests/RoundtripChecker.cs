@@ -15,8 +15,8 @@ namespace LimeBean.Tests {
             _storage = storage;
         }
 
-        public void Check(IConvertible before, IConvertible after) {            
-            var id = _storage.Store("foo", new Dictionary<string, IConvertible> { 
+        public void Check(object before, object after) {
+            var id = _storage.Store("foo", new Dictionary<string, object> { 
                     { "p", before }
                 });
 

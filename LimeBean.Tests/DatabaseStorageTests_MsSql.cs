@@ -44,15 +44,18 @@ namespace LimeBean.Tests {
                 t1  nvarchar(32),
                 t2  nvarchar(4000),
                 t3  nvarchar(MAX),
+                dt  datetime2,
+                g   uniqueidentifier,
 
                 x1  bit,
                 x2  decimal,
                 x3  float(10),
                 x4  varchar(32),
                 x5  nvarchar(33),
+                x6  datetime,
 
-                x6  int not null,
-                x7  int default 123
+                x7  int not null,
+                x8  int default 123
             )");
 
             var schema = _storage.GetSchema();
@@ -68,6 +71,8 @@ namespace LimeBean.Tests {
             Assert.Equal(MsSqlDetails.RANK_TEXT_32, cols["t1"]);
             Assert.Equal(MsSqlDetails.RANK_TEXT_4000, cols["t2"]);
             Assert.Equal(MsSqlDetails.RANK_TEXT_MAX, cols["t3"]);
+            Assert.Equal(MsSqlDetails.RANK_STATIC_DATETIME, cols["dt"]);
+            Assert.Equal(MsSqlDetails.RANK_STATIC_GUID, cols["g"]);
 
             Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x1"]);
             Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x2"]);
@@ -76,13 +81,14 @@ namespace LimeBean.Tests {
             Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x5"]);
             Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x6"]);
             Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x7"]);
+            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x8"]);
         }
 
         [Fact]
         public void CreateTable() {
             _storage.EnterFluidMode();
 
-            var data = new Dictionary<string, IConvertible> {
+            var data = new Dictionary<string, object> {
                 { "p1", null },
                 { "p2", 1 },
                 { "p3", -1 },
@@ -91,6 +97,8 @@ namespace LimeBean.Tests {
                 { "p6", "abc" },
                 { "p7", "".PadRight(33, 'a') },
                 { "p8", "".PadRight(4001, 'a') },
+                { "p9", DateTime.Now },
+                { "p10", Guid.NewGuid() }
             };
 
             _storage.Store("foo", data);
@@ -104,13 +112,15 @@ namespace LimeBean.Tests {
             Assert.Equal(MsSqlDetails.RANK_TEXT_32, cols["p6"]);
             Assert.Equal(MsSqlDetails.RANK_TEXT_4000, cols["p7"]);
             Assert.Equal(MsSqlDetails.RANK_TEXT_MAX, cols["p8"]);
+            Assert.Equal(MsSqlDetails.RANK_STATIC_DATETIME, cols["p9"]);
+            Assert.Equal(MsSqlDetails.RANK_STATIC_GUID, cols["p10"]);
         }
 
         [Fact]
         public void AlterTable() {
             _storage.EnterFluidMode();
 
-            var data = new Dictionary<string, IConvertible> {
+            var data = new Dictionary<string, object> {
                 { "p1", 1 },
                 { "p2", -1 },
                 { "p3", Int64.MaxValue },
@@ -154,12 +164,13 @@ namespace LimeBean.Tests {
                 checker.Check(0x80000000L, 0x80000000L);
                 checker.Check(3.14, 3.14);
                 checker.Check("hello", "hello");
+                checker.Check(new DateTime(2015, 8, 25), new DateTime(2015, 8, 25));
+                checker.Check(SharedChecks.SAMPLE_GUID, SharedChecks.SAMPLE_GUID);
 
                 // extremal vaues
-                SharedChecks.CheckRoundtripOfExtremalValues(checker);
+                SharedChecks.CheckRoundtripOfExtremalValues(checker, false, true);
 
                 // conversion to string
-                SharedChecks.CheckDateRoundtripForcesString(checker);
                 SharedChecks.CheckBigNumberRoundtripForcesString(checker);
 
                 // bool            
@@ -167,7 +178,7 @@ namespace LimeBean.Tests {
                 checker.Check(false, (byte)0);
 
                 // enum
-                checker.Check(TypeCode.DateTime, (byte)16);
+                checker.Check(DayOfWeek.Thursday, (byte)4);
             });
         }
 
@@ -182,18 +193,18 @@ namespace LimeBean.Tests {
         }
 
         [Fact]
-        public void Blobs() {
-            SharedChecks.CheckBlobs(_db, "varbinary(16)");
+        public void CustomRankInFluidMode() {
+            SharedChecks.CheckCustomRankInFluidMode(_db, _storage, false);
         }
 
         [Fact]
-        public void ReadNonConvertibles() {
-            var guid = Guid.NewGuid();
+        public void CustomRankWithExistingTable() {
+            SharedChecks.CheckCustomRankWithExistingTable(_db, _storage, "varbinary(max)");
+        }
 
-            _db.Exec("create table foo(f uniqueidentifier)");
-            _db.Exec("insert into foo(f) values({0})", guid);
-
-            Assert.Equal(guid.ToString(), _db.Cell<string>(false, "select f from foo"));
+        [Fact]
+        public void StaticRankInFluidMode() {
+            SharedChecks.CheckStaticRankInFluidMode(_db, _storage, DateTime.Now);
         }
 
         [Fact]

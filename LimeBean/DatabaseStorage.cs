@@ -68,90 +68,71 @@ namespace LimeBean {
             return GetSchema().ContainsKey(kind);
         }
 
-        IDictionary<string, int> GetColumnsFromData(IDictionary<string, IConvertible> data) {
+        IDictionary<string, int> GetColumnsFromData(IDictionary<string, object> data) {
             var result = new Dictionary<string, int>();
             foreach(var entry in data)
                 result[entry.Key] = _details.GetRankFromValue(entry.Value);
             return result;
         }
 
-        IConvertible ConvertValue(IConvertible value) {
+        object ConvertValue(object value) {
             if(value == null)
                 return null;
 
-            if(value is UInt64)
-                value = ConvertUnsignedLong((ulong)value);
+            if(value is UInt64) {
+                var number = (ulong)value;
+                value = number <= Int64.MaxValue ? (long)number : (decimal)number;
+            }                
 
-            if(value is Boolean &&_details.SupportsBoolean)
-                return value;
+            if(value is Boolean) {
+                if(_details.SupportsBoolean)
+                    return value;
+                value = (bool)value ? 1 : 0;
+            } else if(value is Decimal) {
+                if(_details.SupportsDecimal)
+                    return value;
+                value = Convert.ToString(value, CultureInfo.InvariantCulture);
+            }
 
-            if(value is Decimal && _details.SupportsDecimal)
-                return value;
+            if(value is Int32 || value is Int64 || value is Byte || value is SByte || value is Int16 || value is UInt16 || value is UInt32 || value is Enum || value is Enum || value is Enum || value is Enum)
+                return _details.ConvertLongValue(Convert.ToInt64(value));
 
-            if(value is DateTime && _details.SupportsDateTime)
-                return value;
+            if(value is Double || value is Single) {
+                var number = Convert.ToDouble(value);
+                if(RecognizeIntegers && number.IsSafeInteger())
+                    return _details.ConvertLongValue(Convert.ToInt64(number));
 
-            switch(value.GetTypeCode()) {
-                case TypeCode.Boolean:
-                case TypeCode.SByte:
-                case TypeCode.Byte:
-                case TypeCode.Int16:
-                case TypeCode.UInt16:
-                case TypeCode.Int32:
-                case TypeCode.UInt32:
-                case TypeCode.Int64:
-                    return _details.ConvertLongValue(value.ToInt64(null));
+                return number;        
+            }
 
-                case TypeCode.Single:
-                case TypeCode.Double:
-                    var number = (double)value;
+            if(value is String) {
+                var text = (string)value;
 
-                    if(RecognizeIntegers) {
-                        const double
-                            minSafeInteger = -0x1fffffffffffff,
-                            maxSafeInteger = 0x1fffffffffffff;
+                if(TrimStrings)
+                    text = text.Trim();
 
-                        if(Math.Truncate(number) == number && number >= minSafeInteger && number <= maxSafeInteger)
-                            return _details.ConvertLongValue(Convert.ToInt64(number));
+                if(ConvertEmptyStringToNull && text.Length < 1)
+                    return null;
+
+                if(RecognizeIntegers && text.Length > 0 && text.Length < 21 && !Char.IsLetter(text, 0)) {
+                    long number;
+                    if(Int64.TryParse(text, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out number)) {
+                        if(number.ToString(CultureInfo.InvariantCulture) == text)
+                            return _details.ConvertLongValue(number);
                     }
-
-                    return number;
-
-                case TypeCode.DateTime:
-                    return ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss");
-            }
-
-            var text = value.ToString(CultureInfo.InvariantCulture);
-
-            if(TrimStrings)
-                text = text.Trim();
-
-            if(ConvertEmptyStringToNull && text.Length < 1)
-                return null;
-
-            if(RecognizeIntegers && text.Length > 0 && text.Length < 21 && !Char.IsLetter(text, 0)) {
-                long number;
-                if(Int64.TryParse(text, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out number)) {
-                    if(number.ToString(CultureInfo.InvariantCulture) == text)
-                        return _details.ConvertLongValue(number);
                 }
+
+                return text;
             }
 
-            return text;
+            return value;
         }
 
-        IConvertible ConvertUnsignedLong(ulong value) {
-            if(value <= Int64.MaxValue)
-                return (long)value;
-
-            return (decimal)value;
-        }
-
-        public IConvertible Store(string kind, IDictionary<string, IConvertible> data) {
+        public object Store(string kind, IDictionary<string, object> data) {
             return Store(kind, data, null);
         }
 
-        public IConvertible Store(string kind, IDictionary<string, IConvertible> data, ICollection<string> dirtyNames) {            
+        public object Store(string kind, IDictionary<string, object> data, ICollection<string> dirtyNames) {            
             var key = _keyAccess.GetKey(kind, data);
             var autoIncrement = _keyAccess.IsAutoIncrement(kind);
 
@@ -161,7 +142,7 @@ namespace LimeBean {
             var isNew = !autoIncrement ? !IsKnownKey(kind, key) : key == null;
 
             if(!isNew && key != null) {
-                data = new Dictionary<string, IConvertible>(data);
+                data = new Dictionary<string, object>(data);
                 _keyAccess.SetKey(kind, data, null);
             }
 
@@ -185,7 +166,7 @@ namespace LimeBean {
             return key;
         }
 
-        public IDictionary<string, IConvertible> Load(string kind, IConvertible key) {
+        public IDictionary<string, object> Load(string kind, object key) {
             if(_isFluidMode && !IsKnownKind(kind))
                 return null;
 
@@ -193,7 +174,7 @@ namespace LimeBean {
             return _db.Row(true, args.Item1, args.Item2);
         }
 
-        public void Trash(string kind, IConvertible key) {
+        public void Trash(string kind, object key) {
             if(_isFluidMode && !IsKnownKind(kind))
                 return;
 
@@ -201,7 +182,7 @@ namespace LimeBean {
             _db.Exec(args.Item1, args.Item2);
         }
 
-        bool IsKnownKey(string kind, IConvertible key) {
+        bool IsKnownKey(string kind, object key) {
             if(_isFluidMode && !IsKnownKind(kind))
                 return false;
 
@@ -209,7 +190,7 @@ namespace LimeBean {
             return _db.Cell<int>(false, args.Item1, args.Item2) > 0;
         }
 
-        void ExecUpdate(string kind, IConvertible key, IDictionary<string, IConvertible> data) {
+        void ExecUpdate(string kind, object key, IDictionary<string, object> data) {
             var propValues = new List<object>();
             var sql = new StringBuilder();
 
@@ -239,7 +220,7 @@ namespace LimeBean {
                 throw new Exception("Row not found");
         }
 
-        Tuple<string, object[]> CreateSimpleByKeyArguments(string prefix, string kind, IConvertible key) {
+        Tuple<string, object[]> CreateSimpleByKeyArguments(string prefix, string kind, object key) {
             var parameters = new List<object>();
             var sql = new StringBuilder(prefix)
                 .Append(" from ")
@@ -250,9 +231,9 @@ namespace LimeBean {
             return Tuple.Create(sql.ToString(), parameters.ToArray());
         }
 
-        IDictionary<string, IConvertible> DropNulls(string kind, IDictionary<string, IConvertible> data) {
+        IDictionary<string, object> DropNulls(string kind, IDictionary<string, object> data) {
             var schema = GetSchema();
-            var result = new Dictionary<string, IConvertible>();
+            var result = new Dictionary<string, object>();
 
             foreach(var entry in data) {
                 if(entry.Value != null || schema.ContainsKey(kind) && schema[kind].ContainsKey(entry.Key))                    
@@ -262,7 +243,7 @@ namespace LimeBean {
             return result;
         }
 
-        void CheckSchema(string kind, IDictionary<string, IConvertible> data) {
+        void CheckSchema(string kind, IDictionary<string, object> data) {
             var newColumns = GetColumnsFromData(data);
             var autoIncrementName = _keyAccess.GetAutoIncrementName(kind);
 
@@ -270,6 +251,8 @@ namespace LimeBean {
                 newColumns.Remove(autoIncrementName);
 
             if(!IsKnownKind(kind)) {
+                foreach(var col in newColumns)
+                    ValidateNewColumnRank(col.Key, col.Value);
                 _db.Exec(CommonDatabaseDetails.FormatCreateTableCommand(_details, kind, autoIncrementName, newColumns));
                 InvalidateSchema();
             } else {
@@ -278,14 +261,16 @@ namespace LimeBean {
                 var addedColumns = new Dictionary<string, int>();
 
                 foreach(var name in newColumns.Keys) {
+                    var newRank = newColumns[name];
+
                     if(!oldColumns.ContainsKey(name)) {
-                        addedColumns[name] = newColumns[name];
+                        ValidateNewColumnRank(name, newRank);
+                        addedColumns[name] = newRank;
                     } else {
                         var oldRank = oldColumns[name];
-                        var newRank = newColumns[name];
 
                         if(newRank != oldRank) {
-                            CheckForStaticRanks(name, oldRank, newRank);
+                            ValidateRankUpgrade(name, oldRank, newRank);
                             if(newRank > oldRank)
                                 changedColumns[name] = newRank;                        
                         }
@@ -299,19 +284,34 @@ namespace LimeBean {
             }
         }
 
-        void CheckForStaticRanks(string columnName, int oldRank, int newRank) {
+        void ValidateNewColumnRank(string columnName, int rank) {
+            if(rank < CommonDatabaseDetails.RANK_CUSTOM)
+                return;
+
+            var text = String.Format("Cannot automatically add column '{0}' because it has a custom SQL type", columnName);
+            throw new InvalidOperationException(text);
+        }
+
+        void ValidateRankUpgrade(string columnName, int oldRank, int newRank) {
             if(Math.Max(oldRank, newRank) < CommonDatabaseDetails.RANK_STATIC_BASE)
                 return;
 
             var text = String.Format(
                 "Cannot automatically convert column '{0}' from '{1}' to '{2}'",
-                columnName, _details.GetSqlTypeFromRank(oldRank), _details.GetSqlTypeFromRank(newRank)
+                columnName, GetRankName(oldRank), GetRankName(newRank)
             );
 
             throw new InvalidOperationException(text);
         }
 
-        void AppendKeyCriteria(string kind, IConvertible key, StringBuilder sql, ICollection<object> parameters) {
+        string GetRankName(int rank) {
+            if(rank < CommonDatabaseDetails.RANK_CUSTOM)
+                return _details.GetSqlTypeFromRank(rank);
+
+            return "(custom)";
+        }
+
+        void AppendKeyCriteria(string kind, object key, StringBuilder sql, ICollection<object> parameters) {
             sql.Append(" where ");
 
             var compound = key as CompoundKey;

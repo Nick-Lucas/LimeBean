@@ -8,6 +8,7 @@ using Xunit;
 namespace LimeBean.Tests {
 
     static class SharedChecks {
+        public static Guid SAMPLE_GUID = Guid.NewGuid();
 
         public static void CheckSchemaReadingKeepsCache(IDatabaseAccess db, DatabaseStorage storage) {
             db.Exec("create table foo(bar int)");
@@ -46,10 +47,6 @@ namespace LimeBean.Tests {
             checker.Check(text, text);
         }
 
-        public static void CheckDateRoundtripForcesString(RoundtripChecker checker) {
-            checker.Check(new DateTime(1984, 6, 14, 13, 14, 15), "1984-06-14 13:14:15");
-        }
-
         public static void CheckBigNumberRoundtripForcesString(RoundtripChecker checker) {
             checker.Check(9223372036854775808, "9223372036854775808");
             checker.Check(9223372036854775808M, "9223372036854775808");
@@ -61,30 +58,17 @@ namespace LimeBean.Tests {
             var date = new DateTime(2015, 1, 1);
             var dateTime = date.AddHours(1).AddMinutes(2).AddSeconds(3);
 
-            Func<DateTime, IDictionary<string, IConvertible>> makeRow = d => new Dictionary<string, IConvertible> { 
-                { "d", d }
-            };
-
-            storage.Store("foo", makeRow(date));
-            storage.Store("foo", makeRow(dateTime));
+            storage.Store("foo", MakeRow("d", date));
+            storage.Store("foo", MakeRow("d", dateTime));
             Assert.Equal(2, db.Cell<int>(false, "select count(*) from foo where d = {0} or d = {1}", date, dateTime));
 
             db.Exec("delete from foo");
 
             for(var i = -2; i <= 2; i++)
-                storage.Store("foo", makeRow(date.AddDays(i)));
+                storage.Store("foo", MakeRow("d", date.AddDays(i)));
             Assert.Equal(3, db.Cell<int>(false, "select count(*) from foo where d between {0} and {1}", date.AddDays(-1), date.AddDays(1)));
 
             Assert.Equal(date, db.Cell<DateTime>(false, "select d from foo where d = {0}", date));        
-        }
-
-        public static void CheckBlobs(IDatabaseAccess db, string type) {
-            var data = new byte[] { 46, 41, 158 };
-
-            db.Exec("create table foo(f " + type + ")");
-            db.Exec("insert into foo(f) values({0})", data);
-
-            Assert.Equal("Lime", db.Cell<string>(false, "select f from foo"));
         }
 
         public static void CheckReadUncommitted(IDatabaseAccess db1, IDatabaseAccess db2) {
@@ -103,6 +87,94 @@ namespace LimeBean.Tests {
                 return true;
             });
         }
+
+        public static void CheckCustomRankInFluidMode(IDatabaseAccess db, DatabaseStorage storage, bool expectSuccess) {
+            storage.EnterFluidMode();
+
+            var row = MakeRow("a", new byte[] { 1, 2, 3 });
+
+            // Try create table
+
+            var x = Record.Exception(delegate() {
+                storage.Store("foo1", row);
+            });
+            
+            if(expectSuccess) {
+                Assert.Null(x);
+            } else {
+                Assert.IsType<InvalidOperationException>(x);
+                Assert.EndsWith("custom SQL type", x.Message);
+            }
+
+            // Try add column
+
+            storage.Store("foo2", MakeRow("b", 1));
+
+            x = Record.Exception(delegate() {
+                storage.Store("foo2", row);
+            });
+
+            if(expectSuccess) {
+                Assert.Null(x);
+            } else {
+                Assert.IsType<InvalidOperationException>(x);
+                Assert.EndsWith("custom SQL type", x.Message);
+            }
+            
+            // Try to upgrade rank
+
+            storage.Store("foo3", MakeRow("a", 1));
+
+            x = Record.Exception(delegate() {
+                storage.Store("foo3", row);
+            });
+
+            if(expectSuccess) {
+                Assert.Null(x);
+            } else {
+                Assert.IsType<InvalidOperationException>(x);
+                Assert.EndsWith("to '(custom)'", x.Message);
+            }
+        }
+
+        public static void CheckStaticRankInFluidMode(IDatabaseAccess db, DatabaseStorage storage, object staticRankValue) {
+            storage.EnterFluidMode();
+            storage.Store("foo", MakeRow("dynamic", 1, "static", staticRankValue));   
+         
+            // dynamic ->  static
+            
+            var x = Record.Exception(delegate() {
+                storage.Store("foo", MakeRow("dynamic", staticRankValue));    
+            });
+            Assert.IsType<InvalidOperationException>(x);
+            Assert.StartsWith("Cannot automatically", x.Message);
+
+            // static -> dynamic
+
+            x = Record.Exception(delegate() {
+                storage.Store("foo", MakeRow("static", 1));
+            });
+
+            Assert.IsType<InvalidOperationException>(x);
+            Assert.StartsWith("Cannot automatically", x.Message);
+
+        }
+
+        public static void CheckCustomRankWithExistingTable(IDatabaseAccess db, DatabaseStorage storage, string blobType) {
+            db.Exec("create table foo(id integer, b " + blobType + ")");
+            storage.Store("foo", MakeRow("b", new byte[] { 123 }));
+            var readBack = db.Cell<byte[]>(false, "select b from foo");
+            Assert.Equal(123, readBack[0]);
+        }
+
+        static IDictionary<string, object> MakeRow(params object[] data) {
+            var row = new Dictionary<string, object>();
+            for(var i = 0; i < data.Length; i += 2) {
+                row[(string)data[i]] = data[1 + i];
+            }
+            return row;
+        }
+
 
     }
 

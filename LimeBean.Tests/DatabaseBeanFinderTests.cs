@@ -95,8 +95,8 @@ namespace LimeBean.Tests {
 
         [Fact]
         public void Iterators() {
-            AssertExtensions.Equivalent(new IConvertible[] { 1L, 3L }, _finder.FindIterator("foo", "where x <> {0}", 2).Select(b => b["x"]));
-            AssertExtensions.Equivalent(new IConvertible[] { 1L, 3L }, _finder.FindIterator<Foo>("where x <> {0}", 2).Select(b => b["x"]));
+            AssertExtensions.Equivalent(new object[] { 1L, 3L }, _finder.FindIterator("foo", "where x <> {0}", 2).Select(b => b["x"]));
+            AssertExtensions.Equivalent(new object[] { 1L, 3L }, _finder.FindIterator<Foo>("where x <> {0}", 2).Select(b => b["x"]));
         }
 
         [Fact]

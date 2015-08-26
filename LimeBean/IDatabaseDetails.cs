@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 
@@ -10,27 +11,27 @@ namespace LimeBean {
         string AutoIncrementSqlType { get; }
         bool SupportsBoolean { get; }
         bool SupportsDecimal { get; }
-        bool SupportsDateTime { get; }
 
         string GetParamName(int index);
+        void CustomizeParam(DbParameter p);
         string QuoteName(string name);
 
         void ExecInitCommands(IDatabaseAccess db);
-        IConvertible ExecInsert(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, IConvertible> data);
+        object ExecInsert(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, object> data);
         string GetCreateTableStatementPostfix();
 
-        int GetRankFromValue(IConvertible value);
+        int GetRankFromValue(object value);
         int GetRankFromSqlType(string sqlType);
         string GetSqlTypeFromRank(int rank);
 
-        IConvertible ConvertLongValue(long value);
+        object ConvertLongValue(long value);
 
         string[] GetTableNames(IDatabaseAccess db);
-        IDictionary<string, IConvertible>[] GetColumns(IDatabaseAccess db, string tableName);
-        bool IsNullableColumn(IDictionary<string, IConvertible> column);
-        IConvertible GetColumnDefaultValue(IDictionary<string, IConvertible> column);
-        string GetColumnName(IDictionary<string, IConvertible> column);
-        string GetColumnType(IDictionary<string, IConvertible> column);
+        IDictionary<string, object>[] GetColumns(IDatabaseAccess db, string tableName);
+        bool IsNullableColumn(IDictionary<string, object> column);
+        object GetColumnDefaultValue(IDictionary<string, object> column);
+        string GetColumnName(IDictionary<string, object> column);
+        string GetColumnType(IDictionary<string, object> column);
 
         void UpdateSchema(
             IDatabaseAccess db, 

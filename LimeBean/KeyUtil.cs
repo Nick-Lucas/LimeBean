@@ -19,7 +19,7 @@ namespace LimeBean {
             return _names.GetSafe(kind, new[] { DefaultName });
         }
 
-        public IConvertible GetKey(string kind, IDictionary<string, IConvertible> data) {
+        public object GetKey(string kind, IDictionary<string, object> data) {
             var keyNames = GetKeyNames(kind);
 
             if(keyNames.Count  > 1) {
@@ -32,7 +32,7 @@ namespace LimeBean {
             return data.GetSafe(keyNames.First());
         }
 
-        public void SetKey(string kind, IDictionary<string, IConvertible> data, IConvertible key) {
+        public void SetKey(string kind, IDictionary<string, object> data, object key) {
             if(key is CompoundKey)
                 throw new NotSupportedException();
 
@@ -53,7 +53,7 @@ namespace LimeBean {
                 _autoIncrements[kind] = autoIncrement.Value;
         }
 
-        public IConvertible PackCompoundKey(string kind, IEnumerable<IConvertible> components) {
+        public object PackCompoundKey(string kind, IEnumerable<object> components) {
             var result = new CompoundKey();
             foreach(var tuple in Enumerable.Zip(GetKeyNames(kind), components, Tuple.Create))
                 result[tuple.Item1] = tuple.Item2;

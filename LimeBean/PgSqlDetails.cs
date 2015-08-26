@@ -1,6 +1,7 @@
 ﻿#if !NO_PGSQL
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -16,7 +17,8 @@ namespace LimeBean {
             RANK_DOUBLE = 3,
             RANK_NUMERIC = 4,
             RANK_TEXT = 5,
-            RANK_STATIC_DATETIME = CommonDatabaseDetails.RANK_STATIC_BASE + 1;
+            RANK_STATIC_DATETIME = CommonDatabaseDetails.RANK_STATIC_BASE + 1,
+            RANK_STATIC_GUID = CommonDatabaseDetails.RANK_STATIC_BASE + 2;
 
         public string DbName {
             get { return "PgSql"; }
@@ -34,12 +36,11 @@ namespace LimeBean {
             get { return true; }
         }
 
-        public bool SupportsDateTime {
-            get { return true; }
-        }
-
         public string GetParamName(int index) {
             return ":p" + index;
+        }
+
+        public void CustomizeParam(DbParameter p) {
         }
 
         public string QuoteName(string name) {
@@ -50,7 +51,7 @@ namespace LimeBean {
             // set names?
         }
 
-        public IConvertible ExecInsert(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, IConvertible> data) {
+        public object ExecInsert(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, object> data) {
             var hasAutoIncrement = !String.IsNullOrEmpty(autoIncrementName);
 
             var postfix = hasAutoIncrement
@@ -61,7 +62,7 @@ namespace LimeBean {
             var values = data.Values.ToArray();
 
             if(hasAutoIncrement)
-                return db.Cell<IConvertible>(false, sql, values);
+                return db.Cell<object>(false, sql, values);
 
             db.Exec(sql, values);
             return null;            
@@ -71,34 +72,35 @@ namespace LimeBean {
             return null;
         }
 
-        public int GetRankFromValue(IConvertible value) {
+        public int GetRankFromValue(object value) {
             if(value == null)
                 return CommonDatabaseDetails.RANK_NULL;
 
-            switch(value.GetTypeCode()) {
-                case TypeCode.Boolean:
-                    return RANK_BOOLEAN;
+            if(value is Boolean)
+                return RANK_BOOLEAN;
 
-                case TypeCode.Int32:
-                    return RANK_INT32;
+            if(value is Int32)
+                return RANK_INT32;
 
-                case TypeCode.Int64:
-                    return RANK_INT64;
+            if(value is Int64)
+                return RANK_INT64;
 
-                case TypeCode.Double:
-                    return RANK_DOUBLE;
+            if(value is Double)
+                return RANK_DOUBLE;
 
-                case TypeCode.Decimal:
-                    return RANK_NUMERIC;
+            if(value is Decimal)
+                return RANK_NUMERIC;
 
-                case TypeCode.String:
-                    return RANK_TEXT;
+            if(value is String)
+                return RANK_TEXT;
 
-                case TypeCode.DateTime:
-                    return RANK_STATIC_DATETIME;
-            }
+            if(value is DateTime)
+                return RANK_STATIC_DATETIME;
 
-            throw new NotSupportedException();
+            if(value is Guid)
+                return RANK_STATIC_GUID;
+
+            return CommonDatabaseDetails.RANK_CUSTOM;
         }
 
         public int GetRankFromSqlType(string sqlType) {
@@ -123,6 +125,9 @@ namespace LimeBean {
 
                 case "timestamp without time zone":
                     return RANK_STATIC_DATETIME;
+
+                case "uuid":
+                    return RANK_STATIC_GUID;
             }
 
             return CommonDatabaseDetails.RANK_CUSTOM;
@@ -150,12 +155,15 @@ namespace LimeBean {
 
                 case RANK_STATIC_DATETIME:
                     return "timestamp without time zone";
+
+                case RANK_STATIC_GUID:
+                    return "uuid";
             }
 
             throw new NotSupportedException();
         }
 
-        public IConvertible ConvertLongValue(long value) {
+        public object ConvertLongValue(long value) {
             if(value.IsInt32Range())
                 return (int)value;
 
@@ -166,23 +174,23 @@ namespace LimeBean {
             return db.Col<string>(false, "select table_name from information_schema.tables where table_schema = 'public'");
         }
 
-        public IDictionary<string, IConvertible>[] GetColumns(IDatabaseAccess db, string tableName) {
+        public IDictionary<string, object>[] GetColumns(IDatabaseAccess db, string tableName) {
             return db.Rows(false, "select * from information_schema.columns where table_name = {0}", tableName);
         }
 
-        public bool IsNullableColumn(IDictionary<string, IConvertible> column) {
+        public bool IsNullableColumn(IDictionary<string, object> column) {
             return "YES".Equals(column["is_nullable"]);
         }
 
-        public IConvertible GetColumnDefaultValue(IDictionary<string, IConvertible> column) {
+        public object GetColumnDefaultValue(IDictionary<string, object> column) {
             return column["column_default"];
         }
 
-        public string GetColumnName(IDictionary<string, IConvertible> column) {
+        public string GetColumnName(IDictionary<string, object> column) {
             return (string)column["column_name"];
         }
 
-        public string GetColumnType(IDictionary<string, IConvertible> column) {
+        public string GetColumnType(IDictionary<string, object> column) {
             var type = (string)column["data_type"];
             var prec = column["numeric_precision"];
             if(prec != null)
@@ -195,7 +203,6 @@ namespace LimeBean {
 
             foreach(var entry in changedColumns) {
                 var name = entry.Key;
-                var quotedName = QuoteName(name);
 
                 var oldRank = oldColumns[name];
                 var newRank = entry.Value;
@@ -203,17 +210,7 @@ namespace LimeBean {
                 if(newRank == RANK_DOUBLE && oldRank == RANK_INT64)
                     newRank = RANK_NUMERIC;
 
-                var op = String.Format("alter {0} type {1}", quotedName, GetSqlTypeFromRank(newRank));
-
-                if(oldRank == RANK_BOOLEAN) {
-                    op += " using case"
-                        + " when " + quotedName + " is null then null"
-                        + " when " + quotedName + " = false then 0" 
-                        + " else 1" 
-                        + " end";
-                }
-
-                operations.Add(op);
+                operations.Add(String.Format("alter {0} type {1} using {0}::{1}", QuoteName(name), GetSqlTypeFromRank(newRank)));
             }
 
             foreach(var entry in addedColumns)

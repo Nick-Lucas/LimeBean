@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -30,12 +31,11 @@ namespace LimeBean {
             get { return false; }
         }
 
-        public bool SupportsDateTime {
-            get { return false; }
-        }
-
         public string GetParamName(int index) {
             return ":p" + index;
+        }
+
+        public void CustomizeParam(DbParameter p) {
         }
 
         public string QuoteName(string name) {
@@ -45,7 +45,7 @@ namespace LimeBean {
         public void ExecInitCommands(IDatabaseAccess db) {            
         }
 
-        public IConvertible ExecInsert(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, IConvertible> data) {
+        public object ExecInsert(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, object> data) {
             db.Exec(
                 CommonDatabaseDetails.FormatInsertCommand(this, tableName, data.Keys),
                 data.Values.ToArray()
@@ -64,20 +64,14 @@ namespace LimeBean {
             return null;
         }
 
-        public int GetRankFromValue(IConvertible value) {
+        public int GetRankFromValue(object value) {
             if(value == null)
                 return CommonDatabaseDetails.RANK_NULL;
 
-            switch(value.GetTypeCode()) {
-                case TypeCode.Int64:
-                case TypeCode.Double:
-                    return RANK_ANY;
+            if(value is String)
+                return RANK_TEXT;
 
-                case TypeCode.String:
-                    return RANK_TEXT;
-            }
-
-            throw new NotSupportedException();
+            return RANK_ANY;
         }
 
         public int GetRankFromSqlType(string sqlType) {
@@ -100,18 +94,13 @@ namespace LimeBean {
         }
 
         public string GetSqlTypeFromRank(int rank) {
-            switch(rank) {
-                case RANK_ANY:
-                    return null;
+            if(rank == RANK_TEXT)
+                return "text";
 
-                case RANK_TEXT:
-                    return "text";
-            }
-
-            throw new NotSupportedException();
+            return null;
         }
 
-        public IConvertible ConvertLongValue(long value) {
+        public object ConvertLongValue(long value) {
             return value;
         }
 
@@ -119,23 +108,23 @@ namespace LimeBean {
             return db.Col<string>(false, "select name from sqlite_master where type = 'table' and name <> 'sqlite_sequence'");
         }
 
-        public IDictionary<string, IConvertible>[] GetColumns(IDatabaseAccess db, string tableName) {
+        public IDictionary<string, object>[] GetColumns(IDatabaseAccess db, string tableName) {
             return db.Rows(false, "pragma table_info(" + QuoteName(tableName) + ")");
         }
 
-        public bool IsNullableColumn(IDictionary<string, IConvertible> column) {
-            return !column["notnull"].ToBoolean(null);            
+        public bool IsNullableColumn(IDictionary<string, object> column) {
+            return !Convert.ToBoolean(column["notnull"]);            
         }
 
-        public IConvertible GetColumnDefaultValue(IDictionary<string, IConvertible> column) {
+        public object GetColumnDefaultValue(IDictionary<string, object> column) {
             return column["dflt_value"];
         }
 
-        public string GetColumnName(IDictionary<string, IConvertible> column) {
+        public string GetColumnName(IDictionary<string, object> column) {
             return (string)column["name"];
         }
 
-        public string GetColumnType(IDictionary<string, IConvertible> column) {
+        public string GetColumnType(IDictionary<string, object> column) {
             return (string)column["type"];
         }
 

@@ -26,15 +26,15 @@ namespace LimeBean.Tests {
             var bean = new Bean();
 
             Assert.Equal(0, bean.Get<int>("x"));
-            Assert.Null(bean.GetNullable<int>("x"));
+            Assert.Null(bean.Get<int?>("x"));
 
             bean.Put("x", 0);
             Assert.Equal(0, bean.Get<int>("x"));
-            Assert.Equal(0, bean.GetNullable<int>("x"));
+            Assert.Equal(0, bean.Get<int?>("x"));
 
             bean.Put("x", null);
             Assert.Equal(0, bean.Get<int>("x"));
-            Assert.Null(bean.GetNullable<int>("x"));
+            Assert.Null(bean.Get<int?>("x"));
 
             bean.Put("x", new Nullable<int>(1));
             Assert.Equal(1, bean.Get<int>("x"));
@@ -46,12 +46,12 @@ namespace LimeBean.Tests {
                 var bean = new Bean();
 
                 bean.Put("x", "3.14");
-                Assert.Equal(3.14, bean.GetNullable<double>("x"));
+                Assert.Equal(3.14, bean.Get<double?>("x"));
                 Assert.Equal(3.14M, bean.Get<decimal>("x"));
 
                 bean.Put("x", "abc");
                 Assert.Equal(0, bean.Get<int>("x"));
-                Assert.Null(bean.GetNullable<int>("x"));
+                Assert.Null(bean.Get<int?>("x"));
             });
         }
 
@@ -59,17 +59,20 @@ namespace LimeBean.Tests {
         public void TypedAccessors_Enums() {
             var bean = new Bean();
 
-            bean.Put("x", TypeCode.String);
-            Assert.Equal(TypeCode.String, bean.Get<TypeCode>("x"));
+            bean.Put("x", DayOfWeek.Thursday);
+            Assert.Equal(DayOfWeek.Thursday, bean.Get<DayOfWeek>("x"));
 
-            bean.Put("x", "OBJECT");
-            Assert.Equal(TypeCode.Object, bean.Get<TypeCode>("x"));
+            bean.Put("x", "THURSDAY");
+            Assert.Equal(DayOfWeek.Thursday, bean.Get<DayOfWeek>("x"));
 
-            bean.Put("x", (ulong)TypeCode.DateTime);
-            Assert.Equal(TypeCode.DateTime, bean.Get<TypeCode>("x"));
+            bean.Put("x", (ulong)DayOfWeek.Thursday);
+            Assert.Equal(DayOfWeek.Thursday, bean.Get<DayOfWeek>("x"));
 
             bean.Put("x", "?");
-            Assert.Equal(default(TypeCode), bean.Get<TypeCode>("x"));
+            Assert.Equal(default(DayOfWeek), bean.Get<DayOfWeek>("x"));
+
+            bean.Put("x", 4);
+            Assert.Equal(DayOfWeek.Thursday, bean.Get<DayOfWeek?>("x"));
         }
 
         [Fact]
@@ -84,6 +87,15 @@ namespace LimeBean.Tests {
 
             bean.Put("x", "?");
             Assert.Equal(new DateTime(), bean.Get<DateTime>("x"));
+        }
+
+        [Fact]
+        public void TypedAccessors_NonConvertile() {
+            var guid = Guid.NewGuid();
+            var bean = new Bean();
+            bean.Put("p", guid);
+            Assert.Equal(guid, bean.Get<Guid>("p"));
+            Assert.Equal(guid, bean.Get<Guid?>("p"));
         }
 
         [Fact]
@@ -103,7 +115,7 @@ namespace LimeBean.Tests {
             var bean = new Bean();
             bean["id"] = 123;
             bean.Put("a", 1).Put("b", "abc");
-            AssertExtensions.Equivalent(bean.Export(), new Dictionary<string, IConvertible> { 
+            AssertExtensions.Equivalent(bean.Export(), new Dictionary<string, object> { 
                 { "id", 123 }, { "a", 1 }, { "b", "abc" }
             });
             Assert.NotSame(bean.Export(), bean.Export());
@@ -116,7 +128,7 @@ namespace LimeBean.Tests {
             bean["b"] = 1;
             bean["c"] = 1;
 
-            var data = new Dictionary<string, IConvertible> { { "b", 2 }, { "c", null } };
+            var data = new Dictionary<string, object> { { "b", 2 }, { "c", null } };
             bean.Import(data);
 
             Assert.Equal(1, bean["a"]);

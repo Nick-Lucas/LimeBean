@@ -10,6 +10,9 @@ namespace LimeBean {
         internal static bool IsEnum(this Type type) {
             return type.GetTypeInfo().IsEnum;
         }
+        internal static bool IsGenericType(this Type type) {
+            return type.GetTypeInfo().IsGenericType;
+        }
     }
 
 #else
@@ -31,6 +34,9 @@ namespace LimeBean {
     static partial class Extensions {
         internal static bool IsEnum(this Type type) {
             return type.IsEnum;
+        }
+        internal static bool IsGenericType(this Type type) {
+            return type.IsGenericType;
         }
     }
 

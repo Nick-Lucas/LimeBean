@@ -1,6 +1,7 @@
 ﻿#if !NO_MARIADB
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -18,7 +19,8 @@ namespace LimeBean {
             RANK_TEXT5 = 4,
             RANK_TEXT8 = 5,
             RANK_TEXT16 = 6,
-            RANK_TEXT24 = 7;
+            RANK_TEXT24 = 7,
+            RANK_STATIC_DATETIME = CommonDatabaseDetails.RANK_STATIC_BASE + 1;
 
         public string DbName {
             get { return "MariaDB"; }
@@ -36,12 +38,11 @@ namespace LimeBean {
             get { return false; }
         }
 
-        public bool SupportsDateTime {
-            get { return false; }
-        }
-
         public string GetParamName(int index) {
             return "@p" + index;
+        }
+
+        public void CustomizeParam(DbParameter p) { 
         }
 
         public string QuoteName(string name) {
@@ -52,7 +53,7 @@ namespace LimeBean {
             db.Exec("set names utf8");
         }
 
-        public IConvertible ExecInsert(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, IConvertible> data) {
+        public object ExecInsert(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, object> data) {
             db.Exec(
                 CommonDatabaseDetails.FormatInsertCommand(this, tableName, data.Keys, defaultsExpr: "values ()"),
                 data.Values.ToArray()
@@ -64,46 +65,48 @@ namespace LimeBean {
             // per-connection, http://stackoverflow.com/q/21185666
             // robust to triggers, http://dba.stackexchange.com/a/25141
 
-            return db.Cell<IConvertible>(false, "select last_insert_id()");
+            return db.Cell<object>(false, "select last_insert_id()");
         }
 
         public string GetCreateTableStatementPostfix() {
             return "engine=InnoDB default charset=utf8 collate=utf8_unicode_ci";
         }
 
-        public int GetRankFromValue(IConvertible value) {
+        public int GetRankFromValue(object value) {
             if(value == null)
                 return CommonDatabaseDetails.RANK_NULL;
 
-            switch(value.GetTypeCode()) {
-                case TypeCode.SByte:
-                    return RANK_INT8;
+            if(value is SByte)
+                return RANK_INT8;
 
-                case TypeCode.Int32:
-                    return RANK_INT32;
+            if(value is Int32)
+                return RANK_INT32;
 
-                case TypeCode.Int64:
-                    return RANK_INT64;
+            if(value is Int64)
+                return RANK_INT64;
 
-                case TypeCode.Double:
-                    return RANK_DOUBLE;
+            if(value is Double)
+                return RANK_DOUBLE;
 
-                case TypeCode.String:
-                    var len = (value as String).Length;
+            if(value is String) {
+                var len = (value as String).Length;
 
-                    if(len <= 32)
-                        return RANK_TEXT5;
+                if(len <= 32)
+                    return RANK_TEXT5;
 
-                    if(len <= 255)
-                        return RANK_TEXT8;
+                if(len <= 255)
+                    return RANK_TEXT8;
 
-                    if(len <= 65535)
-                        return RANK_TEXT16;
+                if(len <= 65535)
+                    return RANK_TEXT16;
 
-                    return RANK_TEXT24;
+                return RANK_TEXT24;
             }
 
-            throw new NotSupportedException();
+            if(value is DateTime)
+                return RANK_STATIC_DATETIME;
+
+            return CommonDatabaseDetails.RANK_CUSTOM;
         }
 
         public int GetRankFromSqlType(string sqlType) {
@@ -134,6 +137,9 @@ namespace LimeBean {
             if(sqlType == "mediumtext")
                 return RANK_TEXT24;
 
+            if(sqlType == "datetime")
+                return RANK_STATIC_DATETIME;
+
             return CommonDatabaseDetails.RANK_CUSTOM;
         }
 
@@ -162,12 +168,15 @@ namespace LimeBean {
 
                 case RANK_TEXT24:
                     return "mediumtext";
+
+                case RANK_STATIC_DATETIME:
+                    return "datetime";
             }
 
             throw new NotSupportedException();
         }
 
-        public IConvertible ConvertLongValue(long value) {
+        public object ConvertLongValue(long value) {
             if(value.IsSignedByteRange())
                 return (sbyte)value;
 
@@ -181,23 +190,23 @@ namespace LimeBean {
             return db.Col<string>(false, "show tables");
         }
 
-        public IDictionary<string, IConvertible>[] GetColumns(IDatabaseAccess db, string tableName) {
+        public IDictionary<string, object>[] GetColumns(IDatabaseAccess db, string tableName) {
             return db.Rows(false, "show columns from " + QuoteName(tableName));
         }
 
-        public bool IsNullableColumn(IDictionary<string, IConvertible> column) {
+        public bool IsNullableColumn(IDictionary<string, object> column) {
             return "YES".Equals(column["Null"]);
         }
 
-        public IConvertible GetColumnDefaultValue(IDictionary<string, IConvertible> column) {
+        public object GetColumnDefaultValue(IDictionary<string, object> column) {
             return column["Default"];
         }
 
-        public string GetColumnName(IDictionary<string, IConvertible> column) {
+        public string GetColumnName(IDictionary<string, object> column) {
             return (string)column["Field"];
         }
 
-        public string GetColumnType(IDictionary<string, IConvertible> column) {
+        public string GetColumnType(IDictionary<string, object> column) {
             return (string)column["Type"];
         }
 

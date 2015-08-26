@@ -40,6 +40,7 @@ namespace LimeBean.Tests {
                 n   Numeric,
                 t   text,
                 ts  timestamp,
+                g   uuid,
 
                 b2  BOOL,
                 i2  INT4,
@@ -78,6 +79,8 @@ namespace LimeBean.Tests {
             Assert.Equal(PgSqlDetails.RANK_STATIC_DATETIME, cols["ts"]);
             Assert.Equal(PgSqlDetails.RANK_STATIC_DATETIME, cols["ts2"]);
 
+            Assert.Equal(PgSqlDetails.RANK_STATIC_GUID, cols["g"]);
+
             Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x1"]);
             Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x2"]);
             Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x3"]);
@@ -90,7 +93,7 @@ namespace LimeBean.Tests {
         public void CreateTable() {
             _storage.EnterFluidMode();
 
-            var data = new Dictionary<string, IConvertible> {
+            var data = new Dictionary<string, object> {
                 { "p1", null },
                 { "p2", true },
                 { "p3", 1 },
@@ -99,7 +102,8 @@ namespace LimeBean.Tests {
                 { "p6", Decimal.MaxValue },
                 { "p7", UInt64.MaxValue },
                 { "p8", "abc" },
-                { "p9", DateTime.Now }
+                { "p9", DateTime.Now },
+                { "p10", Guid.NewGuid() }
             };
 
             _storage.Store("foo", data);
@@ -114,13 +118,14 @@ namespace LimeBean.Tests {
             Assert.Equal(PgSqlDetails.RANK_NUMERIC, cols["p7"]);
             Assert.Equal(PgSqlDetails.RANK_TEXT, cols["p8"]);
             Assert.Equal(PgSqlDetails.RANK_STATIC_DATETIME, cols["p9"]);
+            Assert.Equal(PgSqlDetails.RANK_STATIC_GUID, cols["p10"]);
         }
 
         [Fact]
         public void AlterTable() {
             _storage.EnterFluidMode();
 
-            var data = new Dictionary<string, IConvertible> {
+            var data = new Dictionary<string, object> {
                 { "p1", true },
                 { "p2", 1 },
                 { "p3", 1 },
@@ -160,37 +165,10 @@ namespace LimeBean.Tests {
             _db.Exec("insert into foo (p) values (true)");            
 
             _storage.EnterFluidMode();
-            _storage.Store("foo", MakeRow(2));
+            _storage.Store("foo", new Dictionary<string, object> { { "p", 2 } });
 
             var col = _db.Col<string>(false, "select p from foo order by id");
             Assert.Equal(new[] { null, "0", "1", "2" }, col);
-        }
-
-        [Fact]
-        public void AlterTable_CannotConvertToDate() {
-            _storage.EnterFluidMode();
-            _storage.Store("foo", MakeRow(123));
-
-            var x = Record.Exception(delegate() {
-                _storage.Store("foo", MakeRow(DateTime.Now));
-            });
-
-            Assert.IsType<InvalidOperationException>(x);
-            Assert.EndsWith("from 'integer' to 'timestamp without time zone'", x.Message);
-        }
-
-        [Fact]
-        public void AlterTable_CannotConvertFromDate() {
-            _storage.EnterFluidMode();
-            _storage.Store("foo", MakeRow(DateTime.Now));
-
-
-            var x = Record.Exception(delegate() {
-                _storage.Store("foo", MakeRow("abc"));
-            });
-
-            Assert.IsType<InvalidOperationException>(x);
-            Assert.EndsWith("from 'timestamp without time zone' to 'text'", x.Message);
         }
 
         [Fact]
@@ -208,13 +186,14 @@ namespace LimeBean.Tests {
                 checker.Check(7.90M, 7.90M);
                 checker.Check("hello", "hello");
                 checker.Check(new DateTime(2015, 8, 23), new DateTime(2015, 8, 23));
+                checker.Check(SharedChecks.SAMPLE_GUID, SharedChecks.SAMPLE_GUID);
 
                 // extremal vaues
                 SharedChecks.CheckRoundtripOfExtremalValues(checker, true, true);
                 checker.Check(UInt64.MaxValue, (decimal)UInt64.MaxValue);
 
                 // enum
-                checker.Check(TypeCode.DateTime, (int)16);
+                checker.Check(DayOfWeek.Thursday, (int)4);
             });
         }
 
@@ -229,13 +208,20 @@ namespace LimeBean.Tests {
         }
 
         [Fact]
-        public void Blobs() {
-            SharedChecks.CheckBlobs(_db, "bytea");
+        public void CustomRankInFluidMode() {
+            SharedChecks.CheckCustomRankInFluidMode(_db, _storage, false);
         }
 
-        IDictionary<string, IConvertible> MakeRow(IConvertible value) {
-            return new Dictionary<string, IConvertible> { { "p", value } };
+        [Fact]
+        public void CustomRankWithExistingTable() {
+            SharedChecks.CheckCustomRankWithExistingTable(_db, _storage, "bytea");
         }
+
+        [Fact]
+        public void StaticRankInFluidMode() {
+            SharedChecks.CheckStaticRankInFluidMode(_db, _storage, DateTime.Now);
+        }
+
     }
 
 }

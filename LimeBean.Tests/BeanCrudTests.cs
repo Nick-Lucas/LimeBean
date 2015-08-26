@@ -100,7 +100,7 @@ namespace LimeBean.Tests {
             var observer = new TracingObserver();
             crud.AddObserver(observer);
 
-            var bean = crud.RowToBean<Tracer>(new Dictionary<string, IConvertible> { 
+            var bean = crud.RowToBean<Tracer>(new Dictionary<string, object> { 
                 { "s", "hello" }
             });
 
@@ -111,7 +111,7 @@ namespace LimeBean.Tests {
 
             observer.TraceLog = "";
 
-            bean = crud.RowToBean<Tracer>(new Dictionary<string, IConvertible> { 
+            bean = crud.RowToBean<Tracer>(new Dictionary<string, object> { 
                 { "id", 123 },
                 { "s", "see you" }
             });
@@ -121,7 +121,7 @@ namespace LimeBean.Tests {
             Assert.Equal("ad: bl: al:123", bean.TraceLog);
             Assert.Equal("ad: bl: al:123", observer.TraceLog);
 
-            Assert.Null(crud.Load("temp",  (IConvertible)null));
+            Assert.Null(crud.Load("temp", null));
         }
 
         [Fact]

@@ -26,8 +26,13 @@ namespace LimeBean.Tests {
         }
 
         [Fact]
+        public void TypedReadsUseConvertSafe() {
+            Assert.Equal(DayOfWeek.Thursday, _db.Cell<DayOfWeek?>(false, "select 4"));
+        }
+
+        [Fact]
         public void Caching_EnableDisable() {
-            var readers = new Func<string, IConvertible>[] { 
+            var readers = new Func<string, object>[] { 
                 sql => _db.Cell<string>(true, sql),
                 sql => _db.Col<string>(true, sql)[0],
                 sql => _db.Row(true, sql)["r"],

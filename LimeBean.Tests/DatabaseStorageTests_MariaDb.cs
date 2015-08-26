@@ -57,6 +57,8 @@ namespace LimeBean.Tests {
                 t4  Text,
                 t5  MEDIUMTEXT,
 
+                dt1 datetime,                
+
                 x1  smallint,
                 x2  mediumint,
                 x3  double(3,2),
@@ -102,6 +104,8 @@ namespace LimeBean.Tests {
             Assert.Equal(MariaDbDetails.RANK_TEXT16, t["t4"]);
             Assert.Equal(MariaDbDetails.RANK_TEXT24, t["t5"]);
 
+            Assert.Equal(MariaDbDetails.RANK_STATIC_DATETIME, t["dt1"]);
+
             Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x1"]);
             Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x2"]);
             Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x3"]);
@@ -123,7 +127,7 @@ namespace LimeBean.Tests {
         public void CreateTable() {
             _storage.EnterFluidMode();
 
-            var data = new Dictionary<string, IConvertible> {
+            var data = new Dictionary<string, object> {
                 { "p1", null },
                 { "p2", 1 },
                 { "p3", 1000 },
@@ -132,7 +136,8 @@ namespace LimeBean.Tests {
                 { "p6", "abc" },
                 { "p7", "".PadRight(33, 'a') },
                 { "p8", "".PadRight(256, 'a') },
-                { "p9", "".PadRight(65536, 'a') }
+                { "p9", "".PadRight(65536, 'a') },
+                { "p10", DateTime.Now }
             };
 
             _storage.Store("foo", data);
@@ -147,13 +152,14 @@ namespace LimeBean.Tests {
             Assert.Equal(MariaDbDetails.RANK_TEXT8, cols["p7"]);
             Assert.Equal(MariaDbDetails.RANK_TEXT16, cols["p8"]);
             Assert.Equal(MariaDbDetails.RANK_TEXT24, cols["p9"]);
+            Assert.Equal(MariaDbDetails.RANK_STATIC_DATETIME, cols["p10"]);
         }
 
         [Fact]
         public void AlterTable() {
             _storage.EnterFluidMode();
 
-            var data = new Dictionary<string, IConvertible> {
+            var data = new Dictionary<string, object> {
                 { "p1", 1 },
                 { "p2", 1000 },
                 { "p3", Int64.MaxValue },
@@ -200,12 +206,12 @@ namespace LimeBean.Tests {
                 checker.Check(0x80000000L, 0x80000000L);
                 checker.Check(3.14, 3.14);
                 checker.Check("hello", "hello");
+                checker.Check(new DateTime(2015, 8, 25), new DateTime(2015, 8, 25));
 
                 // extremal vaues
-                SharedChecks.CheckRoundtripOfExtremalValues(checker);
+                SharedChecks.CheckRoundtripOfExtremalValues(checker, false, true);
 
                 // conversion to string
-                SharedChecks.CheckDateRoundtripForcesString(checker);
                 SharedChecks.CheckBigNumberRoundtripForcesString(checker);
 
                 // bool            
@@ -213,7 +219,7 @@ namespace LimeBean.Tests {
                 checker.Check(false, (sbyte)0);
 
                 // enum
-                checker.Check(TypeCode.DateTime, (sbyte)16);
+                checker.Check(DayOfWeek.Thursday, (sbyte)4);
             });
         }
 
@@ -228,8 +234,18 @@ namespace LimeBean.Tests {
         }
 
         [Fact]
-        public void Blobs() {
-            SharedChecks.CheckBlobs(_db, "varbinary(16)");
+        public void CustomRankInFluidMode() {
+            SharedChecks.CheckCustomRankInFluidMode(_db, _storage, false);
+        }
+
+        [Fact]
+        public void CustomRankWithExistingTable() {
+            SharedChecks.CheckCustomRankWithExistingTable(_db, _storage, "tinyblob");
+        }
+
+        [Fact]
+        public void StaticRankInFluidMode() {
+            SharedChecks.CheckStaticRankInFluidMode(_db, _storage, DateTime.Now);
         }
 
         [Fact]

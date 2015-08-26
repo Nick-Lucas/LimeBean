@@ -1,6 +1,8 @@
 ﻿#if !NO_MSSQL
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -17,7 +19,9 @@ namespace LimeBean {
             RANK_DOUBLE = 3,
             RANK_TEXT_32 = 4,
             RANK_TEXT_4000 = 5,
-            RANK_TEXT_MAX = 6;
+            RANK_TEXT_MAX = 6,
+            RANK_STATIC_DATETIME = CommonDatabaseDetails.RANK_STATIC_BASE + 1,
+            RANK_STATIC_GUID = CommonDatabaseDetails.RANK_STATIC_BASE + 2;
 
         public string DbName {
             get { return "MsSql"; }
@@ -35,12 +39,16 @@ namespace LimeBean {
             get { return false; }
         }
 
-        public bool SupportsDateTime {
-            get { return false; }
-        }
-
         public string GetParamName(int index) {
             return "@p" + index;
+        }
+
+        public void CustomizeParam(DbParameter p) {
+            if(p.Value is DateTime) {
+                var date = (DateTime)p.Value;
+                if(date.Year < 1753)
+                    p.DbType = DbType.DateTime2;
+            }
         }
 
         public string QuoteName(string name) {
@@ -53,7 +61,7 @@ namespace LimeBean {
         public void ExecInitCommands(IDatabaseAccess db) {
         }
 
-        public IConvertible ExecInsert(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, IConvertible> data) {
+        public object ExecInsert(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, object> data) {
             var hasAutoIncrement = !String.IsNullOrEmpty(autoIncrementName);
 
             var valuesPrefix = hasAutoIncrement
@@ -64,7 +72,7 @@ namespace LimeBean {
             var values = data.Values.ToArray();
 
             if(hasAutoIncrement)
-                return db.Cell<IConvertible>(false, sql, values);
+                return db.Cell<object>(false, sql, values);
 
             db.Exec(sql, values);
             return null;
@@ -74,36 +82,41 @@ namespace LimeBean {
             return null;
         }
 
-        public int GetRankFromValue(IConvertible value) {
+        public int GetRankFromValue(object value) {
             if(value == null)
                 return CommonDatabaseDetails.RANK_NULL;
 
-            switch(value.GetTypeCode()) {
-                case TypeCode.Byte:
-                    return RANK_BYTE;
+            if(value is Byte)
+                return RANK_BYTE;
 
-                case TypeCode.Int32:
-                    return RANK_INT32;
+            if(value is Int32)
+                return RANK_INT32;
 
-                case TypeCode.Int64:
-                    return RANK_INT64;
+            if(value is Int64)
+                return RANK_INT64;
 
-                case TypeCode.Double:
-                    return RANK_DOUBLE;
+            if(value is Double)
+                return RANK_DOUBLE;
 
-                case TypeCode.String:
-                    var len = (value as String).Length;
+            if(value is String) {
+                var len = (value as String).Length;
 
-                    if(len <= 32)
-                        return RANK_TEXT_32;
+                if(len <= 32)
+                    return RANK_TEXT_32;
 
-                    if(len <= 4000)
-                        return RANK_TEXT_4000;
+                if(len <= 4000)
+                    return RANK_TEXT_4000;
 
-                    return RANK_TEXT_MAX;
+                return RANK_TEXT_MAX;
             }
 
-            throw new NotSupportedException();
+            if(value is DateTime)
+                return RANK_STATIC_DATETIME;
+
+            if(value is Guid)
+                return RANK_STATIC_GUID;
+
+            return CommonDatabaseDetails.RANK_CUSTOM;
         }
 
         public int GetRankFromSqlType(string sqlType) {
@@ -115,6 +128,12 @@ namespace LimeBean {
 
             if(sqlType.StartsWith("127:"))
                 return RANK_INT64;
+
+            if(sqlType.StartsWith("42:"))
+                return RANK_STATIC_DATETIME;
+
+            if(sqlType.StartsWith("36:"))
+                return RANK_STATIC_GUID;
 
             switch(sqlType) { 
                 case "62:8":
@@ -155,12 +174,18 @@ namespace LimeBean {
 
                 case RANK_TEXT_MAX:
                     return "nvarchar(MAX)";
+
+                case RANK_STATIC_DATETIME:
+                    return "datetime2";
+
+                case RANK_STATIC_GUID:
+                    return "uniqueidentifier";
             }
 
             throw new NotSupportedException();
         }
 
-        public IConvertible ConvertLongValue(long value) {
+        public object ConvertLongValue(long value) {
             if(value.IsUnsignedByteRange())
                 return (byte)value;
 
@@ -174,23 +199,23 @@ namespace LimeBean {
             return db.Col<string>(false, "select name from sys.objects where type='U'");
         }
 
-        public IDictionary<string, IConvertible>[] GetColumns(IDatabaseAccess db, string tableName) {
+        public IDictionary<string, object>[] GetColumns(IDatabaseAccess db, string tableName) {
             return db.Rows(false, "select name, system_type_id, max_length, is_nullable, object_definition(default_object_id) [default] from sys.columns where object_id = object_id({0})", tableName);
         }
 
-        public bool IsNullableColumn(IDictionary<string, IConvertible> column) {
+        public bool IsNullableColumn(IDictionary<string, object> column) {
             return (bool)column["is_nullable"];
         }
 
-        public IConvertible GetColumnDefaultValue(IDictionary<string, IConvertible> column) {
+        public object GetColumnDefaultValue(IDictionary<string, object> column) {
             return column["default"];
         }
 
-        public string GetColumnName(IDictionary<string, IConvertible> column) {
+        public string GetColumnName(IDictionary<string, object> column) {
             return (string)column["name"];
         }
 
-        public string GetColumnType(IDictionary<string, IConvertible> column) {
+        public string GetColumnType(IDictionary<string, object> column) {
             return String.Concat(column["system_type_id"], ":", column["max_length"]);
         }
 

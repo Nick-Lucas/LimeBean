@@ -37,29 +37,29 @@ namespace LimeBean {
             return ContinueDispense(new T());
         }
 
-        public Bean RowToBean(string kind, IDictionary<string, IConvertible> row) {
+        public Bean RowToBean(string kind, IDictionary<string, object> row) {
             if(row == null)
                 return null;
             
             return ContinueLoad(Dispense(kind), row);
         }
 
-        public T RowToBean<T>(IDictionary<string, IConvertible> row) where T : Bean, new() {
+        public T RowToBean<T>(IDictionary<string, object> row) where T : Bean, new() {
             if(row == null)
                 return null;
 
             return ContinueLoad(Dispense<T>(), row);
         }
 
-        public Bean Load(string kind, IConvertible key) {
+        public Bean Load(string kind, object key) {
             return RowToBean(kind, _storage.Load(kind, key));
         }
 
-        public T Load<T>(IConvertible key) where T : Bean, new() {
+        public T Load<T>(object key) where T : Bean, new() {
             return RowToBean<T>(_storage.Load(Bean.GetKind<T>(), key));
         }
 
-        public IConvertible Store(Bean bean) {
+        public object Store(Bean bean) {
             EnsureDispensed(bean);
 
             ImplicitTransaction(delegate() {
@@ -116,7 +116,7 @@ namespace LimeBean {
             return bean;
         }
 
-        T ContinueLoad<T>(T bean, IDictionary<string, IConvertible> row) where T : Bean {
+        T ContinueLoad<T>(T bean, IDictionary<string, object> row) where T : Bean {
             bean.BeforeLoad();
             foreach(var observer in _observers)
                 observer.BeforeLoad(bean);
