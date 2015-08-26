@@ -315,17 +315,24 @@ namespace LimeBean {
             return Count<T>(true, expr, parameters);
         }
 
+        public IEnumerable<object> ColIterator(string sql, params object[] parameters) {
+            return ColIterator<object>(sql, parameters);
+        }
+
         public T Cell<T>(string sql, params object[] parameters) {
             return Cell<T>(true, sql, parameters);
         }
 
-#warning TODO
-        //public string Cell(string sql, params object[] parameters) {
-        //    return Cell<string>(sql, parameters);
-        //}
+        public object Cell(string sql, params object[] parameters) {
+            return Cell<object>(sql, parameters);
+        }
 
         public T[] Col<T>(string sql, params object[] parameters) {
             return Col<T>(true, sql, parameters);
+        }
+
+        public object[] Col(string sql, params object[] parameters) {
+            return Col<object>(true, sql, parameters);
         }
 
         public IDictionary<string, object> Row(string sql, params object[] parameters) {
