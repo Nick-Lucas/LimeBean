@@ -206,10 +206,10 @@ namespace LimeBean.Tests {
                 checker.Check(0x80000000L, 0x80000000L);
                 checker.Check(3.14, 3.14);
                 checker.Check("hello", "hello");
-                checker.Check(new DateTime(2015, 8, 25), new DateTime(2015, 8, 25));
+                checker.Check(SharedChecks.SAMPLE_DATETIME, SharedChecks.SAMPLE_DATETIME);
 
                 // extremal vaues
-                SharedChecks.CheckRoundtripOfExtremalValues(checker, false, true);
+                SharedChecks.CheckRoundtripOfExtremalValues(checker, checkDateTime: true);
 
                 // conversion to string
                 SharedChecks.CheckBigNumberRoundtripForcesString(checker);

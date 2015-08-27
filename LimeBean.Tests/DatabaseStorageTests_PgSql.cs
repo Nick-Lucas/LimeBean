@@ -39,7 +39,8 @@ namespace LimeBean.Tests {
                 d   DOUBLE precision,
                 n   Numeric,
                 t   text,
-                ts  timestamp,
+                ts  timestamp,                
+                tz  timestamptz,
                 g   uuid,
 
                 b2  BOOL,
@@ -47,7 +48,7 @@ namespace LimeBean.Tests {
                 l2  INT8,
                 d2  FLOAT8,
                 ts2 timestamp without time zone,
-                
+                tz2 timestamp with time zone,
 
                 x1  integer not null,
                 x2  integer default 123,
@@ -79,6 +80,9 @@ namespace LimeBean.Tests {
             Assert.Equal(PgSqlDetails.RANK_STATIC_DATETIME, cols["ts"]);
             Assert.Equal(PgSqlDetails.RANK_STATIC_DATETIME, cols["ts2"]);
 
+            Assert.Equal(PgSqlDetails.RANK_STATIC_DATETIME_OFFSET, cols["tz"]);
+            Assert.Equal(PgSqlDetails.RANK_STATIC_DATETIME_OFFSET, cols["tz2"]);
+
             Assert.Equal(PgSqlDetails.RANK_STATIC_GUID, cols["g"]);
 
             Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x1"]);
@@ -103,7 +107,8 @@ namespace LimeBean.Tests {
                 { "p7", UInt64.MaxValue },
                 { "p8", "abc" },
                 { "p9", DateTime.Now },
-                { "p10", Guid.NewGuid() }
+                { "p10", DateTimeOffset.Now },
+                { "p11", Guid.NewGuid() }
             };
 
             _storage.Store("foo", data);
@@ -118,7 +123,8 @@ namespace LimeBean.Tests {
             Assert.Equal(PgSqlDetails.RANK_NUMERIC, cols["p7"]);
             Assert.Equal(PgSqlDetails.RANK_TEXT, cols["p8"]);
             Assert.Equal(PgSqlDetails.RANK_STATIC_DATETIME, cols["p9"]);
-            Assert.Equal(PgSqlDetails.RANK_STATIC_GUID, cols["p10"]);
+            Assert.Equal(PgSqlDetails.RANK_STATIC_DATETIME_OFFSET, cols["p10"]);
+            Assert.Equal(PgSqlDetails.RANK_STATIC_GUID, cols["p11"]);
         }
 
         [Fact]
@@ -185,11 +191,17 @@ namespace LimeBean.Tests {
                 checker.Check(3.14, 3.14);
                 checker.Check(7.90M, 7.90M);
                 checker.Check("hello", "hello");
-                checker.Check(new DateTime(2015, 8, 23), new DateTime(2015, 8, 23));
+                checker.Check(SharedChecks.SAMPLE_DATETIME, SharedChecks.SAMPLE_DATETIME);
                 checker.Check(SharedChecks.SAMPLE_GUID, SharedChecks.SAMPLE_GUID);
 
+                // https://github.com/npgsql/npgsql/issues/11
+                checker.Check(
+                    SharedChecks.SAMPLE_DATETIME_OFFSET, 
+                    SharedChecks.SAMPLE_DATETIME_OFFSET.ToLocalTime().DateTime
+                );
+
                 // extremal vaues
-                SharedChecks.CheckRoundtripOfExtremalValues(checker, true, true);
+                SharedChecks.CheckRoundtripOfExtremalValues(checker, checkDecimal: true, checkDateTime: true);
                 checker.Check(UInt64.MaxValue, (decimal)UInt64.MaxValue);
 
                 // enum

@@ -21,7 +21,8 @@ namespace LimeBean {
             RANK_TEXT_4000 = 5,
             RANK_TEXT_MAX = 6,
             RANK_STATIC_DATETIME = CommonDatabaseDetails.RANK_STATIC_BASE + 1,
-            RANK_STATIC_GUID = CommonDatabaseDetails.RANK_STATIC_BASE + 2;
+            RANK_STATIC_DATETIME_OFFSET = CommonDatabaseDetails.RANK_STATIC_BASE + 2,
+            RANK_STATIC_GUID = CommonDatabaseDetails.RANK_STATIC_BASE + 3;
 
         public string DbName {
             get { return "MsSql"; }
@@ -113,6 +114,9 @@ namespace LimeBean {
             if(value is DateTime)
                 return RANK_STATIC_DATETIME;
 
+            if(value is DateTimeOffset)
+                return RANK_STATIC_DATETIME_OFFSET;
+
             if(value is Guid)
                 return RANK_STATIC_GUID;
 
@@ -131,6 +135,9 @@ namespace LimeBean {
 
             if(sqlType.StartsWith("42:"))
                 return RANK_STATIC_DATETIME;
+
+            if(sqlType.StartsWith("43:"))
+                return RANK_STATIC_DATETIME_OFFSET;
 
             if(sqlType.StartsWith("36:"))
                 return RANK_STATIC_GUID;
@@ -177,6 +184,9 @@ namespace LimeBean {
 
                 case RANK_STATIC_DATETIME:
                     return "datetime2";
+
+                case RANK_STATIC_DATETIME_OFFSET:
+                    return "datetimeoffset";
 
                 case RANK_STATIC_GUID:
                     return "uniqueidentifier";

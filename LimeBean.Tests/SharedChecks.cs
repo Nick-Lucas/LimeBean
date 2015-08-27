@@ -9,6 +9,8 @@ namespace LimeBean.Tests {
 
     static class SharedChecks {
         public static Guid SAMPLE_GUID = Guid.NewGuid();
+        public static DateTime SAMPLE_DATETIME = new DateTime(1984, 6, 14, 11, 22, 33);
+        public static DateTimeOffset SAMPLE_DATETIME_OFFSET = new DateTimeOffset(SAMPLE_DATETIME, TimeSpan.FromHours(6));
 
         public static void CheckSchemaReadingKeepsCache(IDatabaseAccess db, DatabaseStorage storage) {
             db.Exec("create table foo(bar int)");
@@ -26,7 +28,7 @@ namespace LimeBean.Tests {
             Assert.Equal(savedQueryCount, queryCount);        
         }
 
-        public static void CheckRoundtripOfExtremalValues(RoundtripChecker checker, bool checkDecimal = false, bool checkDateTime = false) {
+        public static void CheckRoundtripOfExtremalValues(RoundtripChecker checker, bool checkDecimal = false, bool checkDateTime = false, bool checkDateTimeOffset = false) {
             checker.Check(Int64.MinValue, Int64.MinValue);
             checker.Check(Int64.MaxValue, Int64.MaxValue);
             checker.Check(Double.Epsilon, Double.Epsilon);
@@ -43,6 +45,11 @@ namespace LimeBean.Tests {
                 checker.Check(DateTime.MaxValue.Date, DateTime.MaxValue.Date);            
             }
 
+            if(checkDateTimeOffset) {
+                checker.Check(DateTimeOffset.MinValue, DateTimeOffset.MinValue);
+                checker.Check(DateTimeOffset.MaxValue.Date, DateTimeOffset.MaxValue.Date);
+            }
+
             var text = String.Empty.PadRight(84 * 1000, 'x');
             checker.Check(text, text);
         }
@@ -54,9 +61,9 @@ namespace LimeBean.Tests {
 
         public static void CheckDateTimeQueries(IDatabaseAccess db, DatabaseStorage storage) {
             storage.EnterFluidMode();
-
-            var date = new DateTime(2015, 1, 1);
-            var dateTime = date.AddHours(1).AddMinutes(2).AddSeconds(3);
+            
+            var dateTime = SharedChecks.SAMPLE_DATETIME;
+            var date = SharedChecks.SAMPLE_DATETIME.Date;
 
             storage.Store("foo", MakeRow("d", date));
             storage.Store("foo", MakeRow("d", dateTime));

@@ -18,7 +18,8 @@ namespace LimeBean {
             RANK_NUMERIC = 4,
             RANK_TEXT = 5,
             RANK_STATIC_DATETIME = CommonDatabaseDetails.RANK_STATIC_BASE + 1,
-            RANK_STATIC_GUID = CommonDatabaseDetails.RANK_STATIC_BASE + 2;
+            RANK_STATIC_DATETIME_OFFSET = CommonDatabaseDetails.RANK_STATIC_BASE + 2,
+            RANK_STATIC_GUID = CommonDatabaseDetails.RANK_STATIC_BASE + 3;
 
         public string DbName {
             get { return "PgSql"; }
@@ -97,6 +98,9 @@ namespace LimeBean {
             if(value is DateTime)
                 return RANK_STATIC_DATETIME;
 
+            if(value is DateTimeOffset)
+                return RANK_STATIC_DATETIME_OFFSET;
+
             if(value is Guid)
                 return RANK_STATIC_GUID;
 
@@ -125,6 +129,9 @@ namespace LimeBean {
 
                 case "timestamp without time zone":
                     return RANK_STATIC_DATETIME;
+
+                case "timestamp with time zone":
+                    return RANK_STATIC_DATETIME_OFFSET;
 
                 case "uuid":
                     return RANK_STATIC_GUID;
@@ -155,6 +162,9 @@ namespace LimeBean {
 
                 case RANK_STATIC_DATETIME:
                     return "timestamp without time zone";
+
+                case RANK_STATIC_DATETIME_OFFSET:
+                    return "timestamp with time zone";
 
                 case RANK_STATIC_GUID:
                     return "uuid";

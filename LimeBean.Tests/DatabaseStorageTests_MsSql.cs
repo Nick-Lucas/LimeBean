@@ -45,6 +45,7 @@ namespace LimeBean.Tests {
                 t2  nvarchar(4000),
                 t3  nvarchar(MAX),
                 dt  datetime2,
+                dto datetimeoffset,
                 g   uniqueidentifier,
 
                 x1  bit,
@@ -72,16 +73,11 @@ namespace LimeBean.Tests {
             Assert.Equal(MsSqlDetails.RANK_TEXT_4000, cols["t2"]);
             Assert.Equal(MsSqlDetails.RANK_TEXT_MAX, cols["t3"]);
             Assert.Equal(MsSqlDetails.RANK_STATIC_DATETIME, cols["dt"]);
+            Assert.Equal(MsSqlDetails.RANK_STATIC_DATETIME_OFFSET, cols["dto"]);
             Assert.Equal(MsSqlDetails.RANK_STATIC_GUID, cols["g"]);
 
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x1"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x2"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x3"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x4"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x5"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x6"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x7"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x8"]);
+            foreach(var i in Enumerable.Range(1, 8))
+                Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x" + i]);
         }
 
         [Fact]
@@ -98,7 +94,8 @@ namespace LimeBean.Tests {
                 { "p7", "".PadRight(33, 'a') },
                 { "p8", "".PadRight(4001, 'a') },
                 { "p9", DateTime.Now },
-                { "p10", Guid.NewGuid() }
+                { "p10", DateTimeOffset.Now },
+                { "p11", Guid.NewGuid() }
             };
 
             _storage.Store("foo", data);
@@ -113,7 +110,8 @@ namespace LimeBean.Tests {
             Assert.Equal(MsSqlDetails.RANK_TEXT_4000, cols["p7"]);
             Assert.Equal(MsSqlDetails.RANK_TEXT_MAX, cols["p8"]);
             Assert.Equal(MsSqlDetails.RANK_STATIC_DATETIME, cols["p9"]);
-            Assert.Equal(MsSqlDetails.RANK_STATIC_GUID, cols["p10"]);
+            Assert.Equal(MsSqlDetails.RANK_STATIC_DATETIME_OFFSET, cols["p10"]);
+            Assert.Equal(MsSqlDetails.RANK_STATIC_GUID, cols["p11"]);
         }
 
         [Fact]
@@ -164,11 +162,12 @@ namespace LimeBean.Tests {
                 checker.Check(0x80000000L, 0x80000000L);
                 checker.Check(3.14, 3.14);
                 checker.Check("hello", "hello");
-                checker.Check(new DateTime(2015, 8, 25), new DateTime(2015, 8, 25));
+                checker.Check(SharedChecks.SAMPLE_DATETIME, SharedChecks.SAMPLE_DATETIME);
+                checker.Check(SharedChecks.SAMPLE_DATETIME_OFFSET, SharedChecks.SAMPLE_DATETIME_OFFSET);
                 checker.Check(SharedChecks.SAMPLE_GUID, SharedChecks.SAMPLE_GUID);
 
                 // extremal vaues
-                SharedChecks.CheckRoundtripOfExtremalValues(checker, false, true);
+                SharedChecks.CheckRoundtripOfExtremalValues(checker, checkDateTime: true, checkDateTimeOffset: true);
 
                 // conversion to string
                 SharedChecks.CheckBigNumberRoundtripForcesString(checker);

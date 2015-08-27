@@ -213,7 +213,7 @@ namespace LimeBean.Tests {
                 SharedChecks.CheckRoundtripOfExtremalValues(checker);
 
                 // conversion to string
-                checker.Check(new DateTime(1984, 6, 14, 13, 14, 15), "1984-06-14 13:14:15");
+                checker.Check(SharedChecks.SAMPLE_DATETIME, "1984-06-14 11:22:33");
                 SharedChecks.CheckBigNumberRoundtripForcesString(checker);
 
                 // upscale to long
