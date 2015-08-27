@@ -10,10 +10,7 @@ namespace LimeBean {
 
     class SQLiteDetails : IDatabaseDetails {
 
-        // NOTE using NUMERIC affinity does not work because driver forces conversion to Decimal
-        public const int
-            RANK_ANY = 0,
-            RANK_TEXT = 1;
+        public const int RANK_ANY = 0;
 
         public string DbName {
             get { return "SQLite"; }
@@ -68,35 +65,14 @@ namespace LimeBean {
             if(value == null)
                 return CommonDatabaseDetails.RANK_NULL;
 
-            if(value is String)
-                return RANK_TEXT;
-
             return RANK_ANY;
         }
 
         public int GetRankFromSqlType(string sqlType) {
-            // according to http://www.sqlite.org/datatype3.html#affname
-
-            if(String.IsNullOrEmpty(sqlType))
-                return RANK_ANY;
-
-            sqlType = sqlType.ToLower();
-
-            if(!sqlType.Contains("int")) {
-                if(sqlType.Contains("char") || sqlType.Contains("clob") || sqlType.Contains("text"))
-                    return RANK_TEXT;
-
-                if(sqlType.Contains("blob"))
-                    return RANK_ANY;
-            }
-
-            return CommonDatabaseDetails.RANK_CUSTOM;
+            return RANK_ANY;
         }
 
         public string GetSqlTypeFromRank(int rank) {
-            if(rank == RANK_TEXT)
-                return "text";
-
             return null;
         }
 
@@ -113,11 +89,11 @@ namespace LimeBean {
         }
 
         public bool IsNullableColumn(IDictionary<string, object> column) {
-            return !Convert.ToBoolean(column["notnull"]);            
+            return true;
         }
 
         public object GetColumnDefaultValue(IDictionary<string, object> column) {
-            return column["dflt_value"];
+            return null;
         }
 
         public string GetColumnName(IDictionary<string, object> column) {
@@ -125,39 +101,15 @@ namespace LimeBean {
         }
 
         public string GetColumnType(IDictionary<string, object> column) {
-            return (string)column["type"];
+            return null;
         }
 
         public void UpdateSchema(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, int> oldColumns, IDictionary<string, int> changedColumns, IDictionary<string, int> addedColumns) {
-            var quotedTableName = QuoteName(tableName);
-
-            if(changedColumns.Count > 0) {
-                var tmpName = "lime_tmp_" + Guid.NewGuid().ToString("N");
-
-                var orderedOldColumns = new List<KeyValuePair<string, int>>(oldColumns.Count);
-                var orderedNewColumns = new List<KeyValuePair<string, int>>(oldColumns.Count);
-
-                foreach(var pair in oldColumns) {
-                    orderedOldColumns.Add(pair);
-
-                    var name = pair.Key;
-                    if(changedColumns.ContainsKey(name))
-                        orderedNewColumns.Add(new KeyValuePair<string, int>(name, changedColumns[name]));                        
-                    else
-                        orderedNewColumns.Add(pair);
-                }               
-
-                db.Exec("drop table if exists " + tmpName);
-                db.Exec(CommonDatabaseDetails.FormatCreateTableCommand(this, tmpName, autoIncrementName, orderedOldColumns));
-                db.Exec("insert into " + tmpName + " select * from " + quotedTableName);
-                db.Exec("drop table " + quotedTableName);
-                db.Exec(CommonDatabaseDetails.FormatCreateTableCommand(this, tableName, autoIncrementName, orderedNewColumns));
-                db.Exec("insert into " + quotedTableName + " select * from " + tmpName);
-                db.Exec("drop table " + tmpName);
-            }
+            if(changedColumns.Count > 0)
+                throw new NotSupportedException();
 
             foreach(var entry in addedColumns)
-                db.Exec("alter table " + quotedTableName + " add " + QuoteName(entry.Key) + " " + GetSqlTypeFromRank(entry.Value));
+                db.Exec("alter table " + QuoteName(tableName) + " add " + QuoteName(entry.Key) + " " + GetSqlTypeFromRank(entry.Value));
         }
 
         public bool IsReadOnlyCommand(string text) {

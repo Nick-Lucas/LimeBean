@@ -28,79 +28,51 @@ namespace LimeBean.Tests {
 
         [Fact]
         public void Schema() {
-            _db.Exec(@"create table t (
-                id int,
-
-                a1,
-                a2 LONGBLOB,
-
-                t1 mediumtext,
-                t2 CLOB,
-                t3 VarChar(123),
-                
-                x1 charint,
-                x2 numeric,
-                x3 real,
-                x4 eprst,
-                
-                x5 text not null,
-                x6 text default 'a'
-            )");
+            _db.Exec("create table t (id, a)");
 
             var schema = _storage.GetSchema();
             Assert.Equal(1, schema.Count);
 
             var t = schema["t"];
             Assert.False(t.ContainsKey("id"));
-
-            Assert.Equal(SQLiteDetails.RANK_ANY, t["a1"]);
-            Assert.Equal(SQLiteDetails.RANK_ANY, t["a2"]);
-
-            Assert.Equal(SQLiteDetails.RANK_TEXT, t["t1"]);
-            Assert.Equal(SQLiteDetails.RANK_TEXT, t["t2"]);
-            Assert.Equal(SQLiteDetails.RANK_TEXT, t["t3"]);
-
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x1"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x2"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x3"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x4"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x5"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x6"]);
+            Assert.Equal(SQLiteDetails.RANK_ANY, t["a"]);
         }
 
         [Fact]
         public void StoreToGoodTable() {
-            _db.Exec("create table kind1 (id integer primary key, p1 numeric, p2 text)");
-            var id = _storage.Store("kind1", new Dictionary<string, object> { 
-                { "p1", 123 },
-                { "p2", "hello" }
-            });
+            _db.Exec("create table kind1 (id integer primary key, p1, p2)");
+
+            var id = _storage.Store("kind1", SharedChecks.MakeRow(
+                "p1", 123, 
+                "p2", "hello"
+            ));
 
             var row = _db.Row(true, "select * from kind1");
-            Assert.Equal(123, Convert.ToInt32(row["p1"]));
+
+            Assert.Equal(123L, row["p1"]);
             Assert.Equal("hello", row["p2"]);
             Assert.Equal(id, row["id"]);
 
-            Assert.Equal(id, _storage.Store("kind1", new Dictionary<string, object> { 
-                { "id", id },
-                { "p1", -1 },
-                { "p2", "see you" }            
-            }));
+            Assert.Equal(id, _storage.Store("kind1", SharedChecks.MakeRow(
+                "id", id,
+                "p1", -1,
+                "p2", "see you"            
+            )));
 
             row = _db.Row(true, "select * from kind1");
-            Assert.Equal(-1, Convert.ToInt32(row["p1"]));
+            Assert.Equal(-1L, row["p1"]);
             Assert.Equal("see you", row["p2"]);
         }
 
         [Fact]
         public void StoreToMissingTable() {
             _storage.EnterFluidMode();
-            _storage.Store("kind1", new Dictionary<string, object> { 
-                { "p1", 123 },
-                { "p2", 3.14 },
-                { "p3", "hello" },
-                { "p4", null }
-            });
+            _storage.Store("kind1", SharedChecks.MakeRow(
+                "p1", 123,
+                "p2", 3.14,
+                "p3", "hello",
+                "p4", null
+            ));
 
             var row = _db.Row(true, "select * from kind1");
             Assert.Equal(123L, row["p1"]);
@@ -111,7 +83,7 @@ namespace LimeBean.Tests {
             var table = _storage.GetSchema()["kind1"];
             Assert.Equal(SQLiteDetails.RANK_ANY, table["p1"]);
             Assert.Equal(SQLiteDetails.RANK_ANY, table["p2"]);
-            Assert.Equal(SQLiteDetails.RANK_TEXT, table["p3"]);
+            Assert.Equal(SQLiteDetails.RANK_ANY, table["p3"]);
             Assert.DoesNotContain("p4", table.Keys);
         }
 
@@ -120,31 +92,35 @@ namespace LimeBean.Tests {
             _db.Exec("create table kind1 (id integer primary key)");
             _storage.EnterFluidMode();
 
-            _storage.Store("kind1", new Dictionary<string, object> { 
-                { "x", 1 } 
-            });
+            _storage.Store("kind1", SharedChecks.MakeRow("x", 1));
 
             var schema = _storage.GetSchema();
             Assert.Equal(SQLiteDetails.RANK_ANY, schema["kind1"]["x"]);
 
-            _storage.Store("kind1", new Dictionary<string, object> { 
-                { "x", "hello" },
-                { "y", null }
-            });
+            _storage.Store("kind1", SharedChecks.MakeRow(
+                "x", "hello",
+                "y", 3.14,
+                "z", null
+            ));
 
             schema = _storage.GetSchema();
-            Assert.Equal(SQLiteDetails.RANK_TEXT, schema["kind1"]["x"]);
-            Assert.DoesNotContain("y", schema["kind1"].Keys);
+            Assert.Equal(SQLiteDetails.RANK_ANY, schema["kind1"]["x"]);
+            Assert.Equal(SQLiteDetails.RANK_ANY, schema["kind1"]["y"]);
+            Assert.DoesNotContain("z", schema["kind1"].Keys);
 
             var rows = _db.Rows(true, "select * from kind1 order by id");
-            Assert.Equal("1", rows[0]["x"]);
+
+            Assert.Equal(1L, rows[0]["x"]);
+            Assert.Null(rows[0]["y"]);
+
             Assert.Equal("hello", rows[1]["x"]);
+            Assert.Equal(3.14, rows[1]["y"]);
         }
 
         [Fact]
         public void ChangeSchemaWhenFrozen() {
             Assert.Throws(SQLitePortability.ExceptionType, delegate() {
-                _storage.Store("unlucky", new Dictionary<string, object> { { "a", 1 } });
+                _storage.Store("unlucky", SharedChecks.MakeRow("a", 1));
             });
         }
 
@@ -152,11 +128,11 @@ namespace LimeBean.Tests {
         public void InsertUpdateWithoutValues() {
             _storage.EnterFluidMode();
 
-            var id = _storage.Store("kind1", new Dictionary<string, object>());
+            var id = _storage.Store("kind1", SharedChecks.MakeRow());
             Assert.Equal(1, _db.Cell<int>(true, "select count(*) from kind1"));
 
             Assert.Null(Record.Exception(delegate() {
-                _storage.Store("kind1", new Dictionary<string, object>() { { "id", id } });
+                _storage.Store("kind1", SharedChecks.MakeRow("id", id));
             }));
         }
 
@@ -165,7 +141,10 @@ namespace LimeBean.Tests {
             _storage.EnterFluidMode();
 
             var error = Record.Exception(delegate() {
-                _storage.Store("foo", new Dictionary<string, object> { { "id", 123 }, { "a", 1 } });
+                _storage.Store("foo", SharedChecks.MakeRow(
+                    "id", 123, 
+                    "a", 1
+                ));
             });
             Assert.Equal("Row not found", error.Message);
         }
@@ -188,12 +167,12 @@ namespace LimeBean.Tests {
 
         [Fact]
         public void Load() {
-            _db.Exec("create table kind1 (id integer primary key, p1 numeric, p2 text)");
-            _db.Exec("insert into kind1 (id, p1, p2) values (5, 123, 'hello')");
+            _db.Exec("create table kind1 (id integer primary key, p1, p2)");
+            _db.Exec("insert into kind1 (id, p1, p2) values (5, 3.14, 'hello')");
 
             var data = _storage.Load("kind1", 5);
             Assert.Equal(5L, data["id"]);
-            Assert.Equal(123, Convert.ToInt32(data["p1"]));
+            Assert.Equal(3.14, data["p1"]);
             Assert.Equal("hello", data["p2"]);
         }
 
@@ -287,7 +266,7 @@ namespace LimeBean.Tests {
 
         [Fact]
         public void Trash() {
-            var emptiness = new Dictionary<string, object>();
+            var emptiness = SharedChecks.MakeRow();
 
             _storage.EnterFluidMode();
 
@@ -305,53 +284,25 @@ namespace LimeBean.Tests {
             _storage.EnterFluidMode();
 
             var trueKeys = new[] { 
-                _storage.Store("foo", new Dictionary<string, object> { { "x", true } }),
-                _storage.Store("foo", new Dictionary<string, object> { { "x", 1 } }),
-                _storage.Store("foo", new Dictionary<string, object> { { "x", "1" } })
+                _storage.Store("foo", SharedChecks.MakeRow("x", true)),
+                _storage.Store("foo", SharedChecks.MakeRow("x", 1)),
+                _storage.Store("foo", SharedChecks.MakeRow("x", "1"))
             };
 
             var falseKeys = new[] {
-                _storage.Store("foo", new Dictionary<string, object> { { "x", false } }),
-                _storage.Store("foo", new Dictionary<string, object> { { "x", 0 } }),
-                _storage.Store("foo", new Dictionary<string, object> { { "x", "0" } })
+                _storage.Store("foo", SharedChecks.MakeRow("x", false)),
+                _storage.Store("foo", SharedChecks.MakeRow("x", 0)),
+                _storage.Store("foo", SharedChecks.MakeRow("x", "0"))
             };
 
             var nullKeys = new[] { 
-                _storage.Store("foo", new Dictionary<string, object> { { "x", null } }),
-                _storage.Store("foo", new Dictionary<string, object> { { "x", "" } })
+                _storage.Store("foo", SharedChecks.MakeRow("x", null)),
+                _storage.Store("foo", SharedChecks.MakeRow("x", ""))
             };
 
             AssertExtensions.Equivalent(trueKeys, _db.Col<object>(true, "select id from foo where x"));
             AssertExtensions.Equivalent(falseKeys, _db.Col<object>(true, "select id from foo where not x"));
             AssertExtensions.Equivalent(nullKeys, _db.Col<object>(true, "select id from foo where x is null"));
-        }
-
-        [Fact]
-        public void Numbers() {
-            _storage.EnterFluidMode();
-
-            var id = _storage.Store("foo", new Dictionary<string, object> { { "long", 42 }, { "double", 3.14 } });
-
-            var row = _storage.Load("foo", id);
-            Assert.IsType<long>(row["long"]);
-            Assert.IsType<double>(row["double"]);
-
-            // Expand long to real
-
-            row["long"] = 3.14;
-            _storage.Store("foo", row);
-
-            row = _storage.Load("foo", id);
-            Assert.IsType<double>(row["long"]);
-
-            // Store long in real column, type rank will not go back
-
-            row["long"] = Int64.MaxValue;
-            _storage.Store("foo", row);
-
-            row = _storage.Load("foo", id);
-            Assert.IsType<long>(row["long"]);
-            Assert.Equal(Int64.MaxValue, row["long"]);
         }
 
         [Fact]
