@@ -121,7 +121,7 @@ namespace LimeBean.Tests {
             var data = new Dictionary<string, object> {
                 { "p1", 1 },
                 { "p2", -1 },
-                { "p3", Int64.MaxValue },
+                { "p3", 1 + (long)Int32.MaxValue },
                 { "p4", 3.14 },
                 { "p5", "abc" },
                 { "p6", "".PadRight(33, 'a') },
@@ -147,6 +147,11 @@ namespace LimeBean.Tests {
             Assert.Equal(MsSqlDetails.RANK_TEXT_MAX, cols["p6"]);
             Assert.Equal(MsSqlDetails.RANK_TEXT_MAX, cols["p7"]);
             Assert.Equal(MsSqlDetails.RANK_BYTE, cols["p8"]);
+        }
+
+        [Fact]
+        public void LongToDouble() {
+            SharedChecks.CheckLongToDouble(_db, _storage);
         }
 
         [Fact]

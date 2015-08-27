@@ -143,7 +143,7 @@ namespace LimeBean.Tests {
             var data = new Dictionary<string, object> {
                 { "p1", 1 },
                 { "p2", 1000 },
-                { "p3", Int64.MaxValue },
+                { "p3", 1 + (long)Int32.MaxValue },
                 { "p4", 3.14 },
                 { "p5", "abc" },
                 { "p6", "".PadRight(37, 'a') },
@@ -170,6 +170,11 @@ namespace LimeBean.Tests {
             Assert.Equal(MariaDbDetails.RANK_TEXT_MAX, cols["p6"]);
             Assert.Equal(MariaDbDetails.RANK_TEXT_MAX, cols["p7"]);
             Assert.Equal(MariaDbDetails.RANK_INT8, cols["p8"]);
+        }
+
+        [Fact]
+        public void LongToDouble() {
+            SharedChecks.CheckLongToDouble(_db, _storage);
         }
 
         [Fact]

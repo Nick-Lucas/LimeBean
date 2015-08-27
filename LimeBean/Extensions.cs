@@ -35,6 +35,10 @@ namespace LimeBean {
             return -0x80000000L <= value && value <= 0x7FFFFFFFL;
         }
 
+        internal static bool IsInt53Range(this Int64 value) {
+            return -0x1fffffffffffffL <= value && value <= 0x1fffffffffffffL;
+        }
+
         internal static bool IsSafeInteger(this Double value) {
             const double
                 min = -0x1fffffffffffff,

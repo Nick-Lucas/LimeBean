@@ -87,12 +87,8 @@ namespace LimeBean.Tests {
 
             Assert.Equal(PgSqlDetails.RANK_STATIC_GUID, cols["g"]);
 
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x1"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x2"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x3"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x4"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x5"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x6"]);
+            foreach(var i in Enumerable.Range(1, 6))
+                Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x" + i]);
         }
 
         [Fact]
@@ -136,22 +132,19 @@ namespace LimeBean.Tests {
             var data = new Dictionary<string, object> {
                 { "p1", true },
                 { "p2", 1 },
-                { "p3", 1 },
-                { "p4", Int64.MaxValue },
-                { "p5", 3.14 }, 
-                { "p6", Decimal.MaxValue },
-                { "p7", "abc" }
+                { "p3", 1 + (long)Int32.MaxValue },
+                { "p4", 3.14 }, 
+                { "p5", Decimal.MaxValue },
+                { "p6", "abc" }
             };
 
             _storage.Store("foo", data);
 
-            data["p1"] = 1;
-            data["p2"] = Int64.MaxValue;
-            data["p3"] = 3.14;
-            data["p4"] = 3.14;
-            data["p5"] = Decimal.MaxValue;
-            data["p6"] = "abc";
-            data["p8"] = 123;
+            for(var i = 1; i < data.Count; i++)
+                data["p" + i] = data["p" + (1 + i)];
+
+            data["p6"] = 1;
+            data["p7"] = 1;
 
             _storage.Store("foo", data);
 
@@ -160,9 +153,8 @@ namespace LimeBean.Tests {
             Assert.Equal(PgSqlDetails.RANK_INT64, cols["p2"]);
             Assert.Equal(PgSqlDetails.RANK_DOUBLE, cols["p3"]);
             Assert.Equal(PgSqlDetails.RANK_NUMERIC, cols["p4"]);
-            Assert.Equal(PgSqlDetails.RANK_NUMERIC, cols["p5"]);
             Assert.Equal(PgSqlDetails.RANK_TEXT, cols["p6"]);
-            Assert.Equal(PgSqlDetails.RANK_INT32, cols["p8"]);
+            Assert.Equal(PgSqlDetails.RANK_INT32, cols["p7"]);
         }
 
         [Fact]
@@ -177,6 +169,11 @@ namespace LimeBean.Tests {
 
             var col = _db.Col<string>(false, "select p from foo order by id");
             Assert.Equal(new[] { null, "0", "1", "2" }, col);
+        }
+
+        [Fact]
+        public void LongToDouble() {
+            SharedChecks.CheckLongToDouble(_db, _storage);
         }
 
         [Fact]

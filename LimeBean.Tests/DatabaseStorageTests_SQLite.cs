@@ -198,6 +198,11 @@ namespace LimeBean.Tests {
         }
 
         [Fact]
+        public void LongToDouble() {
+            SharedChecks.CheckLongToDouble(_db, _storage);
+        }
+
+        [Fact]
         public void Roundtrip() {
             AssertExtensions.WithCulture("ru", delegate() {
                 _storage.EnterFluidMode();

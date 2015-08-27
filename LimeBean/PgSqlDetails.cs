@@ -211,17 +211,10 @@ namespace LimeBean {
         public void UpdateSchema(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, int> oldColumns, IDictionary<string, int> changedColumns, IDictionary<string, int> addedColumns) {
             var operations = new List<string>();
 
-            foreach(var entry in changedColumns) {
-                var name = entry.Key;
+            CommonDatabaseDetails.FixLongToDoubleUpgrade(this, db, tableName, oldColumns, changedColumns, RANK_INT64, RANK_DOUBLE, RANK_NUMERIC);
 
-                var oldRank = oldColumns[name];
-                var newRank = entry.Value;
-
-                if(newRank == RANK_DOUBLE && oldRank == RANK_INT64)
-                    newRank = RANK_NUMERIC;
-
-                operations.Add(String.Format("alter {0} type {1} using {0}::{1}", QuoteName(name), GetSqlTypeFromRank(newRank)));
-            }
+            foreach(var entry in changedColumns)
+                operations.Add(String.Format("alter {0} type {1} using {0}::{1}", QuoteName(entry.Key), GetSqlTypeFromRank(entry.Value)));
 
             foreach(var entry in addedColumns)
                 operations.Add(String.Format("add {0} {1}", QuoteName(entry.Key), GetSqlTypeFromRank(entry.Value)));

@@ -59,6 +59,16 @@ namespace LimeBean.Tests {
             checker.Check(9223372036854775808M, "9223372036854775808");
         }
 
+        public static void CheckLongToDouble(IDatabaseAccess db, DatabaseStorage storage) {
+            storage.EnterFluidMode();
+
+            var bigLong = Int64.MinValue + 12345;
+            var longID = storage.Store("foo", MakeRow("p", bigLong));
+            
+            storage.Store("foo", MakeRow("p", Math.PI));
+            Assert.Equal(bigLong, db.Cell<long>(false, "select p from foo where id = {0}", longID));
+        } 
+
         public static void CheckDateTimeQueries(IDatabaseAccess db, DatabaseStorage storage) {
             storage.EnterFluidMode();
             

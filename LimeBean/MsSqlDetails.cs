@@ -230,6 +230,8 @@ namespace LimeBean {
         }
 
         public void UpdateSchema(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, int> oldColumns, IDictionary<string, int> changedColumns, IDictionary<string, int> addedColumns) {
+            CommonDatabaseDetails.FixLongToDoubleUpgrade(this, db, tableName, oldColumns, changedColumns, RANK_INT64, RANK_DOUBLE, RANK_TEXT_32);
+
             tableName = QuoteName(tableName);
 
             foreach(var entry in changedColumns)

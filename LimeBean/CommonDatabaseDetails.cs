@@ -76,6 +76,25 @@ namespace LimeBean {
             return builder.ToString();
         }
 
+        public static void FixLongToDoubleUpgrade(IDatabaseDetails details, IDatabaseAccess db, string tableName, IDictionary<string, int> oldColumns, IDictionary<string, int> changedColumns, int longRank, int doubleRank, int safeRank) {
+            var names = new List<string>(changedColumns.Keys);
+            var quotedTableName = details.QuoteName(tableName);
+
+            foreach(var name in names) {
+                var oldRank = oldColumns[name];
+                var newRank = changedColumns[name];
+
+                if(oldRank == longRank && newRank == doubleRank) {
+                    var quotedName = details.QuoteName(name);
+                    var min = db.Cell<long>(false, "select min(" + quotedName + ") from " + quotedTableName);
+                    var max = db.Cell<long>(false, "select max(" + quotedName + ") from " + quotedTableName);
+                    if(!min.IsInt53Range() || !max.IsInt53Range())
+                        changedColumns[name] = safeRank;
+                }
+            }
+        }
+
+
     }
 
 }
