@@ -251,8 +251,8 @@ namespace LimeBean {
                 newColumns.Remove(autoIncrementName);
 
             if(!IsKnownKind(kind)) {
-                foreach(var col in newColumns)
-                    ValidateNewColumnRank(col.Key, col.Value);
+                foreach(var name in newColumns.Keys)
+                    ValidateNewColumnRank(name, newColumns[name], data[name]);                
                 _db.Exec(CommonDatabaseDetails.FormatCreateTableCommand(_details, kind, autoIncrementName, newColumns));
                 InvalidateSchema();
             } else {
@@ -264,16 +264,12 @@ namespace LimeBean {
                     var newRank = newColumns[name];
 
                     if(!oldColumns.ContainsKey(name)) {
-                        ValidateNewColumnRank(name, newRank);
+                        ValidateNewColumnRank(name, newRank, data[name]);
                         addedColumns[name] = newRank;
                     } else {
                         var oldRank = oldColumns[name];
-
-                        if(newRank != oldRank) {
-                            ValidateRankUpgrade(name, oldRank, newRank);
-                            if(newRank > oldRank)
-                                changedColumns[name] = newRank;                        
-                        }
+                        if(newRank > oldRank && Math.Max(oldRank, newRank) < CommonDatabaseDetails.RANK_STATIC_BASE)
+                            changedColumns[name] = newRank;                        
                     }
                 }
 
@@ -284,31 +280,12 @@ namespace LimeBean {
             }
         }
 
-        void ValidateNewColumnRank(string columnName, int rank) {
+        void ValidateNewColumnRank(string columnName, int rank, object value) {
             if(rank < CommonDatabaseDetails.RANK_CUSTOM)
                 return;
 
-            var text = String.Format("Cannot automatically add column '{0}' because it has a custom SQL type", columnName);
+            var text = String.Format("Cannot automatically add column for property '{0}' of type '{1}'", columnName, value.GetType());
             throw new InvalidOperationException(text);
-        }
-
-        void ValidateRankUpgrade(string columnName, int oldRank, int newRank) {
-            if(Math.Max(oldRank, newRank) < CommonDatabaseDetails.RANK_STATIC_BASE)
-                return;
-
-            var text = String.Format(
-                "Cannot automatically convert column '{0}' from '{1}' to '{2}'",
-                columnName, GetRankName(oldRank), GetRankName(newRank)
-            );
-
-            throw new InvalidOperationException(text);
-        }
-
-        string GetRankName(int rank) {
-            if(rank < CommonDatabaseDetails.RANK_CUSTOM)
-                return _details.GetSqlTypeFromRank(rank);
-
-            return "(custom)";
         }
 
         void AppendKeyCriteria(string kind, object key, StringBuilder sql, ICollection<object> parameters) {

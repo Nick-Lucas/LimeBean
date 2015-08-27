@@ -111,7 +111,7 @@ namespace LimeBean.Tests {
             });
         }
 
-        public static void CheckCustomRankInFluidMode(IDatabaseAccess db, DatabaseStorage storage, bool expectSuccess) {
+        public static void CheckCustomRank_MissingColumn(IDatabaseAccess db, DatabaseStorage storage, bool expectSuccess) {
             storage.EnterFluidMode();
 
             var row = MakeRow("a", new byte[] { 1, 2, 3 });
@@ -121,13 +121,11 @@ namespace LimeBean.Tests {
             var x = Record.Exception(delegate() {
                 storage.Store("foo1", row);
             });
-            
-            if(expectSuccess) {
+
+            if(expectSuccess)
                 Assert.Null(x);
-            } else {
-                Assert.IsType<InvalidOperationException>(x);
-                Assert.EndsWith("custom SQL type", x.Message);
-            }
+            else
+                AssertCannotAddColumn(x);
 
             // Try add column
 
@@ -137,53 +135,13 @@ namespace LimeBean.Tests {
                 storage.Store("foo2", row);
             });
 
-            if(expectSuccess) {
+            if(expectSuccess)
                 Assert.Null(x);
-            } else {
-                Assert.IsType<InvalidOperationException>(x);
-                Assert.EndsWith("custom SQL type", x.Message);
-            }
-            
-            // Try to upgrade rank
-
-            storage.Store("foo3", MakeRow("a", 1));
-
-            x = Record.Exception(delegate() {
-                storage.Store("foo3", row);
-            });
-
-            if(expectSuccess) {
-                Assert.Null(x);
-            } else {
-                Assert.IsType<InvalidOperationException>(x);
-                Assert.EndsWith("to '(custom)'", x.Message);
-            }
+            else
+                AssertCannotAddColumn(x);
         }
 
-        public static void CheckStaticRankInFluidMode(IDatabaseAccess db, DatabaseStorage storage, object staticRankValue) {
-            storage.EnterFluidMode();
-            storage.Store("foo", MakeRow("dynamic", 1, "static", staticRankValue));   
-         
-            // dynamic ->  static
-            
-            var x = Record.Exception(delegate() {
-                storage.Store("foo", MakeRow("dynamic", staticRankValue));    
-            });
-            Assert.IsType<InvalidOperationException>(x);
-            Assert.StartsWith("Cannot automatically", x.Message);
-
-            // static -> dynamic
-
-            x = Record.Exception(delegate() {
-                storage.Store("foo", MakeRow("static", 1));
-            });
-
-            Assert.IsType<InvalidOperationException>(x);
-            Assert.StartsWith("Cannot automatically", x.Message);
-
-        }
-
-        public static void CheckCustomRankWithExistingTable(IDatabaseAccess db, DatabaseStorage storage, string blobType) {
+        public static void CheckCustomRank_ExistingColumn(IDatabaseAccess db, DatabaseStorage storage, string blobType) {
             db.Exec("create table foo(id integer, b " + blobType + ")");
             storage.Store("foo", MakeRow("b", new byte[] { 123 }));
             var readBack = db.Cell<byte[]>(false, "select b from foo");
@@ -198,6 +156,10 @@ namespace LimeBean.Tests {
             return row;
         }
 
+        static void AssertCannotAddColumn(Exception x) {
+            Assert.IsType<InvalidOperationException>(x);
+            Assert.StartsWith("Cannot automatically add ", x.Message);
+        }
 
     }
 

@@ -224,18 +224,13 @@ namespace LimeBean.Tests {
         }
 
         [Fact]
-        public void CustomRankInFluidMode() {
-            SharedChecks.CheckCustomRankInFluidMode(_db, _storage, false);
+        public void CustomRank_MissingColumn() {
+            SharedChecks.CheckCustomRank_MissingColumn(_db, _storage, false);
         }
 
         [Fact]
-        public void CustomRankWithExistingTable() {
-            SharedChecks.CheckCustomRankWithExistingTable(_db, _storage, "bytea");
-        }
-
-        [Fact]
-        public void StaticRankInFluidMode() {
-            SharedChecks.CheckStaticRankInFluidMode(_db, _storage, DateTime.Now);
+        public void CustomRank_ExistingColumn() {
+            SharedChecks.CheckCustomRank_ExistingColumn(_db, _storage, "bytea");
         }
 
     }

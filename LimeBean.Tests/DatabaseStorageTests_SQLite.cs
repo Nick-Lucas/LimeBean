@@ -377,13 +377,13 @@ namespace LimeBean.Tests {
         }
 
         [Fact]
-        public void CustomRankInFluidMode() {
-            SharedChecks.CheckCustomRankInFluidMode(_db, _storage, true);
+        public void CustomRank_MissingColumn() {
+            SharedChecks.CheckCustomRank_MissingColumn(_db, _storage, true);
         }
 
         [Fact]
-        public void CustomRankWithExistingTable() {
-            SharedChecks.CheckCustomRankWithExistingTable(_db, _storage, "blob");
+        public void CustomRank_ExistingColumn() {
+            SharedChecks.CheckCustomRank_ExistingColumn(_db, _storage, "blob");
         }
 
     }
