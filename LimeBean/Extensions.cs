@@ -56,6 +56,9 @@ namespace LimeBean {
                 if(targetType.IsGenericType() && targetType.GetGenericTypeDefinition() == typeof(Nullable<>))
                     targetType = Nullable.GetUnderlyingType(targetType);;
 
+                if(targetType == typeof(Guid))
+                    return (T)Activator.CreateInstance(typeof(T), value);
+
                 if(targetType.IsEnum())
                     return (T)Enum.Parse(targetType, Convert.ToString(value), true);
 

@@ -216,6 +216,9 @@ namespace LimeBean.Tests {
                 checker.Check(SharedChecks.SAMPLE_DATETIME, "1984-06-14 11:22:33");
                 SharedChecks.CheckBigNumberRoundtripForcesString(checker);
 
+                // Guid
+                checker.Check(SharedChecks.SAMPLE_GUID, SharedChecks.SAMPLE_GUID.ToByteArray());
+
                 // upscale to long
                 checker.Check(0, 0L);
                 checker.Check(1, 1L);
@@ -361,6 +364,11 @@ namespace LimeBean.Tests {
         [Fact]
         public void DateTimeQueries() {
             SharedChecks.CheckDateTimeQueries(_db, _storage);
+        }
+
+        [Fact]
+        public void GuidQuery() {
+            SharedChecks.CheckGuidQuery(_db, _storage);
         }
 
         [Fact]

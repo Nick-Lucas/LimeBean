@@ -62,8 +62,8 @@ namespace LimeBean.Tests {
         public static void CheckDateTimeQueries(IDatabaseAccess db, DatabaseStorage storage) {
             storage.EnterFluidMode();
             
-            var dateTime = SharedChecks.SAMPLE_DATETIME;
-            var date = SharedChecks.SAMPLE_DATETIME.Date;
+            var dateTime = SAMPLE_DATETIME;
+            var date = SAMPLE_DATETIME.Date;
 
             storage.Store("foo", MakeRow("d", date));
             storage.Store("foo", MakeRow("d", dateTime));
@@ -76,6 +76,12 @@ namespace LimeBean.Tests {
             Assert.Equal(3, db.Cell<int>(false, "select count(*) from foo where d between {0} and {1}", date.AddDays(-1), date.AddDays(1)));
 
             Assert.Equal(date, db.Cell<DateTime>(false, "select d from foo where d = {0}", date));        
+        }
+
+        public static void CheckGuidQuery(IDatabaseAccess db, DatabaseStorage storage) {
+            storage.EnterFluidMode();
+            storage.Store("foo", MakeRow("g", SAMPLE_GUID));
+            Assert.Equal(SAMPLE_GUID, db.Cell<Guid>(false, "select g from foo where g = {0}", SAMPLE_GUID));
         }
 
         public static void CheckReadUncommitted(IDatabaseAccess db1, IDatabaseAccess db2) {

@@ -214,6 +214,11 @@ namespace LimeBean.Tests {
         }
 
         [Fact]
+        public void GuidQuery() {
+            SharedChecks.CheckGuidQuery(_db, _storage);
+        }
+
+        [Fact]
         public void CustomRankInFluidMode() {
             SharedChecks.CheckCustomRankInFluidMode(_db, _storage, false);
         }

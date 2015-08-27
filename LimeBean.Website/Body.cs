@@ -577,7 +577,7 @@ namespace LimeBean.Website {
             class GuidKeyObserver : BeanObserver {
                 public override void BeforeStore(Bean bean) {
                     if(bean["id"] == null)
-                        bean["id"] = Guid.NewGuid().ToString();                    
+                        bean["id"] = Guid.NewGuid();
                 }
             }
 #endif
