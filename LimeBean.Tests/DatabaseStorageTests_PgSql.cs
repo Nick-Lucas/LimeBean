@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
+// NOTE http://www.roryhart.net/code/slow-create-database-with-postgresql/
+
 namespace LimeBean.Tests {
 
     public class DatabaseStorageTests_PgSql : IDisposable, IClassFixture<PgSqlConnectionFixture> {
