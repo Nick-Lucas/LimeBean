@@ -51,11 +51,9 @@ namespace LimeBean.Tests {
                 d1  Double,
                 d2  DOUBLE PRECISION,
 
-                t1  varchar(32),
-                t2  VarChar(255),
-                t3  TinyText,
-                t4  Text,
-                t5  MEDIUMTEXT,
+                t1  varchar(36),
+                t2  VarChar(191),
+                t3  LongText,
 
                 dt1 datetime,                
 
@@ -63,18 +61,18 @@ namespace LimeBean.Tests {
                 x2  mediumint,
                 x3  double(3,2),
                 x4  float,
-                x6  decimal,
-                x7  date,
-                x8  timestamp,
-                x9  char(32),
-                x10 varchar(123),
-                x11 binary,
-                x12 blob,
-                x13 longtext,
+                x5  decimal,
+                x6  date,
+                x7  timestamp,
+                x8  char(36),
+                x9 varchar(123),
+                x10 binary,
+                x11 blob,
+                x12 text,
 
-                x14 int unsigned,
-                x15 int not null,
-                x16 int default '123'
+                x13 int unsigned,
+                x14 int not null,
+                x15 int default '123'
             )");
 
             var schema = _storage.GetSchema();
@@ -98,29 +96,14 @@ namespace LimeBean.Tests {
             Assert.Equal(MariaDbDetails.RANK_DOUBLE, t["d1"]);
             Assert.Equal(MariaDbDetails.RANK_DOUBLE, t["d2"]);
 
-            Assert.Equal(MariaDbDetails.RANK_TEXT5, t["t1"]);
-            Assert.Equal(MariaDbDetails.RANK_TEXT8, t["t2"]);
-            Assert.Equal(MariaDbDetails.RANK_TEXT8, t["t3"]);
-            Assert.Equal(MariaDbDetails.RANK_TEXT16, t["t4"]);
-            Assert.Equal(MariaDbDetails.RANK_TEXT24, t["t5"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT_36, t["t1"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT_191, t["t2"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT_MAX, t["t3"]);
 
             Assert.Equal(MariaDbDetails.RANK_STATIC_DATETIME, t["dt1"]);
 
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x1"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x2"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x3"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x4"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x6"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x7"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x8"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x9"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x10"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x11"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x12"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x13"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x14"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x15"]);
-            Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x16"]);
+            foreach(var i in Enumerable.Range(1, 15))
+                Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x" + i]);
         }
 
         [Fact]
@@ -134,10 +117,9 @@ namespace LimeBean.Tests {
                 { "p4", Int64.MaxValue },
                 { "p5", 3.14 },
                 { "p6", "abc" },
-                { "p7", "".PadRight(33, 'a') },
-                { "p8", "".PadRight(256, 'a') },
-                { "p9", "".PadRight(65536, 'a') },
-                { "p10", DateTime.Now }
+                { "p7", "".PadRight(37, 'a') },
+                { "p8", "".PadRight(192, 'a') },
+                { "p9", DateTime.Now }
             };
 
             _storage.Store("foo", data);
@@ -148,11 +130,10 @@ namespace LimeBean.Tests {
             Assert.Equal(MariaDbDetails.RANK_INT32, cols["p3"]);
             Assert.Equal(MariaDbDetails.RANK_INT64, cols["p4"]);
             Assert.Equal(MariaDbDetails.RANK_DOUBLE, cols["p5"]);
-            Assert.Equal(MariaDbDetails.RANK_TEXT5, cols["p6"]);
-            Assert.Equal(MariaDbDetails.RANK_TEXT8, cols["p7"]);
-            Assert.Equal(MariaDbDetails.RANK_TEXT16, cols["p8"]);
-            Assert.Equal(MariaDbDetails.RANK_TEXT24, cols["p9"]);
-            Assert.Equal(MariaDbDetails.RANK_STATIC_DATETIME, cols["p10"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT_36, cols["p6"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT_191, cols["p7"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT_MAX, cols["p8"]);
+            Assert.Equal(MariaDbDetails.RANK_STATIC_DATETIME, cols["p9"]);
         }
 
         [Fact]
@@ -165,18 +146,17 @@ namespace LimeBean.Tests {
                 { "p3", Int64.MaxValue },
                 { "p4", 3.14 },
                 { "p5", "abc" },
-                { "p6", "".PadRight(33, 'a') },
-                { "p7", "".PadRight(256, 'a') },
-                { "p8", "".PadRight(65536, 'a') }
+                { "p6", "".PadRight(37, 'a') },
+                { "p7", "".PadRight(192, 'a') }
             };
 
             _storage.Store("foo", data);
 
-            for(var i = 1; i < 8; i++)
+            for(var i = 1; i < data.Count; i++)
                 data["p" + i] = data["p" + (i + 1)];
 
+            data["p7"] = 123;
             data["p8"] = 123;
-            data["p9"] = 123;
 
             _storage.Store("foo", data);
 
@@ -185,12 +165,11 @@ namespace LimeBean.Tests {
             Assert.Equal(MariaDbDetails.RANK_INT32, cols["p1"]);
             Assert.Equal(MariaDbDetails.RANK_INT64, cols["p2"]);
             Assert.Equal(MariaDbDetails.RANK_DOUBLE, cols["p3"]);
-            Assert.Equal(MariaDbDetails.RANK_TEXT5, cols["p4"]);
-            Assert.Equal(MariaDbDetails.RANK_TEXT8, cols["p5"]);
-            Assert.Equal(MariaDbDetails.RANK_TEXT16, cols["p6"]);
-            Assert.Equal(MariaDbDetails.RANK_TEXT24, cols["p7"]);
-            Assert.Equal(MariaDbDetails.RANK_TEXT24, cols["p8"]);
-            Assert.Equal(MariaDbDetails.RANK_INT8, cols["p9"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT_36, cols["p4"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT_191, cols["p5"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT_MAX, cols["p6"]);
+            Assert.Equal(MariaDbDetails.RANK_TEXT_MAX, cols["p7"]);
+            Assert.Equal(MariaDbDetails.RANK_INT8, cols["p8"]);
         }
 
         [Fact]
@@ -213,6 +192,7 @@ namespace LimeBean.Tests {
 
                 // conversion to string
                 SharedChecks.CheckBigNumberRoundtripForcesString(checker);
+                checker.Check(SharedChecks.SAMPLE_GUID, SharedChecks.SAMPLE_GUID.ToString());
 
                 // bool            
                 checker.Check(true, (sbyte)1);
@@ -259,6 +239,14 @@ namespace LimeBean.Tests {
                 otherDb.Exec("use " + dbName);
                 SharedChecks.CheckReadUncommitted(_db, otherDb);
             }
+        }
+
+        [Fact]
+        public void UTF8_mb4() {
+            const string pile = "\U0001f4a9";
+            _storage.EnterFluidMode();
+            var id = _storage.Store("foo", SharedChecks.MakeRow("p", pile));
+            Assert.Equal(pile, _storage.Load("foo", id)["p"]);
         }
     }
 

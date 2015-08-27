@@ -174,7 +174,7 @@ namespace LimeBean.Tests {
             Assert.Equal(123, readBack[0]);
         }
 
-        static IDictionary<string, object> MakeRow(params object[] data) {
+        public static IDictionary<string, object> MakeRow(params object[] data) {
             var row = new Dictionary<string, object>();
             for(var i = 0; i < data.Length; i += 2) {
                 row[(string)data[i]] = data[1 + i];

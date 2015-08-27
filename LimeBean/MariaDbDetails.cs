@@ -16,11 +16,16 @@ namespace LimeBean {
             RANK_INT32 = 1,
             RANK_INT64 = 2,
             RANK_DOUBLE = 3,
-            RANK_TEXT5 = 4,
-            RANK_TEXT8 = 5,
-            RANK_TEXT16 = 6,
-            RANK_TEXT24 = 7,
+
+            // http://stackoverflow.com/a/19472829
+            // TODO is it worth adding varchar(1024)?
+            RANK_TEXT_36 = 4,   // up to Guid len
+            RANK_TEXT_191 = 5,  // 767-byte index limit with 4 bytes per char
+            RANK_TEXT_MAX = 6,
+
             RANK_STATIC_DATETIME = CommonDatabaseDetails.RANK_STATIC_BASE + 1;
+
+        string _charset;
 
         public string DbName {
             get { return "MariaDB"; }
@@ -50,7 +55,8 @@ namespace LimeBean {
         }
 
         public void ExecInitCommands(IDatabaseAccess db) {
-            db.Exec("set names utf8");
+            _charset = db.Cell<string>(false, "show charset like 'utf8mb4'") != null ? "utf8mb4" : "utf8";
+            db.Exec("set names " + _charset);
         }
 
         public object ExecInsert(IDatabaseAccess db, string tableName, string autoIncrementName, IDictionary<string, object> data) {
@@ -69,7 +75,7 @@ namespace LimeBean {
         }
 
         public string GetCreateTableStatementPostfix() {
-            return "engine=InnoDB default charset=utf8 collate=utf8_unicode_ci";
+            return String.Format("engine=InnoDB default charset={0} collate={0}_unicode_ci", _charset);
         }
 
         public int GetRankFromValue(object value) {
@@ -91,20 +97,20 @@ namespace LimeBean {
             if(value is String) {
                 var len = (value as String).Length;
 
-                if(len <= 32)
-                    return RANK_TEXT5;
+                if(len <= 36)
+                    return RANK_TEXT_36;
 
-                if(len <= 255)
-                    return RANK_TEXT8;
+                if(len <= 191)
+                    return RANK_TEXT_191;
 
-                if(len <= 65535)
-                    return RANK_TEXT16;
-
-                return RANK_TEXT24;
+                return RANK_TEXT_MAX;
             }
 
             if(value is DateTime)
                 return RANK_STATIC_DATETIME;
+
+            if(value is Guid)
+                return RANK_TEXT_36;
 
             return CommonDatabaseDetails.RANK_CUSTOM;
         }
@@ -125,17 +131,14 @@ namespace LimeBean {
             if(sqlType == "double")
                 return RANK_DOUBLE;
 
-            if(sqlType == "varchar(32)")
-                return RANK_TEXT5;
+            if(sqlType == "varchar(36)")
+                return RANK_TEXT_36;
 
-            if(sqlType == "varchar(255)" || sqlType == "tinytext")
-                return RANK_TEXT8;
+            if(sqlType == "varchar(191)")
+                return RANK_TEXT_191;
 
-            if(sqlType == "text")
-                return RANK_TEXT16;
-
-            if(sqlType == "mediumtext")
-                return RANK_TEXT24;
+            if(sqlType == "longtext")
+                return RANK_TEXT_MAX;
 
             if(sqlType == "datetime")
                 return RANK_STATIC_DATETIME;
@@ -157,17 +160,14 @@ namespace LimeBean {
                 case RANK_DOUBLE:
                     return "double";
 
-                case RANK_TEXT5:
-                    return "varchar(32)";
+                case RANK_TEXT_36:
+                    return "varchar(36)";
 
-                case RANK_TEXT8:
-                    return "varchar(255)";
+                case RANK_TEXT_191:
+                    return "varchar(191)";
 
-                case RANK_TEXT16:
-                    return "text";
-
-                case RANK_TEXT24:
-                    return "mediumtext";
+                case RANK_TEXT_MAX:
+                    return "longtext";
 
                 case RANK_STATIC_DATETIME:
                     return "datetime";
