@@ -25,6 +25,7 @@ namespace LimeBean.Website {
             body = AddHeaderAnchors(body, headerIdList);            
 
             layout = layout.Replace("{{body}}", body);
+            layout = layout.Replace("{{version}}", ReadVersion());
             ValidateHeaderAnchors(headerIdList, layout);
             File.WriteAllText("../www/index.html", layout);
         }
@@ -94,6 +95,13 @@ namespace LimeBean.Website {
             var wrong = refs.Except(knownIdList);
             if(wrong.Any())
                 throw new Exception("Wrong header refs found: " + String.Join(" ", wrong));
+        }
+
+        static string ReadVersion() {            
+            return Regex.Match(
+                File.ReadAllText("../../LimeBean.NuGet/write-meta.ps1"), 
+                "meta_version.+?([\\d.]+)"
+            ).Groups[1].Value;
         }
     }
 

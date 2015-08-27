@@ -42,7 +42,7 @@ namespace LimeBean.Website {
         /// 
         ///     {
         ///         "dependencies": {
-        ///             "LimeBean": "1.0"
+        ///             "LimeBean": "{{version}}"
         ///         }
         ///     }
 
@@ -159,7 +159,7 @@ namespace LimeBean.Website {
             /// Nullable values are supported too:
             /// 
 #if CODE
-            bean.GetNullable<bool>("flag");
+            bean.Get<bool?>("flag");
 #endif
             /// And there is a companion `Put` method which is chainable:
             /// 
