@@ -94,7 +94,7 @@ namespace LimeBean {
                 value = Convert.ToString(value, CultureInfo.InvariantCulture);
             }
 
-            if(value is Int32 || value is Int64 || value is Byte || value is SByte || value is Int16 || value is UInt16 || value is UInt32 || value is Enum || value is Enum || value is Enum || value is Enum)
+            if(value is Int32 || value is Int64 || value is Byte || value is SByte || value is Int16 || value is UInt16 || value is UInt32 || value is Enum)
                 return _details.ConvertLongValue(Convert.ToInt64(value));
 
             if(value is Double || value is Single) {
