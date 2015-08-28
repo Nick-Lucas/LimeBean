@@ -13,11 +13,12 @@
 
 ## Supported Frameworks and Databases
 
-              | .NET | Mono | DNX    | UAP | Xamarin 
---------------|------|------|--------|-----|---------
-SQLite        | +    | +    | +      | +   | +
-MySQL/MariaDB | +    | +    | future | ?   | -
-SQL Server    | +    | +    | +      | ?   | -
+              | .NET | Mono | DNX      | UAP | Xamarin 
+--------------|------|------|----------|-----|---------
+SQLite        | +    | +    | +        | +   | +
+MySQL/MariaDB | +    | +    | CLR only | ?   | -
+PostgreSQL    | +    | +    | CLR only | ?   | -
+SQL Server    | +    | +    | +        | ?   | -
 
 ## Documentation
 

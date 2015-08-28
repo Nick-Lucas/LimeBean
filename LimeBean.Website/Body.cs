@@ -3,6 +3,10 @@ using System.Linq;
 using System.Data.Common;
 using System.Data.SQLite;
 using System.Web;
+using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
+using System.Data;
+using MySql.Data.Types;
 
 namespace LimeBean.Website {
 
@@ -24,6 +28,7 @@ namespace LimeBean.Website {
         /// 
         /// * **SQLite** 
         /// * **MySQL/MariaDB** 
+        /// * **PostgreSQL**
         /// * **SQL Server**
         /// 
         /// LimeBean doesn't rely on Reflection, IL emitting, etc. It's perfectly compatible with **Mono/Xamarin
@@ -50,17 +55,18 @@ namespace LimeBean.Website {
             /// ## Connect to Database
             /// LimeBean needs an ADO.NET driver to work with. Use one of the following:
             /// 
-            /// * [System.Data.SQLite](https://www.nuget.org/packages/System.Data.SQLite) for SQLite on .NET
-            /// * [Mono.Data.Sqlite](http://www.mono-project.com/download/) for SQLite on Mono and Xamarin
+            /// * [System.Data.SQLite](https://www.nuget.org/packages/System.Data.SQLite) for SQLite in .NET
+            /// * [Mono.Data.Sqlite](http://www.mono-project.com/download/) for SQLite in Mono and Xamarin
             /// * [Microsoft.Data.Sqlite](https://www.nuget.org/packages/Microsoft.Data.SQLite) for SQLite in ASP.NET 5 and Windows 10 Universal projects
             /// * [MySql.Data](https://www.nuget.org/packages/MySql.Data/) for MySQL or MariaDB
+            /// * [Npgsql](https://www.nuget.org/packages/Npgsql/) for PostgreSQL
             /// * [System.Data.SqlClient](https://msdn.microsoft.com/en-us/library/System.Data.SqlClient.aspx) for SQL Server
             /// 
             /// To start using LimeBean, create an instance of the `BeanApi` class:
             {
 #if CODE     
-                // Using a connection string and an ADO.NET provider factory
-                var api = new BeanApi("data source=/path/to/db", SQLiteFactory.Instance);
+                // Using a connection string and an ADO.NET provider factory                
+                var api = new BeanApi("data source=/path/to/db", MySqlClientFactory.Instance);
 #endif
             }
             {
@@ -148,21 +154,13 @@ namespace LimeBean.Website {
 
         void TypedAccessors(Bean bean) {
             /// ## Typed Accessors
-            /// Data values are stored within a bean as `IConvertible` which is a common interface implemented by
-            /// all primitive types. In most cases however, you need specific types, such as strings or numbers.
-            /// Beans provide the `Get<T>` method for this purpose:
-            /// 
+            /// To access bean properties in a strongly-typed fashion, use the `Get<T>` method:
 #if CODE
             bean.Get<string>("title");
             bean.Get<decimal>("price");
-#endif
-            /// Nullable values are supported too:
-            /// 
-#if CODE
-            bean.Get<bool?>("flag");
+            bean.Get<bool?>("someFlag");
 #endif
             /// And there is a companion `Put` method which is chainable:
-            /// 
 #if CODE
             bean
                 .Put("name", "Jane Doe")
@@ -428,6 +426,32 @@ namespace LimeBean.Website {
             api.Exec("SET autocommit = 0");
 #endif
             /// **NOTE:** all described functions accept parameters in the same form as [finder methods](#finding-beans-with-sql) do.
+        }
+
+        void CustomizingSqlCommands(BeanApi api, Bean bean) {
+            /// ## Customizing SQL Commands
+            /// In some cases it is necessary to manually adjust parameters in a SQL command which is about to execute.
+            /// This can be done in the `QueryExecuting` event handler. 
+            /// 
+            /// **Example 1.**  Force `datetime2` type for all dates (SQL Server):
+#if CODE
+            api.QueryExecuting += cmd => {
+                foreach(SqlParameter p in cmd.Parameters)
+                    if(p.Value is DateTime)
+                        p.SqlDbType = SqlDbType.DateTime2;
+            };
+#endif
+            /// **Example 2.** Work with `MySqlGeometry` objects (MySQL/MariaDB):
+#if CODE
+            api.QueryExecuting += cmd => {
+                foreach(MySqlParameter p in cmd.Parameters)
+                    if(p.Value is MySqlGeometry)
+                        p.MySqlDbType = MySqlDbType.Geometry;
+            };
+
+            bean["point"] = new MySqlGeometry(34.962, 34.066);
+            api.Store(bean);
+#endif
         }
 
         class DataValidation {
