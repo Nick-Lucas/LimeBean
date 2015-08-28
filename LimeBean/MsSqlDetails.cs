@@ -22,7 +22,8 @@ namespace LimeBean {
             RANK_TEXT_MAX = 6,
             RANK_STATIC_DATETIME = CommonDatabaseDetails.RANK_STATIC_BASE + 1,
             RANK_STATIC_DATETIME_OFFSET = CommonDatabaseDetails.RANK_STATIC_BASE + 2,
-            RANK_STATIC_GUID = CommonDatabaseDetails.RANK_STATIC_BASE + 3;
+            RANK_STATIC_GUID = CommonDatabaseDetails.RANK_STATIC_BASE + 3,
+            RANK_STATIC_BLOB = CommonDatabaseDetails.RANK_STATIC_BASE + 4;
 
         public string DbName {
             get { return "MsSql"; }
@@ -120,6 +121,9 @@ namespace LimeBean {
             if(value is Guid)
                 return RANK_STATIC_GUID;
 
+            if(value is byte[])
+                return RANK_STATIC_BLOB;
+
             return CommonDatabaseDetails.RANK_CUSTOM;
         }
 
@@ -154,6 +158,9 @@ namespace LimeBean {
 
                 case "231:-1":
                     return RANK_TEXT_MAX;
+
+                case "165:-1":
+                    return RANK_STATIC_BLOB;
             }
 
             return CommonDatabaseDetails.RANK_CUSTOM;
@@ -190,6 +197,9 @@ namespace LimeBean {
 
                 case RANK_STATIC_GUID:
                     return "uniqueidentifier";
+
+                case RANK_STATIC_BLOB:
+                    return "varbinary(MAX)";
             }
 
             throw new NotSupportedException();

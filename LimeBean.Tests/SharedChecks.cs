@@ -8,9 +8,10 @@ using Xunit;
 namespace LimeBean.Tests {
 
     static class SharedChecks {
-        public static Guid SAMPLE_GUID = Guid.NewGuid();
-        public static DateTime SAMPLE_DATETIME = new DateTime(1984, 6, 14, 11, 22, 33);
-        public static DateTimeOffset SAMPLE_DATETIME_OFFSET = new DateTimeOffset(SAMPLE_DATETIME, TimeSpan.FromHours(6));
+        public static readonly Guid SAMPLE_GUID = Guid.NewGuid();
+        public static readonly DateTime SAMPLE_DATETIME = new DateTime(1984, 6, 14, 11, 22, 33);
+        public static readonly DateTimeOffset SAMPLE_DATETIME_OFFSET = new DateTimeOffset(SAMPLE_DATETIME, TimeSpan.FromHours(6));
+        public static readonly byte[] SAMPLE_BLOB = new byte[] { 1, 2, 3 };
 
         public static void CheckSchemaReadingKeepsCache(IDatabaseAccess db, DatabaseStorage storage) {
             db.Exec("create table foo(bar int)");
@@ -111,41 +112,22 @@ namespace LimeBean.Tests {
             });
         }
 
-        public static void CheckCustomRank_MissingColumn(IDatabaseAccess db, DatabaseStorage storage, bool expectSuccess) {
+        public static void CheckCustomRank_MissingColumn(IDatabaseAccess db, DatabaseStorage storage) {
             storage.EnterFluidMode();
 
-            var row = MakeRow("a", new byte[] { 1, 2, 3 });
+            var row = MakeRow("a", new object());
 
             // Try create table
-
-            var x = Record.Exception(delegate() {
+            AssertCannotAddColumn(Record.Exception(delegate() {
                 storage.Store("foo1", row);
-            });
-
-            if(expectSuccess)
-                Assert.Null(x);
-            else
-                AssertCannotAddColumn(x);
-
-            // Try add column
+            }));
 
             storage.Store("foo2", MakeRow("b", 1));
 
-            x = Record.Exception(delegate() {
+            // Try add column
+            AssertCannotAddColumn(Record.Exception(delegate() {
                 storage.Store("foo2", row);
-            });
-
-            if(expectSuccess)
-                Assert.Null(x);
-            else
-                AssertCannotAddColumn(x);
-        }
-
-        public static void CheckCustomRank_ExistingColumn(IDatabaseAccess db, DatabaseStorage storage, string blobType) {
-            db.Exec("create table foo(id integer, b " + blobType + ")");
-            storage.Store("foo", MakeRow("b", new byte[] { 123 }));
-            var readBack = db.Cell<byte[]>(false, "select b from foo");
-            Assert.Equal(123, readBack[0]);
+            }));
         }
 
         public static IDictionary<string, object> MakeRow(params object[] data) {

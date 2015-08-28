@@ -47,6 +47,7 @@ namespace LimeBean.Tests {
                 dt  datetime2,
                 dto datetimeoffset,
                 g   uniqueidentifier,
+                bl  varbinary(MAX),
 
                 x1  bit,
                 x2  decimal,
@@ -54,9 +55,10 @@ namespace LimeBean.Tests {
                 x4  varchar(32),
                 x5  nvarchar(33),
                 x6  datetime,
+                x7  varbinary(123),
 
-                x7  int not null,
-                x8  int default 123
+                x8  int not null,
+                x9  int default 123
             )");
 
             var schema = _storage.GetSchema();
@@ -75,8 +77,9 @@ namespace LimeBean.Tests {
             Assert.Equal(MsSqlDetails.RANK_STATIC_DATETIME, cols["dt"]);
             Assert.Equal(MsSqlDetails.RANK_STATIC_DATETIME_OFFSET, cols["dto"]);
             Assert.Equal(MsSqlDetails.RANK_STATIC_GUID, cols["g"]);
+            Assert.Equal(MsSqlDetails.RANK_STATIC_BLOB, cols["bl"]);
 
-            foreach(var i in Enumerable.Range(1, 8))
+            foreach(var i in Enumerable.Range(1, 9))
                 Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x" + i]);
         }
 
@@ -95,7 +98,8 @@ namespace LimeBean.Tests {
                 { "p8", "".PadRight(4001, 'a') },
                 { "p9", DateTime.Now },
                 { "p10", DateTimeOffset.Now },
-                { "p11", Guid.NewGuid() }
+                { "p11", Guid.NewGuid() },
+                { "p12", new byte[0] }
             };
 
             _storage.Store("foo", data);
@@ -112,6 +116,7 @@ namespace LimeBean.Tests {
             Assert.Equal(MsSqlDetails.RANK_STATIC_DATETIME, cols["p9"]);
             Assert.Equal(MsSqlDetails.RANK_STATIC_DATETIME_OFFSET, cols["p10"]);
             Assert.Equal(MsSqlDetails.RANK_STATIC_GUID, cols["p11"]);
+            Assert.Equal(MsSqlDetails.RANK_STATIC_BLOB, cols["p12"]);
         }
 
         [Fact]
@@ -170,6 +175,7 @@ namespace LimeBean.Tests {
                 checker.Check(SharedChecks.SAMPLE_DATETIME, SharedChecks.SAMPLE_DATETIME);
                 checker.Check(SharedChecks.SAMPLE_DATETIME_OFFSET, SharedChecks.SAMPLE_DATETIME_OFFSET);
                 checker.Check(SharedChecks.SAMPLE_GUID, SharedChecks.SAMPLE_GUID);
+                checker.Check(SharedChecks.SAMPLE_BLOB, SharedChecks.SAMPLE_BLOB);
 
                 // extremal vaues
                 SharedChecks.CheckRoundtripOfExtremalValues(checker, checkDateTime: true, checkDateTimeOffset: true);
@@ -203,12 +209,7 @@ namespace LimeBean.Tests {
 
         [Fact]
         public void CustomRank_MissingColumn() {
-            SharedChecks.CheckCustomRank_MissingColumn(_db, _storage, false);
-        }
-
-        [Fact]
-        public void CustomRank_ExistingColumn() {
-            SharedChecks.CheckCustomRank_ExistingColumn(_db, _storage, "varbinary(max)");
+            SharedChecks.CheckCustomRank_MissingColumn(_db, _storage);
         }
 
         [Fact]

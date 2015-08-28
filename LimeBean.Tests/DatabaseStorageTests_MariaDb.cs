@@ -55,7 +55,9 @@ namespace LimeBean.Tests {
                 t2  VarChar(191),
                 t3  LongText,
 
-                dt1 datetime,                
+                dt1 datetime,
+
+                b1  longblob,
 
                 x1  smallint,
                 x2  mediumint,
@@ -65,7 +67,7 @@ namespace LimeBean.Tests {
                 x6  date,
                 x7  timestamp,
                 x8  char(36),
-                x9 varchar(123),
+                x9  varchar(123),
                 x10 binary,
                 x11 blob,
                 x12 text,
@@ -102,6 +104,8 @@ namespace LimeBean.Tests {
 
             Assert.Equal(MariaDbDetails.RANK_STATIC_DATETIME, t["dt1"]);
 
+            Assert.Equal(MariaDbDetails.RANK_STATIC_BLOB, t["b1"]);
+
             foreach(var i in Enumerable.Range(1, 15))
                 Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, t["x" + i]);
         }
@@ -119,7 +123,8 @@ namespace LimeBean.Tests {
                 { "p6", "abc" },
                 { "p7", "".PadRight(37, 'a') },
                 { "p8", "".PadRight(192, 'a') },
-                { "p9", DateTime.Now }
+                { "p9", DateTime.Now },
+                { "p10", new byte[0] }
             };
 
             _storage.Store("foo", data);
@@ -134,6 +139,7 @@ namespace LimeBean.Tests {
             Assert.Equal(MariaDbDetails.RANK_TEXT_191, cols["p7"]);
             Assert.Equal(MariaDbDetails.RANK_TEXT_MAX, cols["p8"]);
             Assert.Equal(MariaDbDetails.RANK_STATIC_DATETIME, cols["p9"]);
+            Assert.Equal(MariaDbDetails.RANK_STATIC_BLOB, cols["p10"]);
         }
 
         [Fact]
@@ -191,6 +197,7 @@ namespace LimeBean.Tests {
                 checker.Check(3.14, 3.14);
                 checker.Check("hello", "hello");
                 checker.Check(SharedChecks.SAMPLE_DATETIME, SharedChecks.SAMPLE_DATETIME);
+                checker.Check(SharedChecks.SAMPLE_BLOB, SharedChecks.SAMPLE_BLOB);
 
                 // extremal vaues
                 SharedChecks.CheckRoundtripOfExtremalValues(checker, checkDateTime: true);
@@ -225,12 +232,7 @@ namespace LimeBean.Tests {
 
         [Fact]
         public void CustomRank_MissingColumn() {
-            SharedChecks.CheckCustomRank_MissingColumn(_db, _storage, false);
-        }
-
-        [Fact]
-        public void CustomRank_ExistingColumn() {
-            SharedChecks.CheckCustomRank_ExistingColumn(_db, _storage, "tinyblob");
+            SharedChecks.CheckCustomRank_MissingColumn(_db, _storage);
         }
 
         [Fact]

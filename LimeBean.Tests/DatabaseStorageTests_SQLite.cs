@@ -192,6 +192,7 @@ namespace LimeBean.Tests {
                 checker.Check("hello", "hello");
                 checker.Check(123L, 123L);
                 checker.Check(3.14, 3.14);
+                checker.Check(SharedChecks.SAMPLE_BLOB, SharedChecks.SAMPLE_BLOB);
 
                 // extremal vaues
                 SharedChecks.CheckRoundtripOfExtremalValues(checker);
@@ -325,16 +326,6 @@ namespace LimeBean.Tests {
         [Fact]
         public void GuidQuery() {
             SharedChecks.CheckGuidQuery(_db, _storage);
-        }
-
-        [Fact]
-        public void CustomRank_MissingColumn() {
-            SharedChecks.CheckCustomRank_MissingColumn(_db, _storage, true);
-        }
-
-        [Fact]
-        public void CustomRank_ExistingColumn() {
-            SharedChecks.CheckCustomRank_ExistingColumn(_db, _storage, "blob");
         }
 
     }

@@ -44,6 +44,7 @@ namespace LimeBean.Tests {
                 ts  timestamp,                
                 tz  timestamptz,
                 g   uuid,
+                bl  bytea,
 
                 b2  BOOL,
                 i2  INT4,
@@ -87,6 +88,8 @@ namespace LimeBean.Tests {
 
             Assert.Equal(PgSqlDetails.RANK_STATIC_GUID, cols["g"]);
 
+            Assert.Equal(PgSqlDetails.RANK_STATIC_BLOB, cols["bl"]);
+
             foreach(var i in Enumerable.Range(1, 6))
                 Assert.Equal(CommonDatabaseDetails.RANK_CUSTOM, cols["x" + i]);
         }
@@ -106,7 +109,8 @@ namespace LimeBean.Tests {
                 { "p8", "abc" },
                 { "p9", DateTime.Now },
                 { "p10", DateTimeOffset.Now },
-                { "p11", Guid.NewGuid() }
+                { "p11", Guid.NewGuid() },
+                { "p12", new byte[0] }
             };
 
             _storage.Store("foo", data);
@@ -123,6 +127,7 @@ namespace LimeBean.Tests {
             Assert.Equal(PgSqlDetails.RANK_STATIC_DATETIME, cols["p9"]);
             Assert.Equal(PgSqlDetails.RANK_STATIC_DATETIME_OFFSET, cols["p10"]);
             Assert.Equal(PgSqlDetails.RANK_STATIC_GUID, cols["p11"]);
+            Assert.Equal(PgSqlDetails.RANK_STATIC_BLOB, cols["p12"]);
         }
 
         [Fact]
@@ -192,6 +197,7 @@ namespace LimeBean.Tests {
                 checker.Check("hello", "hello");
                 checker.Check(SharedChecks.SAMPLE_DATETIME, SharedChecks.SAMPLE_DATETIME);
                 checker.Check(SharedChecks.SAMPLE_GUID, SharedChecks.SAMPLE_GUID);
+                checker.Check(SharedChecks.SAMPLE_BLOB, SharedChecks.SAMPLE_BLOB);
 
                 // https://github.com/npgsql/npgsql/issues/11
                 checker.Check(
@@ -225,12 +231,7 @@ namespace LimeBean.Tests {
 
         [Fact]
         public void CustomRank_MissingColumn() {
-            SharedChecks.CheckCustomRank_MissingColumn(_db, _storage, false);
-        }
-
-        [Fact]
-        public void CustomRank_ExistingColumn() {
-            SharedChecks.CheckCustomRank_ExistingColumn(_db, _storage, "bytea");
+            SharedChecks.CheckCustomRank_MissingColumn(_db, _storage);
         }
 
     }

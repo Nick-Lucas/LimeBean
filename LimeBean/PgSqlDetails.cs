@@ -19,7 +19,8 @@ namespace LimeBean {
             RANK_TEXT = 5,
             RANK_STATIC_DATETIME = CommonDatabaseDetails.RANK_STATIC_BASE + 1,
             RANK_STATIC_DATETIME_OFFSET = CommonDatabaseDetails.RANK_STATIC_BASE + 2,
-            RANK_STATIC_GUID = CommonDatabaseDetails.RANK_STATIC_BASE + 3;
+            RANK_STATIC_GUID = CommonDatabaseDetails.RANK_STATIC_BASE + 3,
+            RANK_STATIC_BLOB = CommonDatabaseDetails.RANK_STATIC_BASE + 4;
 
         public string DbName {
             get { return "PgSql"; }
@@ -104,6 +105,9 @@ namespace LimeBean {
             if(value is Guid)
                 return RANK_STATIC_GUID;
 
+            if(value is byte[])
+                return RANK_STATIC_BLOB;
+
             return CommonDatabaseDetails.RANK_CUSTOM;
         }
 
@@ -135,6 +139,9 @@ namespace LimeBean {
 
                 case "uuid":
                     return RANK_STATIC_GUID;
+
+                case "bytea":
+                    return RANK_STATIC_BLOB;
             }
 
             return CommonDatabaseDetails.RANK_CUSTOM;
@@ -168,6 +175,9 @@ namespace LimeBean {
 
                 case RANK_STATIC_GUID:
                     return "uuid";
+
+                case RANK_STATIC_BLOB:
+                    return "bytea";
             }
 
             throw new NotSupportedException();

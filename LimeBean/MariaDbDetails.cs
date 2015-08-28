@@ -23,7 +23,8 @@ namespace LimeBean {
             RANK_TEXT_191 = 5,  // 767-byte index limit with 4 bytes per char
             RANK_TEXT_MAX = 6,
 
-            RANK_STATIC_DATETIME = CommonDatabaseDetails.RANK_STATIC_BASE + 1;
+            RANK_STATIC_DATETIME = CommonDatabaseDetails.RANK_STATIC_BASE + 1,
+            RANK_STATIC_BLOB = CommonDatabaseDetails.RANK_STATIC_BASE + 2;
 
         string _charset;
 
@@ -112,6 +113,9 @@ namespace LimeBean {
             if(value is Guid)
                 return RANK_TEXT_36;
 
+            if(value is byte[])
+                return RANK_STATIC_BLOB;
+
             return CommonDatabaseDetails.RANK_CUSTOM;
         }
 
@@ -143,6 +147,9 @@ namespace LimeBean {
             if(sqlType == "datetime")
                 return RANK_STATIC_DATETIME;
 
+            if(sqlType == "longblob")
+                return RANK_STATIC_BLOB;
+
             return CommonDatabaseDetails.RANK_CUSTOM;
         }
 
@@ -171,6 +178,9 @@ namespace LimeBean {
 
                 case RANK_STATIC_DATETIME:
                     return "datetime";
+
+                case RANK_STATIC_BLOB:
+                    return "longblob";
             }
 
             throw new NotSupportedException();
