@@ -42,9 +42,6 @@ namespace LimeBean {
             return ":p" + index;
         }
 
-        public void CustomizeParam(DbParameter p) {
-        }
-
         public string QuoteName(string name) {
             return '"' + name + '"';
         }

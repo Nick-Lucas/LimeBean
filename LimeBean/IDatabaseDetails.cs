@@ -13,7 +13,6 @@ namespace LimeBean {
         bool SupportsDecimal { get; }
 
         string GetParamName(int index);
-        void CustomizeParam(DbParameter p);
         string QuoteName(string name);
 
         void ExecInitCommands(IDatabaseAccess db);

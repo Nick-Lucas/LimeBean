@@ -45,14 +45,6 @@ namespace LimeBean {
             return "@p" + index;
         }
 
-        public void CustomizeParam(DbParameter p) {
-            if(p.Value is DateTime) {
-                var date = (DateTime)p.Value;
-                if(date.Year < 1753)
-                    p.DbType = DbType.DateTime2;
-            }
-        }
-
         public string QuoteName(string name) {
             if(name.Contains("]"))
                 throw new ArgumentException();

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
@@ -165,6 +166,14 @@ namespace LimeBean.Tests {
             AssertExtensions.WithCulture("ru", delegate() {
                 _storage.EnterFluidMode();
                 var checker = new RoundtripChecker(_db, _storage);
+
+                // similar to https://github.com/StackExchange/dapper-dot-net/issues/229
+                _db.QueryExecuting += cmd => {
+                    foreach(SqlParameter p in cmd.Parameters) {
+                        if(Equals(p.Value, DateTime.MinValue))
+                            p.SqlDbType = SqlDbType.DateTime2;
+                    }
+                };
 
                 // supported ranks
                 checker.Check(null, null);
