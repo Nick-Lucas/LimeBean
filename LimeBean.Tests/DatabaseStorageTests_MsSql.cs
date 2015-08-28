@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using Xunit;
@@ -210,6 +211,13 @@ namespace LimeBean.Tests {
         [Fact]
         public void CustomRank_MissingColumn() {
             SharedChecks.CheckCustomRank_MissingColumn(_db, _storage);
+        }
+
+        [Fact]
+        public void CustomRank_ExistingColumn() {
+            _db.Exec("create table foo(id int, p smallmoney)");                       
+            _storage.Store("foo", SharedChecks.MakeRow("p", new SqlMoney(9.9)));
+            Assert.Equal(9.900M, _db.Cell<object>(false, "select p from foo"));
         }
 
         [Fact]

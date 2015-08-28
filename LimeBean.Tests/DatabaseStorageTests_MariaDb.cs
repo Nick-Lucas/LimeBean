@@ -1,5 +1,7 @@
 ﻿#if !NO_MARIADB
 using LimeBean.Tests.Fixtures;
+using MySql.Data.MySqlClient;
+using MySql.Data.Types;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -233,6 +235,24 @@ namespace LimeBean.Tests {
         [Fact]
         public void CustomRank_MissingColumn() {
             SharedChecks.CheckCustomRank_MissingColumn(_db, _storage);
+        }
+
+        [Fact]
+        public void CustomRank_ExistingColumn() {
+            _db.Exec("create table foo(id int, p geometry)");
+
+            _db.QueryExecuting += cmd => {
+                foreach(MySqlParameter p in cmd.Parameters) {
+                    if(p.Value is MySqlGeometry)
+                        p.MySqlDbType = MySqlDbType.Geometry;
+                }
+            };
+
+            _storage.Store("foo", SharedChecks.MakeRow("p", new MySqlGeometry(54.2, 37.61667)));
+
+            // http://stackoverflow.com/q/30584522
+            var blob = _db.Cell<byte[]>(false, "select p from foo");
+            Assert.Equal(54.2, new MySqlGeometry(MySqlDbType.Geometry, blob).XCoordinate);
         }
 
         [Fact]

@@ -1,5 +1,6 @@
 ﻿#if !NO_PGSQL
 using LimeBean.Tests.Fixtures;
+using NpgsqlTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -232,6 +233,13 @@ namespace LimeBean.Tests {
         [Fact]
         public void CustomRank_MissingColumn() {
             SharedChecks.CheckCustomRank_MissingColumn(_db, _storage);
+        }
+
+        [Fact]
+        public void CustomRank_ExistingColumn() {
+            _db.Exec("create table foo(id int, p point)");
+            _storage.Store("foo", SharedChecks.MakeRow("p", new NpgsqlPoint(54.2, 37.61667)));
+            Assert.Equal(54.2, _db.Cell<NpgsqlPoint>(false, "select p from foo").X);
         }
 
     }
