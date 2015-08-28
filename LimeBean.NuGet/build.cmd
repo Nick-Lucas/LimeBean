@@ -18,6 +18,7 @@ for %%f in (%META_FILES%) do (
 
 call dnu restore ..\LimeBean.Dnx\LimeBean --quiet || goto error
 call dnu pack ..\LimeBean.Dnx\LimeBean --configuration Release --quiet || goto error
+nuget restore ..\LimeBean.Xamarin\LimeBean.Xamarin.sln -verbosity quiet || goto error
 %MSBUILD% ..\LimeBean.Xamarin\LimeBean.Xamarin.sln || goto error
 nuget pack LimeBean.Xamarin.nuspec || goto error
 copy ..\LimeBean.Dnx\LimeBean\bin\Release\*.nupkg . || goto error
