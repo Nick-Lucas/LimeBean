@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Data.Common;
+using System.Reflection;
 
 namespace LimeBean {
 
 #if DOTNET || PCL
 
-    using System.Reflection;
-
-    static partial class Extensions {
+    partial class Extensions {
         internal static bool IsEnum(this Type type) {
             return type.GetTypeInfo().IsEnum;
         }
@@ -17,13 +17,11 @@ namespace LimeBean {
 
 #else
 
-    using System.Data.Common;
-
     [Serializable]
-    public partial class Bean {
+    partial class Bean {
     }
 
-    static partial class Extensions {
+    partial class Extensions {
         internal static bool IsEnum(this Type type) {
             return type.IsEnum;
         }
@@ -36,7 +34,7 @@ namespace LimeBean {
 
 #if !DOTNET && !PCL && !XAMARIN
 
-    public partial class BeanApi {
+    partial class BeanApi {
         public BeanApi(string connectionString, string providerName)
             : this(connectionString, DbProviderFactories.GetFactory(providerName)) {
         }
