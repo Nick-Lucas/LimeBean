@@ -1,0 +1,2 @@
+Uses custom build of System.Data.Common and Microsoft.Data.Sqlite: https://github.com/AlekseyMartynov/Microsoft.Data.Sqlite/tree/pcl
+Requires installed sqlite-wp81-winrt-NNN.vsix and sqlite-winrt81-NNN.vsix from https://www.sqlite.org/download.html

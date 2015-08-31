@@ -76,7 +76,7 @@ namespace LimeBean.Tests {
             var cmd1 = new DbCommandDescriptor("abc", new { a = 123 });
             var cmd2 = new DbCommandDescriptor("abc", new { a = 123 });
 
-            var dict = new Hashtable();
+            var dict = new Dictionary<object, object>();
             dict[cmd1] = "ok";
 
             Assert.Equal("ok", dict[cmd2]);        

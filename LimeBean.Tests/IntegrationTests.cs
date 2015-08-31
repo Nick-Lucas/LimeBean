@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using Xunit;
@@ -56,7 +55,7 @@ namespace LimeBean.Tests {
             Assert.Equal("SQLite", new BeanApi(SQLitePortability.CreateConnection()).CreateDetails().DbName);
 
 #if !NO_MSSQL
-            Assert.Equal("MsSql", new BeanApi(new SqlConnection()).CreateDetails().DbName);
+            Assert.Equal("MsSql", new BeanApi(new System.Data.SqlClient.SqlConnection()).CreateDetails().DbName);
 #endif
 
 #if !NO_MARIADB

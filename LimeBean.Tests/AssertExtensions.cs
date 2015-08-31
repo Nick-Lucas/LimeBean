@@ -26,6 +26,8 @@ namespace LimeBean.Tests {
         static void SetThreadCulture(CultureInfo value) {
 #if DNXCORE50
             CultureInfo.CurrentCulture = value;
+#elif WINDOWS_PHONE_APP
+            #warning TODO
 #else
             Thread.CurrentThread.CurrentCulture = value; 
 #endif

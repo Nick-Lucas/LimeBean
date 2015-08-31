@@ -2,7 +2,7 @@
 
 namespace LimeBean {
 
-#if DOTNET
+#if DOTNET || PCL
 
     using System.Reflection;
 
@@ -23,20 +23,22 @@ namespace LimeBean {
     public partial class Bean {
     }
 
-#if !XAMARIN
-    public partial class BeanApi {
-        public BeanApi(string connectionString, string providerName)
-            : this(connectionString, DbProviderFactories.GetFactory(providerName)) {
-        }
-    }
-#endif
-
     static partial class Extensions {
         internal static bool IsEnum(this Type type) {
             return type.IsEnum;
         }
         internal static bool IsGenericType(this Type type) {
             return type.IsGenericType;
+        }
+    }
+
+#endif
+
+#if !DOTNET && !PCL && !XAMARIN
+
+    public partial class BeanApi {
+        public BeanApi(string connectionString, string providerName)
+            : this(connectionString, DbProviderFactories.GetFactory(providerName)) {
         }
     }
 
