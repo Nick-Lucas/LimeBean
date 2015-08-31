@@ -23,17 +23,18 @@ before_build:
   - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.ps1'))
   - dnvm install %LIME_DNX_VERSION% -r coreclr
   - dnvm install %LIME_DNX_VERSION% -r clr
-  - msbuild /version
 
   # Restore packages
   - dnu restore LimeBean.Dnx --quiet
   - appveyor DownloadFile https://nuget.org/nuget.exe
   - nuget restore LimeBean.sln
   - nuget restore LimeBean.Xamarin\LimeBean.Xamarin.sln
+  - nuget restore LimeBean.Pcl\LimeBean.Pcl.sln
 
 build_script:
   - msbuild LimeBean.sln /v:m
   - msbuild LimeBean.Xamarin\LimeBean.Xamarin.sln /v:m
+  - msbuild LimeBean.Pcl\LimeBean\LimeBean.csproj /v:m
   - dnu build LimeBean.Dnx\LimeBean --quiet
   - dnu build LimeBean.Dnx\LimeBean.Tests --quiet
 
