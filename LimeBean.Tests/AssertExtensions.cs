@@ -26,7 +26,7 @@ namespace LimeBean.Tests {
         static void SetThreadCulture(CultureInfo value) {
 #if DNXCORE50
             CultureInfo.CurrentCulture = value;
-#elif WINDOWS_PHONE_APP
+#elif WINDOWS_PHONE_APP || WINDOWS_APP
             // No reliable way to change culture in runtime.
             // Instead, default project language is set to "it".
 #else
