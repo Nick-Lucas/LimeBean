@@ -23,6 +23,7 @@ before_build:
   - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.ps1'))
   - dnvm install %LIME_DNX_VERSION% -r coreclr
   - dnvm install %LIME_DNX_VERSION% -r clr
+  - msbuild /version
 
   # Restore packages
   - dnu restore LimeBean.Dnx --quiet
