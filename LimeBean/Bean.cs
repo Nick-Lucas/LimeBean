@@ -65,7 +65,7 @@ namespace LimeBean {
 
         public Bean Put<T>(string name, T? value) where T : struct {
             if(value != null)
-                Put(name, value.Value);
+                this[name] = value.Value;
             else
                 this[name] = null;
             return this;

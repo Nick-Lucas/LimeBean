@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -7,3 +8,4 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyVersion("0.0")]
 [assembly: AssemblyDescription("%lime_description%")]
 [assembly: AssemblyCopyright("%lime_copyright%")]
+[assembly: CLSCompliant(true)]
