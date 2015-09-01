@@ -2,7 +2,7 @@
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
+    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{78CDECED-DD4B-4876-87CC-D5B17C2A99C7}</ProjectGuid>
@@ -13,8 +13,8 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <TargetFrameworkProfile>Profile151</TargetFrameworkProfile>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Profile111</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,11 +35,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Data.Sqlite">
-      <HintPath>..\..\packages\Microsoft.Data.Sqlite.Pcl.1.0.0-beta6\lib\portable-net451+win81+wpa81\Microsoft.Data.Sqlite.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.Data.Sqlite.Pcl.1.0.0-beta6-2\lib\portable-net45+win+wpa81+MonoAndroid10+xamarinios10+MonoTouch10\Microsoft.Data.Sqlite.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Data.Common">
-      <HintPath>..\..\packages\Microsoft.Data.Sqlite.Pcl.1.0.0-beta6\lib\portable-net451+win81+wpa81\System.Data.Common.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.Data.Sqlite.Pcl.1.0.0-beta6-2\lib\portable-net45+win+wpa81+MonoAndroid10+xamarinios10+MonoTouch10\System.Data.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
