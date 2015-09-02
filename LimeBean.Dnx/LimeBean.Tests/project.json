@@ -18,7 +18,8 @@
                 "define": [ "NO_MARIADB", "NO_PGSQL" ]
             },
             "dependencies": {
-                "System.Data.SqlClient": "4.0.0-*",
+                "System.Data.SqlClient": "4.0.0-23224",
+                "System.Text.Encoding.CodePages": "4.0.1-beta-*",
                 "System.Runtime.Serialization.Primitives": "4.0.10-*"
             }
         },
