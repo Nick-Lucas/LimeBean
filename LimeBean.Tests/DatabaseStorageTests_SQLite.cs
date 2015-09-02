@@ -10,6 +10,7 @@ namespace LimeBean.Tests {
     public class DatabaseStorageTests_SQLite : IDisposable {
         DbConnection _conn;
         IDatabaseAccess _db;
+        KeyUtil _keys;
         DatabaseStorage _storage;
 
         public DatabaseStorageTests_SQLite() {
@@ -19,7 +20,8 @@ namespace LimeBean.Tests {
             IDatabaseDetails details = new SQLiteDetails();
 
             _db = new DatabaseAccess(_conn, details);
-            _storage = new DatabaseStorage(details, _db, new KeyUtil());
+            _keys = new KeyUtil();
+            _storage = new DatabaseStorage(details, _db, _keys);
         }
 
         public void Dispose() {
@@ -326,6 +328,16 @@ namespace LimeBean.Tests {
         [Fact]
         public void GuidQuery() {
             SharedChecks.CheckGuidQuery(_db, _storage);
+        }
+
+        [Fact]
+        public void CompoundKey() {
+            SharedChecks.CheckCompoundKey(_storage, _keys);
+        }
+
+        [Fact]
+        public void StoringNull() {
+            SharedChecks.CheckStoringNull(_storage);
         }
 
     }

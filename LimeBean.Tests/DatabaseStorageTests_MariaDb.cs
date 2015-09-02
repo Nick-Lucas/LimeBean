@@ -15,18 +15,18 @@ namespace LimeBean.Tests {
     public class DatabaseStorageTests_MariaDb : IDisposable, IClassFixture<MariaDbConnectionFixture> {
         ConnectionFixture _fixture;
         IDatabaseAccess _db;
+        KeyUtil _keys;
         DatabaseStorage _storage;
 
         public DatabaseStorageTests_MariaDb(MariaDbConnectionFixture fixture) {
             _fixture = fixture;
             _fixture.SetUpDatabase();
 
-            IDatabaseDetails details = new MariaDbDetails();
-            IDatabaseAccess db = new DatabaseAccess(_fixture.Connection, details);            
-            DatabaseStorage storage = new DatabaseStorage(details, db, new KeyUtil());
+            var details = new MariaDbDetails();
 
-            _db = db;
-            _storage = storage;
+            _db = new DatabaseAccess(_fixture.Connection, details);
+            _keys = new KeyUtil();
+            _storage = new DatabaseStorage(details, _db, _keys);
         }
 
         public void Dispose() {
@@ -230,6 +230,16 @@ namespace LimeBean.Tests {
         [Fact]
         public void GuidQuery() {
             SharedChecks.CheckGuidQuery(_db, _storage);
+        }
+
+        [Fact]
+        public void CompoundKey() {
+            SharedChecks.CheckCompoundKey(_storage, _keys);
+        }
+
+        [Fact]
+        public void StoringNull() {
+            SharedChecks.CheckStoringNull(_storage);
         }
 
         [Fact]

@@ -130,6 +130,39 @@ namespace LimeBean.Tests {
             }));
         }
 
+        public static void CheckCompoundKey(DatabaseStorage storage, KeyUtil keys) {
+            storage.EnterFluidMode();
+
+            keys.RegisterKey("foo", new[] { "k1", "k2" }, null);
+
+            var row = MakeRow(
+                "k1", "text",
+                "k2", Guid.NewGuid(),
+                "v", "hello"
+            );
+
+            var id = storage.Store("foo", row) as CompoundKey;
+            Assert.Equal(row["k1"], id["k1"]);
+            Assert.Equal(row["k2"], id["k2"]);
+
+            row = storage.Load("foo", id);
+            Assert.Equal("hello", row["v"]);
+        }
+
+        public static void CheckStoringNull(DatabaseStorage storage) {
+            storage.EnterFluidMode();
+
+            var row = MakeRow("p", 1);
+            var id = storage.Store("foo", row);
+
+            row = storage.Load("foo", id);
+            row["p"] = null;
+            storage.Store("foo", row);
+
+            row = storage.Load("foo", id);
+            Assert.Null(row["p"]);
+        }
+
         public static IDictionary<string, object> MakeRow(params object[] data) {
             var row = new Dictionary<string, object>();
             for(var i = 0; i < data.Length; i += 2) {

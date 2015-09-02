@@ -19,6 +19,9 @@ namespace LimeBean.Tests {
 
             bean["x"] = null;
             Assert.Null(bean["x"]);
+
+            bean["x"] = new Nullable<int>(123);
+            Assert.Equal(123, bean["x"]);
         }
 
         [Fact]

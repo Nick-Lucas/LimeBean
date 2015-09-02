@@ -63,14 +63,6 @@ namespace LimeBean {
             return this;
         }
 
-        public Bean Put<T>(string name, T? value) where T : struct {
-            if(value != null)
-                this[name] = value.Value;
-            else
-                this[name] = null;
-            return this;
-        }
-
         // Import / Export
 
         internal IDictionary<string, object> Export() {
