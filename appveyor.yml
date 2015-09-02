@@ -1,6 +1,6 @@
 version: '{build}'
 
-clone_depth: 1
+clone_depth: 50
 
 environment:
   LIME_TEST_MARIA_PWD: Password12!
