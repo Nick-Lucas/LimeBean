@@ -48,8 +48,9 @@
       <HintPath>..\..\packages\Xamarin.Forms.1.4.4.6392\lib\MonoAndroid10\FormsViewGroup.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Data.Sqlite">
-      <HintPath>..\..\packages\Microsoft.Data.Sqlite.Pcl.1.0.0-beta6-2\lib\portable-net45+win+wpa81+MonoAndroid10+xamarinios10+MonoTouch10\Microsoft.Data.Sqlite.dll</HintPath>
+    <Reference Include="Microsoft.Data.Sqlite, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Microsoft.Data.Sqlite.Pcl.1.0.0-beta7\lib\portable-net45+win+wpa81+MonoAndroid10+xamarinios10+MonoTouch10\Microsoft.Data.Sqlite.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Mono.Android" />
@@ -57,13 +58,13 @@
     <Reference Include="System" />
     <Reference Include="System.Collections" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Runtime" />
-    <Reference Include="System.Threading.Tasks" />
     <Reference Include="System.Data.Common, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Microsoft.Data.Sqlite.Pcl.1.0.0-beta6-2\lib\portable-net45+win+wpa81+MonoAndroid10+xamarinios10+MonoTouch10\System.Data.Common.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.Data.Sqlite.Pcl.1.0.0-beta7\lib\portable-net45+win+wpa81+MonoAndroid10+xamarinios10+MonoTouch10\System.Data.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Runtime" />
+    <Reference Include="System.Threading.Tasks" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
     <Reference Include="Xamarin.Android.Support.v4">

@@ -90,12 +90,12 @@
   <ItemGroup>
     <Reference Include="Microsoft.Data.Sqlite, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Microsoft.Data.Sqlite.Pcl.1.0.0-beta6-2\lib\portable-net45+win+wpa81+MonoAndroid10+xamarinios10+MonoTouch10\Microsoft.Data.Sqlite.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.Data.Sqlite.Pcl.1.0.0-beta7\lib\portable-net45+win+wpa81+MonoAndroid10+xamarinios10+MonoTouch10\Microsoft.Data.Sqlite.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Data.Common, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Microsoft.Data.Sqlite.Pcl.1.0.0-beta6-2\lib\portable-net45+win+wpa81+MonoAndroid10+xamarinios10+MonoTouch10\System.Data.Common.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.Data.Sqlite.Pcl.1.0.0-beta7\lib\portable-net45+win+wpa81+MonoAndroid10+xamarinios10+MonoTouch10\System.Data.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Xamarin.Forms.Core">
