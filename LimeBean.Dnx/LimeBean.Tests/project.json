@@ -5,9 +5,9 @@
 
     "dependencies": {
         "LimeBean": "",
-        "Microsoft.Data.SQLite": "1.0.0-beta6",
-        "xunit": "2.1-beta4-*",
-        "xunit.runner.dnx": "2.1-beta4-*"            
+        "Microsoft.Data.SQLite": "1.0.0-beta7",
+        "xunit": "2.1-rc1-*",
+        "xunit.runner.dnx": "2.1-beta5-*"            
     },
     
     "compile": "../../LimeBean.Tests/**/*.cs",

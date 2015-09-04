@@ -1,3 +1,4 @@
+# ping3
 language: csharp
 sudo: required
 mono: nightly
@@ -11,20 +12,23 @@ env:
     - LIME_TEST_MARIA_USER=root
     - LIME_TEST_MARIA_PWD=""
     - LIME_TEST_PGSQL_PWD=""
-    - LIME_DNX_VERSION=1.0.0-beta6
+    - LIME_DNX_VERSION=1.0.0-beta7
     - LIME_XUNIT_CONSOLE_VERSION=2.1.0-rc1-build3124
 
 install:
   - ./travis-update-sqlite.sh
+  - ./travis-coreclr-prereq.sh
 
   # Install DNX
   - curl -sSL https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.sh | DNX_BRANCH=dev sh && source ~/.dnx/dnvm/dnvm.sh
   - dnvm install $LIME_DNX_VERSION -r mono
+  - dnvm install $LIME_DNX_VERSION -r coreclr
 
   # Install NuGet
   - wget https://nuget.org/nuget.exe
 
   # Restore packages
+  - dnvm use $LIME_DNX_VERSION -r mono
   - dnu restore LimeBean.Dnx
   - mono ./nuget.exe restore LimeBean.sln -verbosity detailed
 
@@ -34,6 +38,14 @@ script:
   - dnu build LimeBean.Dnx/LimeBean --quiet
   - dnu build LimeBean.Dnx/LimeBean.Tests --quiet
 
-  # Test
+  # Test (Mono)
   - mono ./packages/xunit.runner.console.$LIME_XUNIT_CONSOLE_VERSION/tools/xunit.console.exe ./bin/LimeBean.Tests.dll -noappdomain -notrait db=mssql
-  - dnx LimeBean.Dnx/LimeBean.Tests xunit.runner.dnx -notrait db=mssql
+
+  # Test (DNX Mono)
+  - dnvm use $LIME_DNX_VERSION -r mono
+  - dnx -p LimeBean.Dnx/LimeBean.Tests xunit.runner.dnx -notrait db=mssql
+
+  # Test (DNX CoreCLR)
+  # TODO try again in beta8, https://github.com/aspnet/Microsoft.Data.Sqlite/issues/133
+  #- dnvm use $LIME_DNX_VERSION -r coreclr
+  #- dnx -p LimeBean.Dnx/LimeBean.Tests xunit.runner.dnx -notrait db=mssql
