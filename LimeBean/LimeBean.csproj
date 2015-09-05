@@ -40,6 +40,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="BeanApi.cs" />
+    <Compile Include="BeanApiLinker.cs" />
     <Compile Include="CommonDatabaseDetails.cs" />
     <Compile Include="CompoundKey.cs" />
     <Compile Include="ConnectionContainer.cs" />

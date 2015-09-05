@@ -70,8 +70,10 @@ namespace LimeBean {
 
         IBeanCrud Crud {
             get {
-                if(_crud == null)
+                if(_crud == null) {
                     _crud = new BeanCrud(Storage, Db, KeyUtil);
+                    _crud.AddObserver(new BeanApiLinker(this));
+                }
                 return _crud;
             }
         }

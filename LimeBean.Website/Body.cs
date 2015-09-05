@@ -492,19 +492,13 @@ namespace LimeBean.Website {
                 }
             }
 #endif
-            class Globals {
-                public static BeanApi Beans { get; set; }
-            }
-            /// We are going to link them so that a product knows its category, and a category can list all its products. 
-            /// Assume that we can access the `BeanApi` object via the globally available `Globals.Beans` property
-            /// (see [BeanApi Object Lifetime](#beanapi-object-lifetime), or alternatively you can use the approach 
-            /// described in [Accessing BeanApi from within the Bean](#accessing-beanapi-from-within-the-bean)).
+            /// We are going to link them so that a product knows its category, and a category can list all its products.
             /// 
             /// In the `Product` class, let's declare a method `GetCategory()`:
 #if CODE
             partial class Product {
                 public Category GetCategory() {
-                    return Globals.Beans.Load<Category>(this["category_id"]);
+                    return GetApi().Load<Category>(this["category_id"]);
                 }
             }
 #endif
@@ -512,7 +506,7 @@ namespace LimeBean.Website {
 #if CODE
             partial class Category {
                 public Product[] GetProducts() {
-                    return Globals.Beans.Find<Product>("where category_id = {0}", this["id"]);
+                    return GetApi().Find<Product>("where category_id = {0}", this["id"]);
                 }
             }
 #endif
@@ -541,7 +535,7 @@ namespace LimeBean.Website {
 #if CODE
                 protected override void BeforeTrash() {
                     foreach(var p in GetProducts())
-                        Globals.Beans.Trash(p);
+                        GetApi().Trash(p);
                 }
 #endif
             }
@@ -676,9 +670,6 @@ namespace LimeBean.Website {
                 /// Register `BeanApi` as a **scoped** service in the Startup.cs file:
 
                 #region Fake ASP
-                public class CallContextServiceLocator {
-                    public static dynamic Locator;
-                }
                 public interface IServiceCollection {
                     void AddScoped<T>();
                 }
@@ -697,11 +688,6 @@ namespace LimeBean.Website {
                         : base("data source=data.db", typeof(SqliteConnection)) {
                         EnterFluidMode();
                     }
-
-                    //TODO https://github.com/aspnet/Hosting/issues/30
-                    //public static BeanApi Current {
-                    //    get { return CallContextServiceLocator.Locator.ServiceProvider.GetService<MyBeanApi>(); }
-                    //}
                 }
 
                 public class Startup {
@@ -728,49 +714,6 @@ namespace LimeBean.Website {
 #endif
             
             }
-        }
-
-        class BeapApiFromBean {
-            /// ## Accessing BeanApi from within the Bean
-            /// When implementing [Lifecycle Hooks](#lifecycle-hooks), 
-            /// it's often needed to call `BeanApi` methods,
-            /// but `Bean` and `BeanApi` objects don't reference each other. 
-            /// In some scenarios, it is possible to have `BeanApi` object globally accesible 
-            /// via a static field or property (see [BeanApi Object Lifetime](#beanapi-object-lifetime)).
-            /// 
-            /// Another approach is using an [observer](#bean-observers) to establish a link:
-#if CODE
-            public abstract class ApiAwareBean : Bean {
-                public BeanApi Api;
-
-                public ApiAwareBean(string kind)
-                    : base(kind) {
-                }
-            }
-
-            public class ApiAwareObserver : BeanObserver {
-                BeanApi Api;
-
-                public ApiAwareObserver(BeanApi api) {
-                    Api = api;
-                }
-
-                public override void AfterDispense(Bean bean) {
-                    var aware = bean as ApiAwareBean;
-                    if(aware != null)
-                        aware.Api = Api;
-                }
-            }
-#endif
-            /// Register `ApiAwareObserver` in `BeanApi`:
-            void Register(BeanApi api) {
-#if CODE
-                api.AddObserver(new ApiAwareObserver(api));
-#endif
-            }
-            /// Now if you inherit your [custom beans](#custom-bean-classes) from `ApiAwareBean`,
-            /// you will be able to access `BeanApi` directly from `BeforeStore`, `BeforeTrash`, and other 
-            /// [hooks](#lifecycle-hooks).
         }
 
         void InternalQueryCache(BeanApi api) {

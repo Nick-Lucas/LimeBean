@@ -20,6 +20,7 @@ namespace LimeBean {
         string _kind;
 
         internal bool Dispensed;
+        internal BeanApi Api;
 
         internal Bean() {
         }
@@ -107,6 +108,10 @@ namespace LimeBean {
         }
 
         // Hooks
+
+        protected BeanApi GetApi() {
+            return Api;
+        }
 
         protected internal virtual void AfterDispense() {
         }

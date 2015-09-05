@@ -85,6 +85,26 @@ namespace LimeBean.Tests {
             }
         }
 
+        [Fact]
+        public void ApiLink() {
+            using(var api = SQLitePortability.CreateApi()) {
+                api.EnterFluidMode();
+
+                var bean = api.Dispense<ApiLinkChecker>();
+                var id = api.Store(bean);
+                Assert.Same(api, bean.Trace["bs"]);
+                Assert.Same(api, bean.Trace["as"]);
+
+                bean = api.Load<ApiLinkChecker>(id);
+                Assert.Same(api, bean.Trace["bl"]);
+                Assert.Same(api, bean.Trace["al"]);
+
+                api.Trash(bean);
+                Assert.Same(api, bean.Trace["bt"]);
+                Assert.Same(api, bean.Trace["at"]);
+            }
+        }
+
         class ThrowingBean : Bean {
             public bool Throw;
 
@@ -103,6 +123,37 @@ namespace LimeBean.Tests {
             }
         }
 
+        class ApiLinkChecker : Bean {
+            public Dictionary<string, BeanApi> Trace = new Dictionary<string, BeanApi>();
+
+            public ApiLinkChecker() 
+                : base("foo") {
+            }
+
+            protected internal override void BeforeLoad() {
+                Trace["bl"] = GetApi();
+            }
+
+            protected internal override void AfterLoad() {
+                Trace["al"] = GetApi();
+            }
+
+            protected internal override void BeforeStore() {
+                Trace["bs"] = GetApi();
+            }
+
+            protected internal override void AfterStore() {
+                Trace["as"] = GetApi();
+            }
+
+            protected internal override void BeforeTrash() {
+                Trace["bt"] = GetApi();
+            }
+
+            protected internal override void AfterTrash() {
+                Trace["at"] = GetApi();
+            }
+        }
     }
 
 }
