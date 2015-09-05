@@ -14,14 +14,14 @@ namespace LimeBean.Website {
         /// ## About LimeBean
         /// LimeBean provides a simple and concise API for accessing **ADO.NET** data sources.
         /// It's halfway between a **micro-ORM** and **direct SQL**.
-        /// With LimeBean, you can look at your data as **objects** or as plain **records**, depending on a situation.
+        /// With LimeBean, you can treat your data as **objects** or as plain **records**, depending on a situation.
         /// 
         /// Compatible with:
         /// 
         /// * **.NET Framework 4.x**
         /// * **Mono**
-        /// * **ASP.NET 5** (DNX, DNXCore)
-        /// * **Windows 10 Universal App Platform** (UAP / UWP / .NETCore 5.0)
+        /// * **ASP.NET 5** (DNX)
+        /// * **Windows 10 Universal App Platform** (UAP)
         /// * **Xamarin** (MonoAndroid, MonoTouch, Xamarin.iOS)
         /// 
         /// Supported databases include:
@@ -32,7 +32,7 @@ namespace LimeBean.Website {
         /// * **SQL Server**
         /// 
         /// LimeBean doesn't rely on Reflection, IL emitting, etc. It's perfectly compatible with **Mono/Xamarin
-        /// Ahead of Time (AOT)** and **Microsoft .NET Native**.
+        /// Ahead of Time (AOT)** and **.NET Native**.
         /// 
         /// The library is inspired by [RedBeanPHP](http://redbeanphp.com).
         /// 
@@ -43,7 +43,7 @@ namespace LimeBean.Website {
         ///     
         /// **For Xamarin**, use a dedicated package [LimeBean.Xamarin](https://www.nuget.org/packages/LimeBean.Xamarin).
         /// 
-        /// **For ASP.NET 5 (DNX) projects**, add a dependency to the project.json file:
+        /// **For ASP.NET 5 (DNX) and UAP projects**, add a dependency to the project.json file:
         /// 
         ///     {
         ///         "dependencies": {
@@ -81,10 +81,9 @@ namespace LimeBean.Website {
                 var api = new BeanApi(connection);
 #endif
             }
-            /// **NOTE:** `BeanApi` is `IDisposable`.
-            /// 
-            /// When `BeanApi` is created from a connection string (two first cases), the underlying connection is initiated on the first usage and closed on dispose.
-            /// Shared connections are used as-is, their state it not changed.
+            /// **NOTE:** `BeanApi` is `IDisposable`. When `BeanApi` is created from a connection string (two first cases above), 
+            /// the underlying connection is initiated on the first usage and closed on dispose.
+            /// Shared connections are used as-is, their state is not changed.
             /// 
             /// See also: [BeanApi Object Lifetime](#beanapi-object-lifetime)
         }
@@ -94,8 +93,8 @@ namespace LimeBean.Website {
             /// (Create / Read / Update / Delete)
             /// 
             /// For basic usage, LimeBean requires zero configuration and no additional code!
-            /// Database schema is maintained on-the-fly (see [Fluid Mode](#fluid-mode)): 
-            /// no need to create tables and columns by yourself.
+            /// Database schema is maintained on-the-fly: 
+            /// no need to create tables and columns (see [Fluid Mode](#fluid-mode)).
             /// 
             /// Take a look at the following sample scenario:
             /// 
@@ -103,7 +102,7 @@ namespace LimeBean.Website {
             // Use a temporary in-memory SQLite database
             var api = new BeanApi("Data Source=:memory:", SQLiteFactory.Instance);
 
-            // Enter the fluid mode
+            // Enter the "Fluid Mode"
             api.EnterFluidMode();
 #endif
             /// **Create**
@@ -128,7 +127,7 @@ namespace LimeBean.Website {
 #endif
             /// **Read**
 #if CODE
-            // Load by id
+            // Load by ID
             bean = api.Load("book", id);
 #endif
             /// **Update**
@@ -172,10 +171,10 @@ namespace LimeBean.Website {
         void FluidMode(BeanApi api) { 
             /// ## Fluid Mode
             /// LimeBean is committed to mitigate the common inconvenience associated with relational databases,
-            /// that is necessity to manually create tables, columns and adjust their data types. 
+            /// namely necessity to manually create tables, columns and adjust their data types. 
             /// In this sense, LimeBean takes SQL databases a little closer to NoSQL ones like MongoDB.
             /// 
-            /// Fluid mode is optional, and is recommended for use only during early development stages
+            /// **Fluid Mode** is optional, turned off by default, and is recommended for use only during early development stages
             /// (particularly for prototyping and scaffolding).
             /// To enable it, invoke the `EnterFluidMode` method on the `BeanApi` object:
 #if CODE
@@ -187,13 +186,13 @@ namespace LimeBean.Website {
             /// LimeBean can create new tables, add missing columns, and widen data types.
             /// It will never truncate data or delete unused columns.
             /// 
-            /// **NOTE:** LimeBean cannot detect renamings.
+            /// **NOTE:** LimeBean doesn't detect renamings.
             /// 
             /// Automatically generated schema is usually sub-optimal and lacks indexes which are essential
             /// for performance. When most of planned tables are already in place, 
             /// and only minor changes are expected, 
-            /// it is recommended to turn the fluid mode off, audit the database structure, add indexes, and make further schema
-            /// changes with a dedicated database management tool (like HeidiSQL, SSMS, etc).
+            /// it is recommended to turn the Fluid Mode off, audit the database structure, add indexes, and make further schema
+            /// changes with a dedicated database management tool (like HeidiSQL, SSMS, pgAdmin, etc).
             /// 
         }
 
@@ -226,8 +225,8 @@ namespace LimeBean.Website {
 #endif
             }
             /// 
-            /// You can use any SQL as long as the result is a set of beans. 
-            /// For other cases, see [generic queries](#generic-sql-queries).
+            /// You can use any SQL as long as the result can be mapped to a set of beans. 
+            /// For other cases, see [Generic Queries](#generic-sql-queries).
             /// 
             /// To find a single bean:
 #if CODE
@@ -266,7 +265,7 @@ namespace LimeBean.Website {
             /// Doing so has several advantages:
             /// 
             /// - All strings prone to typos (bean kind and field names) are encapsulated inside.
-            /// - You take advantage of compile-time checks, IDE assistance and [strong-typed properties](#typed-accessors).
+            /// - You get compile-time checks, IDE assistance and [strong-typed properties](#typed-accessors).
             /// - With [lifecycle hooks](#lifecycle-hooks), it is easy to implement [data validation](#data-validation) and [relations](#relations).
             /// 
             /// For [custom beans classes](#custom-bean-classes), use method overloads with a generic parameter:
@@ -288,16 +287,13 @@ namespace LimeBean.Website {
             /// you can eliminate the use of strings completely:
             
             public class Book : Bean {
-                static string __csharp6_nameof__(object o) { return null; }
-                static object __csharp6_Title__ = null;
-
                 public Book()
                     : base("") {
                 }
 #if CODE
                 public string Title {
-                    get { return Get<string>(__csharp6_nameof__(__csharp6_Title__)); }
-                    set { Put(__csharp6_nameof__(__csharp6_Title__), value); }
+                    get { return Get<string>(nameof(Title)); }
+                    set { Put(nameof(Title), value); }
                 }
 #endif
 
@@ -347,8 +343,8 @@ namespace LimeBean.Website {
 
         class PrimaryKeys {
             /// ## Primary Keys
-            /// By default, all beans have auto-increment integer key named `"id"`. It is possible 
-            /// to customize keys in all aspects:
+            /// By default, all beans have auto-incrementing integer key named `"id"`. 
+            /// Keys are customizable in all aspects:
 
             class Book : Bean {
                 public Book()
@@ -430,7 +426,7 @@ namespace LimeBean.Website {
 
         void CustomizingSqlCommands(BeanApi api, Bean bean) {
             /// ## Customizing SQL Commands
-            /// In some cases it is necessary to manually adjust parameters in a SQL command which is about to execute.
+            /// In some cases it is necessary to manually adjust parameters of a SQL command which is about to execute.
             /// This can be done in the `QueryExecuting` event handler. 
             /// 
             /// **Example 1.**  Force `datetime2` type for all dates (SQL Server):
@@ -497,17 +493,18 @@ namespace LimeBean.Website {
             }
 #endif
             class Globals {
-                public static BeanApi LimeBean { get; set; }
+                public static BeanApi Beans { get; set; }
             }
             /// We are going to link them so that a product knows its category, and a category can list all its products. 
-            /// Assume that we can access the `BeanApi` object via the globally available `Globals.LimeBean` property
-            /// ([read how to accomplish that](#beanapi-object-lifetime)).
+            /// Assume that we can access the `BeanApi` object via the globally available `Globals.Beans` property
+            /// (see [BeanApi Object Lifetime](#beanapi-object-lifetime), or alternatively you can use the approach 
+            /// described in [Accessing BeanApi from within the Bean](#accessing-beanapi-from-within-the-bean)).
             /// 
             /// In the `Product` class, let's declare a method `GetCategory()`:
 #if CODE
             partial class Product {
                 public Category GetCategory() {
-                    return Globals.LimeBean.Load<Category>(this["category_id"]);
+                    return Globals.Beans.Load<Category>(this["category_id"]);
                 }
             }
 #endif
@@ -515,7 +512,7 @@ namespace LimeBean.Website {
 #if CODE
             partial class Category {
                 public Product[] GetProducts() {
-                    return Globals.LimeBean.Find<Product>("where category_id = {0}", this["id"]);
+                    return Globals.Beans.Find<Product>("where category_id = {0}", this["id"]);
                 }
             }
 #endif
@@ -544,7 +541,7 @@ namespace LimeBean.Website {
 #if CODE
                 protected override void BeforeTrash() {
                     foreach(var p in GetProducts())
-                        Globals.LimeBean.Trash(p);
+                        Globals.Beans.Trash(p);
                 }
 #endif
             }
@@ -569,7 +566,7 @@ namespace LimeBean.Website {
             ///
             /// Otherwise it's committed.
             /// 
-            /// Transactions can be nested (if the underlying ADO.NET provider allows it):
+            /// Transactions can be nested (if the underlying ADO.NET provider allows this):
 #if CODE
             api.Transaction(delegate() {
                 // outer transaction
@@ -678,10 +675,12 @@ namespace LimeBean.Website {
                 /// ### ASP.NET 5 Applications (DNX)
                 /// Register `BeanApi` as a **scoped** service in the Startup.cs file:
 
-                #region Fake MVC
-                public interface IServiceProvider { }
+                #region Fake ASP
+                public class CallContextServiceLocator {
+                    public static dynamic Locator;
+                }
                 public interface IServiceCollection {
-                    void AddScoped<T>(Func<IServiceProvider, T> f);
+                    void AddScoped<T>();
                 }
                 public interface IActionResult { }
                 public class ViewResult : IActionResult { 
@@ -693,20 +692,23 @@ namespace LimeBean.Website {
 
                 interface SqliteConnection { }
 #if CODE
-                public class Startup {
+                public class MyBeanApi : BeanApi {
+                    public MyBeanApi()
+                        : base("data source=data.db", typeof(SqliteConnection)) {
+                        EnterFluidMode();
+                    }
 
+                    //TODO https://github.com/aspnet/Hosting/issues/30
+                    //public static BeanApi Current {
+                    //    get { return CallContextServiceLocator.Locator.ServiceProvider.GetService<MyBeanApi>(); }
+                    //}
+                }
+
+                public class Startup {
                     public void ConfigureServices(IServiceCollection services) {
                         // . . .
-
-                        services.AddScoped<BeanApi>(CreateBeans);
+                        services.AddScoped<MyBeanApi>();
                     }
-
-                    BeanApi CreateBeans(IServiceProvider provider) {
-                        var api = new BeanApi("data source=data.db", typeof(SqliteConnection));
-                        api.EnterFluidMode();
-                        return api;
-                    }
-
                 }
 #endif
                 /// Then inject it into any controller:
@@ -714,7 +716,7 @@ namespace LimeBean.Website {
                 public class HomeController : Controller {
                     BeanApi _beans;
 
-                    public HomeController(BeanApi beans) {
+                    public HomeController(MyBeanApi beans) {
                         _beans = beans;
                     }
 
@@ -726,6 +728,49 @@ namespace LimeBean.Website {
 #endif
             
             }
+        }
+
+        class BeapApiFromBean {
+            /// ## Accessing BeanApi from within the Bean
+            /// When implementing [Lifecycle Hooks](#lifecycle-hooks), 
+            /// it's often needed to call `BeanApi` methods,
+            /// but `Bean` and `BeanApi` objects don't reference each other. 
+            /// In some scenarios, it is possible to have `BeanApi` object globally accesible 
+            /// via a static field or property (see [BeanApi Object Lifetime](#beanapi-object-lifetime)).
+            /// 
+            /// Another approach is using an [observer](#bean-observers) to establish a link:
+#if CODE
+            public abstract class ApiAwareBean : Bean {
+                public BeanApi Api;
+
+                public ApiAwareBean(string kind)
+                    : base(kind) {
+                }
+            }
+
+            public class ApiAwareObserver : BeanObserver {
+                BeanApi Api;
+
+                public ApiAwareObserver(BeanApi api) {
+                    Api = api;
+                }
+
+                public override void AfterDispense(Bean bean) {
+                    var aware = bean as ApiAwareBean;
+                    if(aware != null)
+                        aware.Api = Api;
+                }
+            }
+#endif
+            /// Register `ApiAwareObserver` in `BeanApi`:
+            void Register(BeanApi api) {
+#if CODE
+                api.AddObserver(new ApiAwareObserver(api));
+#endif
+            }
+            /// Now if you inherit your [custom beans](#custom-bean-classes) from `ApiAwareBean`,
+            /// you will be able to access `BeanApi` directly from `BeforeStore`, `BeforeTrash`, and other 
+            /// [hooks](#lifecycle-hooks).
         }
 
         void InternalQueryCache(BeanApi api) {
@@ -748,7 +793,7 @@ namespace LimeBean.Website {
             /// * failed [transaction](#transactions) 
             /// 
             /// In rare special cases you may need to **bypass** the cache. 
-            /// For this purpose, query functions provide overloads with the `useCache` argument:
+            /// For this purpose, all query functions provide overloads with the `useCache` argument:
 #if CODE
             var uid = api.Cell<string>(false, "select hex(randomblob(16))");
 #endif
