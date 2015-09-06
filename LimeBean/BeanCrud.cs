@@ -9,13 +9,13 @@ namespace LimeBean {
         IStorage _storage;
         ITransactionSupport _transactionSupport;
         IKeyAccess _keyAccess;
-        ICollection<BeanObserver> _observers;
+        IList<BeanObserver> _observers;
 
         public BeanCrud(IStorage storage, ITransactionSupport transactionSupport, IKeyAccess keys) {
             _storage = storage;
             _transactionSupport = transactionSupport;
             _keyAccess = keys;
-            _observers = new HashSet<BeanObserver>();
+            _observers = new List<BeanObserver>();
             DirtyTracking = true;
         }
 
