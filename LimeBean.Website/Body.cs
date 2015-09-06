@@ -43,7 +43,7 @@ namespace LimeBean.Website {
         ///     
         /// **For Xamarin**, use a dedicated package [LimeBean.Xamarin](https://www.nuget.org/packages/LimeBean.Xamarin).
         /// 
-        /// **For ASP.NET 5 (DNX) and UAP projects**, add a dependency to the project.json file:
+        /// **For DNX and UAP projects**, add a dependency to the project.json file:
         /// 
         ///     {
         ///         "dependencies": {
@@ -81,7 +81,7 @@ namespace LimeBean.Website {
                 var api = new BeanApi(connection);
 #endif
             }
-            /// **NOTE:** `BeanApi` is `IDisposable`. When `BeanApi` is created from a connection string (two first cases above), 
+            /// **NOTE:** `BeanApi` is `IDisposable`. When created from a connection string (two first cases above), 
             /// the underlying connection is initiated on the first usage and closed on dispose.
             /// Shared connections are used as-is, their state is not changed.
             /// 
@@ -188,7 +188,7 @@ namespace LimeBean.Website {
             /// 
             /// **NOTE:** LimeBean doesn't detect renamings.
             /// 
-            /// Automatically generated schema is usually sub-optimal and lacks indexes which are essential
+            /// **CAUTION:** Automatically generated schema is usually sub-optimal and lacks indexes which are essential
             /// for performance. When most of planned tables are already in place, 
             /// and only minor changes are expected, 
             /// it is recommended to turn the Fluid Mode off, audit the database structure, add indexes, and make further schema
@@ -212,7 +212,7 @@ namespace LimeBean.Website {
                 var list = api.Find("book", "WHERE rating > {0}", 7);
 #endif
             }
-            /// Usage of parameters look similar to `String.Format`, but instead of direct interpolation,
+            /// Usage of parameters looks similar to `String.Format`, but instead of direct interpolation,
             /// they are transformed into fair ADO.NET command parameters to protect your queries from injection-attacks.
             /// 
             {
@@ -225,7 +225,7 @@ namespace LimeBean.Website {
 #endif
             }
             /// 
-            /// You can use any SQL as long as the result can be mapped to a set of beans. 
+            /// You can use any SQL as long as the result maps to a set of beans. 
             /// For other cases, see [Generic Queries](#generic-sql-queries).
             /// 
             /// To find a single bean:
@@ -265,10 +265,10 @@ namespace LimeBean.Website {
             /// Doing so has several advantages:
             /// 
             /// - All strings prone to typos (bean kind and field names) are encapsulated inside.
-            /// - You get compile-time checks, IDE assistance and [strong-typed properties](#typed-accessors).
-            /// - With [lifecycle hooks](#lifecycle-hooks), it is easy to implement [data validation](#data-validation) and [relations](#relations).
+            /// - You get compile-time checks, IDE assistance and [typed properties](#typed-accessors).
+            /// - With [Lifecycle Hooks](#lifecycle-hooks), it is easy to implement [data validation](#data-validation) and [relations](#relations).
             /// 
-            /// For [custom beans classes](#custom-bean-classes), use method overloads with a generic parameter:
+            /// For [Custom Beans Classes](#custom-bean-classes), use method overloads with a generic parameter:
             /// 
             void Overloads(BeanApi api) {
 #if CODE
@@ -284,7 +284,7 @@ namespace LimeBean.Website {
             /// ### Using `nameof()`
             /// With the help of the [nameof](https://msdn.microsoft.com/en-us/library/dn986596.aspx) operator
             /// (introduced in C# 6 / Visual Studio 2015),
-            /// you can eliminate the use of strings completely:
+            /// it's possible to define properties without using strings at all:
             
             public class Book : Bean {
                 public Book()
@@ -303,7 +303,7 @@ namespace LimeBean.Website {
 
         class LifecycleHooks { 
             /// ## Lifecycle Hooks
-            /// In [custom bean classes](#custom-bean-classes) you can override lifecycle hook methods to receive 
+            /// [Custom Bean Classes](#custom-bean-classes) provide lifecycle hook methods which you can override to receive 
             /// notifications about [CRUD operations](#crud) occurring to this bean:
             /// 
 #if CODE
@@ -357,7 +357,7 @@ namespace LimeBean.Website {
                 // Custom key name for beans of kind "book"
                 api.Key("book", "book_id");
 
-                // Strongly-typed fashion (see Custom Bean Classes)
+                // Custom key name for custom bean class Book (see Custom Bean Classes)
                 api.Key<Book>("book_id");
 
                 // Custom non-autoincrement key
@@ -377,8 +377,8 @@ namespace LimeBean.Website {
 
         void GenericSqlQueries(BeanApi api) {
             /// ## Generic SQL Queries
-            /// Often it's needed to execute queries which don't map to beans. 
-            /// Examples include aggregation, grouping, joins, selecting single column, etc.
+            /// Often it's needed to execute queries which don't map to beans: 
+            /// aggregates, grouping, joins, selecting single column, etc.
             /// 
             /// `BeanApi` provides methods for such tasks:
             /// 
@@ -412,7 +412,7 @@ namespace LimeBean.Website {
                     // do something
                 }
 
-                foreach(var item in api.ColIterator<string>("...")) {
+                foreach(var item in api.ColIterator("...")) {
                     // do something
                 }
 #endif
@@ -453,8 +453,8 @@ namespace LimeBean.Website {
         class DataValidation {
             /// ## Data Validation
             /// The `BeforeStore` [hook](#lifecycle-hooks) can be used to prevent bean from storing under certain
-            /// circumstances. For example, let's define a bean `Book` which cannot be stored unless 
-            /// it has a non-empty title:
+            /// circumstances. For example, let's define a [custom bean](#custom-bean-classes) `Book` which cannot be stored 
+            /// unless it has a non-empty title:
 #if CODE
             public class Book : Bean {
                 public Book()
@@ -472,7 +472,7 @@ namespace LimeBean.Website {
                 }
             }
 #endif
-            /// See also: [Custom Bean Classes](#custom-bean-classes), [Bean Observers](#bean-observers)
+            /// See also: [Custom Bean Classes](#custom-bean-classes), [Lifecycle Hooks](#lifecycle-hooks)
         }
 
         class Relations {
@@ -506,7 +506,7 @@ namespace LimeBean.Website {
 #if CODE
             partial class Category {
                 public Product[] GetProducts() {
-                    return GetApi().Find<Product>("where category_id = {0}", this["id"]);
+                    return GetApi().Find<Product>("WHERE category_id = {0}", this["id"]);
                 }
             }
 #endif
@@ -572,7 +572,8 @@ namespace LimeBean.Website {
 #endif
             /// ## Implicit Transactions
             /// When you invoke `Store` or `Trash` (see [CRUD](#crud)) outside a transaction, then an implicit transaction
-            /// is initiated behind the scenes. This is done to enforce database integrity in case of advanced logic executed in 
+            /// is initiated behind the scenes. This is done to enforce database integrity in case of 
+            /// additional modifications performed in 
             /// [hooks](#lifecycle-hooks) and [observers](#bean-observers) (such as cascading delete, etc).
             /// 
             /// There are special cases when you may need to turn this behavior off 
@@ -584,7 +585,7 @@ namespace LimeBean.Website {
 
         class BeanObservers {
             /// ## Bean Observers      
-            /// Bean observers have the same purpose as [lifecycle hooks](#lifecycle-hooks) with the difference that former
+            /// Bean observers have the same purpose as [Lifecycle Hooks](#lifecycle-hooks) with the difference that former
             /// are invoked for all beans. With observers you can implement plugins and extensions.
             /// 
             /// For example, let's make so that all beans have GUID keys insted of integer auto-increments:
@@ -619,7 +620,7 @@ namespace LimeBean.Website {
 
         class BeanApiObjectLifetime { 
             /// ## BeanApi Object Lifetime
-            /// The `BeanApi` class is `IDisposable` (because it holds the `DbConnection`) and is not thread-safe.
+            /// The `BeanApi` class is `IDisposable` (it holds the `DbConnection`) and is not thread-safe.
             /// Care should be taken to ensure that the same `BeanApi` is not used from multiple threads without
             /// synchronization, and that it is properly disposed. Let's consider some common usage scenarios.
             /// 
@@ -627,7 +628,9 @@ namespace LimeBean.Website {
             /// If LimeBean is used locally, then it should be enclosed in a `using` block:
             void LocalUsage(string connectionString, Type connectionType) {
 #if CODE
-                using(var api = new BeanApi(connectionString, connectionType)) { 
+                using(var api = new BeanApi(connectionString, connectionType)) {
+                    api.EnterFluidMode();
+                     
                     // work with beans
                 }
 #endif
@@ -635,39 +638,45 @@ namespace LimeBean.Website {
             /// ### Global Singleton
             /// For simple applications like console tools, you can use a single globally available statiс instance:
 #if CODE
-            class Globals { 
-                public static readonly BeanApi LimeBean = new BeanApi("connection string", SQLiteFactory.Instance);
+            class Globals {
+                public static readonly BeanApi MyBeanApi;
+
+                static Globals() {
+                    MyBeanApi = new BeanApi("connection string", SQLiteFactory.Instance);
+                    MyBeanApi.EnterFluidMode();
+                }
             }
 #endif
             /// In case of multi-threading, synchronize operations with `lock` or other techniques.
             /// 
             /// ### Web Applications (classic)
-            /// In a web app (ASP.NET, etc) use one `BeanApi` per web request. 
+            /// In a classic (pre-DNX) ASP.NET app, create one `BeanApi` per web request. 
             /// You can use a Dependency Injection framework which supports per-request scoping,
             /// or do it manually like shown below:
 #if CODE
             // This is your Global.asax file
             public class Global : HttpApplication {
-                const string LIME_BEAN_KEY = "bYeU3kLOQgGiWqUIql7Hqg"; // any unique value
+                const string MY_BEAN_API_KEY = "bYeU3kLOQgGiWqUIql7Hqg"; // any unique value
 
-                public static BeanApi LimeBean {
-                    get { return (BeanApi)HttpContext.Current.Items[LIME_BEAN_KEY]; }
-                    set { HttpContext.Current.Items[LIME_BEAN_KEY] = value; }
+                public static BeanApi MyBeanApi {
+                    get { return (BeanApi)HttpContext.Current.Items[MY_BEAN_API_KEY]; }
+                    set { HttpContext.Current.Items[MY_BEAN_API_KEY] = value; }
                 }
 
                 protected void Application_BeginRequest(object sender, EventArgs e) {
-                    LimeBean = new BeanApi("connection string", SQLiteFactory.Instance);                   
+                    MyBeanApi = new BeanApi("connection string", SQLiteFactory.Instance);
+                    MyBeanApi.EnterFluidMode();
                 }
 
                 protected void Application_EndRequest(object sender, EventArgs e) {
-                    LimeBean.Dispose();
+                    MyBeanApi.Dispose();
                 }
 
             }
 #endif
             class DNX {
                 /// ### ASP.NET 5 Applications (DNX)
-                /// Register `BeanApi` as a **scoped** service in the Startup.cs file:
+                /// Subclass `BeanApi` and register it as a **scoped** service in the Startup.cs file:
 
                 #region Fake ASP
                 public interface IServiceCollection {
