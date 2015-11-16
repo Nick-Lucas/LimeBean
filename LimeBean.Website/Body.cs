@@ -22,7 +22,6 @@ namespace LimeBean.Website {
         /// * **Mono**
         /// * **ASP.NET 5** (DNX)
         /// * **Windows 10 Universal App Platform** (UAP)
-        /// * **Xamarin** (MonoAndroid, MonoTouch, Xamarin.iOS)
         /// 
         /// Supported databases include:
         /// 
@@ -31,9 +30,6 @@ namespace LimeBean.Website {
         /// * **PostgreSQL**
         /// * **SQL Server**
         /// 
-        /// LimeBean doesn't rely on Reflection, IL emitting, etc. It's perfectly compatible with **Mono/Xamarin
-        /// Ahead of Time (AOT)** and **.NET Native**.
-        /// 
         /// The library is inspired by [RedBeanPHP](http://redbeanphp.com).
         /// 
         /// ## Installation
@@ -41,8 +37,6 @@ namespace LimeBean.Website {
         /// 
         ///     PM> Install-Package LimeBean
         ///     
-        /// **For Xamarin**, use a dedicated package [LimeBean.Xamarin](https://www.nuget.org/packages/LimeBean.Xamarin).
-        /// 
         /// **For DNX and UAP projects**, add a dependency to the project.json file:
         /// 
         ///     {
@@ -56,7 +50,7 @@ namespace LimeBean.Website {
             /// LimeBean needs an ADO.NET driver to work with. Use one of the following:
             /// 
             /// * [System.Data.SQLite](https://www.nuget.org/packages/System.Data.SQLite) for SQLite in .NET
-            /// * [Mono.Data.Sqlite](http://www.mono-project.com/download/) for SQLite in Mono and Xamarin
+            /// * [Mono.Data.Sqlite](http://www.mono-project.com/download/) for SQLite in Mono
             /// * [Microsoft.Data.Sqlite](https://www.nuget.org/packages/Microsoft.Data.SQLite) for SQLite in ASP.NET 5 and Windows 10 Universal projects
             /// * [MySql.Data](https://www.nuget.org/packages/MySql.Data/) for MySQL or MariaDB
             /// * [Npgsql](https://www.nuget.org/packages/Npgsql/) for PostgreSQL

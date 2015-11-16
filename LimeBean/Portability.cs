@@ -32,7 +32,7 @@ namespace LimeBean {
 
 #endif
 
-#if !DOTNET && !XAMARIN
+#if !DOTNET
 
     partial class BeanApi {
         public BeanApi(string connectionString, string providerName)

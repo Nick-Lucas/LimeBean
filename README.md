@@ -14,15 +14,13 @@
 
 ## Supported Frameworks and Databases
 
-              | .NET | Mono | DNX      | UAP 10 | Xamarin
---------------|------|------|----------|--------|----------------
-SQLite        | +    | +    | +        | +      | [NuGet][nuxam]
-MySQL/MariaDB | +    | +    | CLR only | ?      | -
-PostgreSQL    | +    | +    | CLR only | ?      | -
-SQL Server    | +    | +    | +        | ?      | -
+              | .NET | Mono | DNX      | UAP 10 
+--------------|------|------|----------|--------
+SQLite        | +    | +    | +        | +
+MySQL/MariaDB | +    | +    | CLR only | ?
+PostgreSQL    | +    | +    | CLR only | ?
+SQL Server    | +    | +    | +        | ?
 
 ## Documentation
 
 http://www.limebean.net
-
-[nuxam]: https://www.nuget.org/packages/LimeBean.Xamarin

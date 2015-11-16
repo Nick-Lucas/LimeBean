@@ -1,7 +1,7 @@
 @echo off
 
 set MSBUILD=c:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe /p:Configuration=Release /v:m
-set META_FILES=..\LimeBean\AssemblyInfo.cs ..\LimeBean.Dnx\LimeBean\project.json LimeBean.Xamarin.nuspec
+set META_FILES=..\LimeBean\AssemblyInfo.cs ..\LimeBean.Dnx\LimeBean\project.json
 set RESULT=ok
 
 if not exist nuget.exe (
@@ -18,9 +18,6 @@ for %%f in (%META_FILES%) do (
 
 call dnu restore ..\LimeBean.Dnx\LimeBean --quiet || goto error
 call dnu pack ..\LimeBean.Dnx\LimeBean --configuration Release --quiet || goto error
-nuget restore ..\LimeBean.Xamarin\LimeBean.Xamarin.sln -verbosity quiet || goto error
-%MSBUILD% ..\LimeBean.Xamarin\LimeBean.Xamarin.sln || goto error
-nuget pack LimeBean.Xamarin.nuspec || goto error
 copy ..\LimeBean.Dnx\LimeBean\bin\Release\*.nupkg . || goto error
 del *symbols*.nupkg
 
