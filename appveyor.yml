@@ -14,9 +14,9 @@ environment:
     secure: SMTYtN67tLVTDY4+OmEUtFeI1Iz+h99vn3gPynUDWrgtQU6rerpubVNmt3KNQw7+
 
 cache:
-  - packages
-  - '%USERPROFILE%\.dnx\runtimes'
-  - '%USERPROFILE%\.dnx\packages'
+  - packages -> **\packages.config
+  - '%USERPROFILE%\.dnx\runtimes -> appveyor.yml'
+  - '%USERPROFILE%\.dnx\packages -> appveyor.yml, **\project.json'
 
 services:
   - mssql2008r2sp2
