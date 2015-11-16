@@ -34,12 +34,10 @@ before_build:
   - appveyor DownloadFile https://nuget.org/nuget.exe
   - nuget restore LimeBean.sln
   - nuget restore LimeBean.Xamarin\LimeBean.Xamarin.sln
-  - nuget restore LimeBean.Pcl\LimeBean.Pcl.sln
 
 build_script:
   - msbuild LimeBean.sln /v:m
   - msbuild LimeBean.Xamarin\LimeBean.Xamarin.sln /v:m
-  - msbuild LimeBean.Pcl\LimeBean\LimeBean.csproj /v:m
   - dnu build LimeBean.Dnx\LimeBean --quiet
   - dnu build LimeBean.Dnx\LimeBean.Tests --quiet
 
