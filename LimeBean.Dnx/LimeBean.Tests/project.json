@@ -23,7 +23,7 @@
         },
         "dnx451": {
             "dependencies": {
-                "MySql.Data": "6.9.7",
+                "MySql.Data": "6.9.8",
                 "Npgsql": "3.0.1"
             }
         }        
