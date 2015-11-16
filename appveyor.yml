@@ -14,9 +14,9 @@ environment:
     secure: SMTYtN67tLVTDY4+OmEUtFeI1Iz+h99vn3gPynUDWrgtQU6rerpubVNmt3KNQw7+
 
 cache:
-  - packages -> **\packages.config
+  - packages -> **\packages.config, Nuget.Config
   - '%USERPROFILE%\.dnx\runtimes -> appveyor.yml'
-  - '%USERPROFILE%\.dnx\packages -> appveyor.yml, **\project.json'
+  - '%USERPROFILE%\.dnx\packages -> appveyor.yml, **\project.json, Nuget.Config'
 
 services:
   - mssql2008r2sp2
