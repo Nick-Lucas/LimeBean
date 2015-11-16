@@ -46,6 +46,5 @@ script:
   - dnx -p LimeBean.Dnx/LimeBean.Tests xunit.runner.dnx -notrait db=mssql
 
   # Test (DNX CoreCLR)
-  # TODO try again in beta8, https://github.com/aspnet/Microsoft.Data.Sqlite/issues/133
-  #- dnvm use $LIME_DNX_VERSION -r coreclr
-  #- dnx -p LimeBean.Dnx/LimeBean.Tests xunit.runner.dnx -notrait db=mssql
+  - dnvm use $LIME_DNX_VERSION -r coreclr
+  - dnx -p LimeBean.Dnx/LimeBean.Tests xunit.runner.dnx -notrait db=mssql
