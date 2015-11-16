@@ -13,7 +13,7 @@ env:
     - LIME_TEST_MARIA_PWD=""
     - LIME_TEST_PGSQL_PWD=""
     - LIME_DNX_VERSION=1.0.0-beta7
-    - LIME_XUNIT_CONSOLE_VERSION=2.1.0-rc1-build3124
+    - LIME_XUNIT_CONSOLE_VERSION=2.1.0
 
 install:
   - ./travis-update-sqlite.sh

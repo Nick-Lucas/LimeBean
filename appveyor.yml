@@ -7,7 +7,7 @@ environment:
   LIME_TEST_PGSQL_PWD: Password12!
   LIME_TEST_MSSQL_NAME: (local)\SQL2008R2SP2
   LIME_DNX_VERSION: 1.0.0-beta7
-  LIME_XUNIT_CONSOLE: packages\xunit.runner.console.2.1.0-rc1-build3124\tools\xunit.console.exe
+  LIME_XUNIT_CONSOLE: packages\xunit.runner.console.2.1.0\tools\xunit.console.exe
   LIME_OPENCOVER_CONSOLE: packages\OpenCover.4.6.166\tools\OpenCover.Console.exe
   LIME_COVERALLS: packages\coveralls.io.1.3.4\tools\coveralls.net.exe
   COVERALLS_REPO_TOKEN:
