@@ -43,8 +43,8 @@ test_script:
   # .NET
   - '%LIME_OPENCOVER_CONSOLE% -register:user -target:%LIME_XUNIT_CONSOLE% -targetargs:"bin\LimeBean.Tests.dll -noshadow -appveyor" -filter:"+[LimeBean]*" -output:opencover.xml'
 
-  # Copy SQLite binaries for DNX
-  - xcopy /Y /I /S System.Data.SQLite\sqlite*.dll LimeBean.Dnx\LimeBean.Tests
+  # TODO check whether this is still needed in RC1
+  - powershell -File get-sqlite-for-dnx.ps1
 
   # DNXCore
   - dnvm use %LIME_DNX_VERSION% -r coreclr

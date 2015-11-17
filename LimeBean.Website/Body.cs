@@ -49,7 +49,7 @@ namespace LimeBean.Website {
             /// ## Connect to Database
             /// LimeBean needs an ADO.NET driver to work with. Use one of the following:
             /// 
-            /// * [System.Data.SQLite](https://www.nuget.org/packages/System.Data.SQLite) for SQLite in .NET
+            /// * [System.Data.SQLite.Core](https://www.nuget.org/packages/System.Data.SQLite.Core) for SQLite in .NET
             /// * [Mono.Data.Sqlite](http://www.mono-project.com/download/) for SQLite in Mono
             /// * [Microsoft.Data.Sqlite](https://www.nuget.org/packages/Microsoft.Data.SQLite) for SQLite in ASP.NET 5 and Windows 10 Universal projects
             /// * [MySql.Data](https://www.nuget.org/packages/MySql.Data/) for MySQL or MariaDB
