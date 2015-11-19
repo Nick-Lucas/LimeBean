@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace LimeBean {
 
-#if DOTNET || DNXCORE50
+#if DOTNET5_1
 
     partial class Extensions {
         internal static bool IsEnum(this Type type) {
@@ -32,7 +32,7 @@ namespace LimeBean {
 
 #endif
 
-#if !DOTNET && !DNXCORE50
+#if !DOTNET5_1
 
     partial class BeanApi {
         public BeanApi(string connectionString, string providerName)
