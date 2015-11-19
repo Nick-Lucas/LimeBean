@@ -15,10 +15,11 @@
     "frameworks": {        
         "dnxcore50": { 
             "compilationOptions" : {
-                "define": [ "NO_MARIADB", "NO_PGSQL" ]
+                "define": [ "NO_MARIADB" ]
             },
             "dependencies": {
-                "System.Data.SqlClient": "4.0.0-beta-23516"
+                "System.Data.SqlClient": "4.0.0-beta-23516",
+                "Npgsql": "3.1.0-*"
             }
         },
         "dnx451": {
