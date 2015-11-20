@@ -14,12 +14,12 @@
 
 ## Supported Frameworks and Databases
 
-              | .NET | Mono | DNX      | UAP 10 
---------------|------|------|----------|--------
-SQLite        | +    | +    | +        | +
-MySQL/MariaDB | +    | +    | CLR only | ?
-PostgreSQL    | +    | +    | CLR only | ?
-SQL Server    | +    | +    | +        | ?
+              | .NET | Mono | DNX (RC1) | UAP 10 
+--------------|------|------|-----------|--------
+SQLite        | +    | +    | +         | +
+MySQL/MariaDB | +    | +    | CLR only  | ?
+PostgreSQL    | +    | +    | +         | ?
+SQL Server    | +    | +    | +         | ?
 
 ## Documentation
 
