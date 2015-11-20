@@ -34,6 +34,9 @@ before_build:
   - appveyor DownloadFile https://nuget.org/nuget.exe
   - nuget restore LimeBean.sln
 
+  # Write version, copyright, etc
+  - powershell -File write-meta.ps1 %APPVEYOR_BUILD_NUMBER% %APPVEYOR_REPO_TAG_NAME%
+
 build_script:
   - msbuild LimeBean.sln /v:m
   - dnu build LimeBean.Dnx\LimeBean --quiet
@@ -50,6 +53,12 @@ test_script:
   # DNX
   - dnvm use %LIME_DNX_VERSION% -r clr
   - dnx -p LimeBean.Dnx/LimeBean.Tests xunit.runner.dnx
+
+after_test:
+  - dnu pack LimeBean.Dnx\LimeBean --configuration=Release --quiet
+
+artifacts:
+  - path: LimeBean.Dnx\LimeBean\bin\Release\*.nupkg
 
 on_success:
   - '%LIME_COVERALLS% --opencover opencover.xml'
