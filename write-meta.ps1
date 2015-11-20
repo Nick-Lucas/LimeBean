@@ -2,9 +2,9 @@ param ([string]$build_number, [string]$tag)
 
 $meta_version_numeric = "0.0"
 
-if ($tag -match '^([.\d]+)[\w-]*')  {
-    $meta_version_full = $matches[0]
-    $meta_version_numeric = $matches[1]
+if ($tag -match '^v?(([.\d]+)[\w-]*)$')  {
+    $meta_version_full = $matches[1]
+    $meta_version_numeric = $matches[2]
 } elseif ($build_number) {
     $meta_version_full = "$meta_version_numeric-ci-build$build_number"
 } else {
