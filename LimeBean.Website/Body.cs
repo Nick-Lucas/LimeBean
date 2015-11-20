@@ -41,7 +41,7 @@ namespace LimeBean.Website {
         /// 
         ///     {
         ///         "dependencies": {
-        ///             "LimeBean": "{{version}}"
+        ///             "LimeBean": "..."
         ///         }
         ///     }
 
