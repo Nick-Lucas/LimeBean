@@ -12,7 +12,7 @@
 
 ## Supported Frameworks and Databases
 
-              | .NET | .Net Core 
+              | .NET | .NET Core 
 --------------|------|-----------
 SQLite        | +    | + 
 MySQL/MariaDB | +    | - 
