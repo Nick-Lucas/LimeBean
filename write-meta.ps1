@@ -17,7 +17,7 @@ $meta_copyright = "Copyright (c) 2014-$(get-date -format yyyy) $meta_author"
 $meta_project_url = "http://www.limebean.net/"
 $meta_license_url = "https://raw.githubusercontent.com/AlekseyMartynov/LimeBean/master/LICENSE.txt"
 
-("LimeBean\AssemblyInfo.cs", "LimeBean.Dnx\LimeBean\project.json") | %{
+("LimeBean\AssemblyInfo.cs", "LimeBean.NetCore\LimeBean\project.json") | %{
     $path = "$PSScriptRoot\$_"
 
     (Get-Content $path) | %{

@@ -1,0 +1,35 @@
+{
+    "version": "0.0",
+    "authors": [ "%lime_author%" ],
+    "copyright": "%lime_copyright%",
+    "description": "%lime_description%",
+
+    "packOptions": {
+        "projectUrl": "%lime_project_url%",
+        "licenseUrl": "%lime_license_url%",
+        "tags": [ "orm", "mysql", "sqlite", "postgres", "postgresql", "netcore" ]
+    },
+
+    "buildOptions": {
+        "compile": "../../LimeBean/**/*.cs",
+    },
+
+    "frameworks": {
+        "netstandard1.0": {
+            "buildOptions": {
+                "define": [ "NETCORE" ]
+            },
+            "imports": [ "dnxcore50", "portable-net45" ],
+            "dependencies": {
+                "System.Collections.Concurrent": "4.0.0",
+                "System.Data.Common": "4.0.0",
+                "System.Linq": "4.0.0"
+            }
+        },
+        "net40": {
+            "frameworkAssemblies": {
+                "System.Data": ""
+            }
+        }
+    }
+}
