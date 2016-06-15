@@ -19,9 +19,8 @@ namespace LimeBean.Website {
         /// Compatible with:
         /// 
         /// * **.NET Framework 4.x**
+        /// * **.NET Core** (ASP.NET Core, UWP)
         /// * **Mono**
-        /// * **ASP.NET 5** (DNX)
-        /// * **Windows 10 Universal App Platform** (UAP)
         /// 
         /// Supported databases include:
         /// 
@@ -36,14 +35,6 @@ namespace LimeBean.Website {
         /// LimeBean is available on [NuGet Gallery](https://www.nuget.org/packages/LimeBean):
         /// 
         ///     PM> Install-Package LimeBean
-        ///     
-        /// **For DNX and UAP projects**, add a dependency to the project.json file:
-        /// 
-        ///     {
-        ///         "dependencies": {
-        ///             "LimeBean": "..."
-        ///         }
-        ///     }
 
         void ConnectToDatabase(DbConnection connection) {
             /// ## Connect to Database
@@ -51,7 +42,7 @@ namespace LimeBean.Website {
             /// 
             /// * [System.Data.SQLite.Core](https://www.nuget.org/packages/System.Data.SQLite.Core) for SQLite in .NET
             /// * [Mono.Data.Sqlite](http://www.mono-project.com/download/) for SQLite in Mono
-            /// * [Microsoft.Data.Sqlite](https://www.nuget.org/packages/Microsoft.Data.SQLite) for SQLite in ASP.NET 5 and Windows 10 Universal projects
+            /// * [Microsoft.Data.SQLite](https://www.nuget.org/packages/Microsoft.Data.SQLite) for SQLite in .NET Core
             /// * [MySql.Data](https://www.nuget.org/packages/MySql.Data/) for MySQL or MariaDB
             /// * [Npgsql](https://www.nuget.org/packages/Npgsql/) for PostgreSQL
             /// * [System.Data.SqlClient](https://msdn.microsoft.com/en-us/library/System.Data.SqlClient.aspx) for SQL Server
@@ -60,7 +51,7 @@ namespace LimeBean.Website {
             {
 #if CODE     
                 // Using a connection string and an ADO.NET provider factory                
-                var api = new BeanApi("data source=/path/to/db", MySqlClientFactory.Instance);
+                var api = new BeanApi("server=localhost; database=db1; ...", MySqlClientFactory.Instance);
 #endif
             }
             {
@@ -230,7 +221,7 @@ namespace LimeBean.Website {
 #if CODE
             var count = api.Count("book", "WHERE rating > {0}", 7);
 #endif
-            /// It is also possible to perform unbuffered (memory-optimized) load for processing in a foreach-loop:
+            /// It is also possible to perform unbuffered (memory-optimized) load for processing in a `foreach` loop:
 #if CODE
             foreach(var bean in api.FindIterator("book", "ORDER BY rating")) {
                 // do something with bean
@@ -644,7 +635,7 @@ namespace LimeBean.Website {
             /// In case of multi-threading, synchronize operations with `lock` or other techniques.
             /// 
             /// ### Web Applications (classic)
-            /// In a classic (pre-DNX) ASP.NET app, create one `BeanApi` per web request. 
+            /// In a classic ASP.NET app, create one `BeanApi` per web request. 
             /// You can use a Dependency Injection framework which supports per-request scoping,
             /// or do it manually like shown below:
 #if CODE
@@ -668,8 +659,8 @@ namespace LimeBean.Website {
 
             }
 #endif
-            class DNX {
-                /// ### ASP.NET 5 Applications (DNX)
+            class NetCore {
+                /// ### ASP.NET Core Applications
                 /// Subclass `BeanApi` and register it as a **scoped** service in the Startup.cs file:
 
                 #region Fake ASP
