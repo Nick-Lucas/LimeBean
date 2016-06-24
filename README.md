@@ -1,14 +1,15 @@
-# LimeBean
+# LimeBean-Revival
 
 [![Build status](https://ci.appveyor.com/api/projects/status/4oxjopx4mbre22ky/branch/master?svg=true)](https://ci.appveyor.com/project/Nick-Lucas/limebean/branch/master)
-[![NuGet](https://img.shields.io/nuget/v/LimeBean.svg)](https://www.nuget.org/packages/LimeBean)
-[![MIT License](https://img.shields.io/github/license/alekseymartynov/limebean.svg)](https://raw.githubusercontent.com/Nick-Lucas/LimeBean/master/LICENSE.txt)
+[![NuGet](https://img.shields.io/nuget/v/LimeBean.svg)](https://www.nuget.org/packages/LimeBean-Revival)
+[![MIT License](https://img.shields.io/github/license/Nick-Lucas/limebean.svg)](https://raw.githubusercontent.com/Nick-Lucas/LimeBean/master/LICENSE.txt)
 
 [RedBeanPHP](http://redbeanphp.com/)-inspired data access layer for .NET
+Originally written by Aleksey Martynov, revived and now maintained here.
 
 ## Available on NuGet Gallery
 
-    PM> Install-Package LimeBean
+    PM> Install-Package LimeBean-Revival
 
 ## Supported Frameworks and Databases
 
@@ -21,4 +22,4 @@ SQL Server    | +    | +
 
 ## Documentation
 
-http://www.limebean.net
+TBC
