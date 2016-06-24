@@ -5,6 +5,7 @@
 [![MIT License](https://img.shields.io/github/license/Nick-Lucas/limebean.svg)](https://raw.githubusercontent.com/Nick-Lucas/LimeBean/master/LICENSE.txt)
 
 [RedBeanPHP](http://redbeanphp.com/)-inspired data access layer for .NET
+
 Originally written by Aleksey Martynov, revived and now maintained here.
 
 ## Available on NuGet Gallery
