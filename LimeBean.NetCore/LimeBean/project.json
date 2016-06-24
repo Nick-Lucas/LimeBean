@@ -1,5 +1,5 @@
 {
-    "name": "LimeBean-Revival",
+    "name": "%lime_name%",
     "version": "0.0",
     "authors": [ "%lime_author%" ],
     "copyright": "%lime_copyright%",
