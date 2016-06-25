@@ -1,0 +1,50 @@
+version: '{build}'
+
+clone_depth: 50
+
+environment:
+  LIME_TEST_MARIA_PWD: Password12!
+  LIME_TEST_PGSQL_PWD: Password12!
+  LIME_TEST_MSSQL_NAME: (local)\SQL2008R2SP2
+  LIME_XUNIT_CONSOLE: packages\xunit.runner.console.2.1.0\tools\xunit.console.exe
+
+cache:
+  - packages -> **\packages.config, Nuget.Config
+  - '%LOCALAPPDATA%\Microsoft\dotnet -> appveyor.yml'
+  - '%USERPROFILE%\.nuget\packages -> appveyor.yml, **\project.json, Nuget.Config'
+
+
+services:
+  - mssql2008r2sp2
+  - mysql
+  - postgresql
+
+before_build:
+  # Install dotnet cli
+  - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/dotnet/cli/v1.0.0-rc2/scripts/obtain/install.ps1'))
+  - set PATH=%PATH%;%LOCALAPPDATA%\Microsoft\dotnet
+
+  # Restore packages
+  - dotnet restore LimeBean.NetCore -v minimal
+  - nuget restore LimeBean.sln
+
+  # Write version, copyright, etc
+  - powershell -File write-meta.ps1 %APPVEYOR_BUILD_NUMBER% %APPVEYOR_REPO_TAG_NAME%
+
+build_script:
+  - msbuild LimeBean.sln /v:m
+  - dotnet build LimeBean.NetCore\LimeBean
+  - dotnet build LimeBean.NetCore\LimeBean.Tests
+
+test_script:
+  # .NET
+  - '%xunit20%\xunit.console bin\LimeBean.Tests.dll -appveyor'
+
+  # .NET Core
+  - dotnet test LimeBean.NetCore\LimeBean.Tests
+
+after_test:
+  - dotnet pack LimeBean.NetCore\LimeBean --no-build --configuration=Release
+
+artifacts:
+  - path: LimeBean.NetCore\LimeBean\bin\Release\*.nupkg

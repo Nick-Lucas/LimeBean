@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7499BFB8-59D8-4784-82E3-A75963DD8CA5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>LimeBean</RootNamespace>
+    <AssemblyName>LimeBean</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="BeanApi.cs" />
+    <Compile Include="BeanApiLinker.cs" />
+    <Compile Include="CommonDatabaseDetails.cs" />
+    <Compile Include="CompoundKey.cs" />
+    <Compile Include="ConnectionContainer.cs" />
+    <Compile Include="DatabaseAccess.cs" />
+    <Compile Include="DatabaseBeanFinder.cs" />
+    <Compile Include="DatabaseStorage.cs" />
+    <Compile Include="DbCommandDescriptor.cs" />
+    <Compile Include="Bean.cs" />
+    <Compile Include="BeanObserver.cs" />
+    <Compile Include="Cache.cs" />
+    <Compile Include="PgSqlDetails.cs" />
+    <Compile Include="Portability.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="IBeanCrud.cs" />
+    <Compile Include="IBeanFinder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="IDatabaseDetails.cs" />
+    <Compile Include="IKeyAccess.cs" />
+    <Compile Include="IStorage.cs" />
+    <Compile Include="BeanCrud.cs" />
+    <Compile Include="IDatabaseAccess.cs" />
+    <Compile Include="ITransactionSupport.cs" />
+    <Compile Include="IValueRelaxations.cs" />
+    <Compile Include="KeyUtil.cs" />
+    <Compile Include="MariaDbDetails.cs" />
+    <Compile Include="MsSqlDetails.cs" />
+    <Compile Include="SQLiteDetails.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
