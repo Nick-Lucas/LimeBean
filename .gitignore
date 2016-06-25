@@ -8,4 +8,4 @@ packages/
 project.lock.json
 LimeBean.NuGet/*.nupkg
 LimeBean.NuGet/nuget.exe
-LimeBean.Website/www/index.html
+index.html
