@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>LimeBean - RedBeanPHP-inspired data access layer for .NET</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/styles/codepen-embed.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="index.css" rel="stylesheet">
+
+    <!--[if lt IE 9]>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href=".">LimeBean</a>
+            </div>
+            <div id="navbar" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a target="_blank" href="https://www.nuget.org/packages/LimeBean">NuGet</a></li>
+                    <li>
+                        <a target="_blank" href="https://github.com/AlekseyMartynov/LimeBean/">
+                            <i class="fa fa-github"></i>
+                            GitHub
+                        </a>
+                    </li>
+                    <li><a target="_blank" href="https://ci.appveyor.com/project/AlekseyMartynov/limebean">AppVeyor</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container lime-hero">
+        <div class="starter-template">
+            <h1>
+                <i class="fa fa-database"></i>
+                LimeBean
+            </h1>
+            <p class="lead">
+                RedBeanPHP-inspired data access layer for .NET
+                <br>
+                ORM-like C# tool to easily store objects in database
+            </p>
+            <div>
+                <a class="btn btn-nuget btn-lg" href="#installation">
+                    <i class="fa fa-cloud-download"></i>
+                    Install via NuGet
+                </a>
+                <a class="btn btn-default btn-lg" href="#connect-to-database">
+                    <i class="fa fa-book"></i>
+                    Documentation
+                </a>
+            </div>
+            <div class="lime-social-buttons">
+                <!-- AddToAny BEGIN -->
+                <div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+                    <a class="a2a_button_twitter"></a>
+                    <a class="a2a_button_google_plus"></a>
+                    <a class="a2a_button_facebook"></a>
+                    <a class="a2a_button_hacker_news"></a>
+                    <a class="a2a_dd" href="https://www.addtoany.com/share_save"></a>
+                </div>
+                <!-- AddToAny END -->
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2 id="about-limebean">About LimeBean</h2>
+<p>LimeBean provides a simple and concise API for accessing <strong>ADO.NET</strong> data sources.
+It's halfway between a <strong>micro-ORM</strong> and <strong>direct SQL</strong>.
+With LimeBean, you can treat your data as <strong>objects</strong> or as plain <strong>records</strong>, depending on a situation.</p>
+<p>Compatible with:</p>
+<ul>
+<li><strong>.NET Framework 4.x</strong></li>
+<li><strong>.NET Core</strong> (ASP.NET Core, UWP)</li>
+<li><strong>Mono</strong></li>
+</ul>
+<p>Supported databases include:</p>
+<ul>
+<li><strong>SQLite</strong></li>
+<li><strong>MySQL/MariaDB</strong></li>
+<li><strong>PostgreSQL</strong></li>
+<li><strong>SQL Server</strong></li>
+</ul>
+<p>The library is inspired by <a href="http://redbeanphp.com">RedBeanPHP</a>.</p>
+<h2 id="installation">Installation</h2>
+<p>LimeBean is available on <a href="https://www.nuget.org/packages/LimeBean">NuGet Gallery</a>:</p>
+<pre><code>PM&gt; Install-Package LimeBean
+</code></pre>
+
+<h2 id="connect-to-database">Connect to Database</h2>
+<p>LimeBean needs an ADO.NET driver to work with. Use one of the following:</p>
+<ul>
+<li><a href="https://www.nuget.org/packages/System.Data.SQLite.Core">System.Data.SQLite.Core</a> for SQLite in .NET</li>
+<li><a href="http://www.mono-project.com/download/">Mono.Data.Sqlite</a> for SQLite in Mono</li>
+<li><a href="https://www.nuget.org/packages/Microsoft.Data.SQLite">Microsoft.Data.SQLite</a> for SQLite in .NET Core</li>
+<li><a href="https://www.nuget.org/packages/MySql.Data/">MySql.Data</a> for MySQL or MariaDB</li>
+<li><a href="https://www.nuget.org/packages/Npgsql/">Npgsql</a> for PostgreSQL</li>
+<li><a href="https://msdn.microsoft.com/en-us/library/System.Data.SqlClient.aspx">System.Data.SqlClient</a> for SQL Server</li>
+</ul>
+<p>To start using LimeBean, create an instance of the <code>BeanApi</code> class:</p>
+<pre><code>// Using a connection string and an ADO.NET provider factory                
+var api = new BeanApi(&quot;server=localhost; database=db1; ...&quot;, MySqlClientFactory.Instance);
+
+
+// Using a connection string and a connection type
+var api = new BeanApi(&quot;data source=/path/to/db&quot;, typeof(SQLiteConnection));
+
+
+// Using a shared pre-opened connection
+var api = new BeanApi(connection);
+</code></pre>
+
+<p><strong>NOTE:</strong> <code>BeanApi</code> is <code>IDisposable</code>. When created from a connection string (two first cases above),
+the underlying connection is initiated on the first usage and closed on dispose.
+Shared connections are used as-is, their state is not changed.</p>
+<p>See also: <a href="#beanapi-object-lifetime">BeanApi Object Lifetime</a></p>
+<h2 id="crud">CRUD</h2>
+<p>(Create / Read / Update / Delete)</p>
+<p>For basic usage, LimeBean requires zero configuration and no additional code!
+Database schema is maintained on-the-fly:
+no need to create tables and columns (see <a href="#fluid-mode">Fluid Mode</a>).</p>
+<p>Take a look at the following sample scenario:</p>
+<pre><code>// Use a temporary in-memory SQLite database
+var api = new BeanApi(&quot;Data Source=:memory:&quot;, SQLiteFactory.Instance);
+
+// Enter the &quot;Fluid Mode&quot;
+api.EnterFluidMode();
+</code></pre>
+
+<p><strong>Create</strong></p>
+<pre><code>// Create a bean. &quot;Bean&quot; means &quot;data record&quot;, &quot;dispense&quot; means &quot;instantiate new&quot;.
+var bean = api.Dispense(&quot;book&quot;);
+
+// Each bean has a kind. &quot;Kind&quot; is a synonym for &quot;table name&quot;
+var kind = bean.GetKind();
+Console.WriteLine(kind);
+
+// Fill it with some data
+bean[&quot;title&quot;] = &quot;Three Comrades&quot;;
+bean[&quot;rating&quot;] = 10;
+
+// Store it
+// Table &quot;book&quot; with 2 columns, one string and one integer, will be generated automatically
+var id = api.Store(bean);
+
+// Each saved bean has an ID, or primary key
+Console.WriteLine(id);
+</code></pre>
+
+<p><strong>Read</strong></p>
+<pre><code>// Load by ID
+bean = api.Load(&quot;book&quot;, id);
+</code></pre>
+
+<p><strong>Update</strong></p>
+<pre><code>// Make some edits
+bean[&quot;title&quot;] = &quot;Learn LimeBean&quot;;
+bean[&quot;release_date&quot;] = new DateTime(2015, 7, 30);
+bean[&quot;rating&quot;] = &quot;good&quot;;
+
+// Save updated bean
+// One new column (&quot;release_date&quot;) will be added
+// The type of column &quot;rating&quot; will be expanded from integer to string
+api.Store(bean);
+</code></pre>
+
+<p><strong>Delete</strong></p>
+<pre><code>api.Trash(bean);
+
+// Don't forget to close the connection
+api.Dispose();
+</code></pre>
+
+<h2 id="typed-accessors">Typed Accessors</h2>
+<p>To access bean properties in a strongly-typed fashion, use the <code>Get&lt;T&gt;</code> method:</p>
+<pre><code>bean.Get&lt;string&gt;(&quot;title&quot;);
+bean.Get&lt;decimal&gt;(&quot;price&quot;);
+bean.Get&lt;bool?&gt;(&quot;someFlag&quot;);
+</code></pre>
+
+<p>And there is a companion <code>Put</code> method which is chainable:</p>
+<pre><code>bean
+    .Put(&quot;name&quot;, &quot;Jane Doe&quot;)
+    .Put(&quot;comment&quot;, null);
+</code></pre>
+
+<p>See also: <a href="#custom-bean-classes">Custom Bean Classes</a></p>
+<h2 id="fluid-mode">Fluid Mode</h2>
+<p>LimeBean is committed to mitigate the common inconvenience associated with relational databases,
+namely necessity to manually create tables, columns and adjust their data types.
+In this sense, LimeBean takes SQL databases a little closer to NoSQL ones like MongoDB.</p>
+<p><strong>Fluid Mode</strong> is optional, turned off by default, and is recommended for use only during early development stages
+(particularly for prototyping and scaffolding).
+To enable it, invoke the <code>EnterFluidMode</code> method on the <code>BeanApi</code> object:</p>
+<pre><code>api.EnterFluidMode();
+</code></pre>
+
+<p>How does it work? When you save the next bean, LimeBean analyzes its fields and compares
+their names and types to the database schema.
+If new data cannot be stored to an existing table, schema alteration occurs.
+LimeBean can create new tables, add missing columns, and widen data types.
+It will never truncate data or delete unused columns.</p>
+<p><strong>NOTE:</strong> LimeBean doesn't detect renamings.</p>
+<p><strong>CAUTION:</strong> Automatically generated schema is usually sub-optimal and lacks indexes which are essential
+for performance. When most of planned tables are already in place,
+and only minor changes are expected,
+it is recommended to turn the Fluid Mode off, audit the database structure, add indexes, and make further schema
+changes with a dedicated database management tool (like HeidiSQL, SSMS, pgAdmin, etc).</p>
+<h2 id="finding-beans-with-sql">Finding Beans with SQL</h2>
+<p>LimeBean doesn't introduce any custom query language, nor does it implement a LINQ provider.
+To find beans matching a criteria, use snippets of plain SQL:</p>
+<pre><code>var list = api.Find(&quot;book&quot;, &quot;WHERE rating &gt; 7&quot;);
+</code></pre>
+
+<p>Instead of embedding values into SQL code, it is recommended to use <strong>parameters</strong>:</p>
+<pre><code>var list = api.Find(&quot;book&quot;, &quot;WHERE rating &gt; {0}&quot;, 7);
+</code></pre>
+
+<p>Usage of parameters looks similar to <code>String.Format</code>, but instead of direct interpolation,
+they are transformed into fair ADO.NET command parameters to protect your queries from injection-attacks.</p>
+<pre><code>var list = api.Find(
+    &quot;book&quot;, 
+    &quot;WHERE release_date BETWEEN {0} and {1} AND author LIKE {2}&quot;,
+    new DateTime(1930, 1, 1), new DateTime(1950, 1, 1), &quot;%remarque%&quot;
+);
+</code></pre>
+
+<p>You can use any SQL as long as the result maps to a set of beans.
+For other cases, see <a href="#generic-sql-queries">Generic Queries</a>.</p>
+<p>To find a single bean:</p>
+<pre><code>var best = api.FindOne(&quot;book&quot;, &quot;ORDER BY rating DESC LIMIT 1&quot;);
+</code></pre>
+
+<p>To find out the number of beans without loading them:</p>
+<pre><code>var count = api.Count(&quot;book&quot;, &quot;WHERE rating &gt; {0}&quot;, 7);
+</code></pre>
+
+<p>It is also possible to perform unbuffered (memory-optimized) load for processing in a <code>foreach</code> loop:</p>
+<pre><code>foreach(var bean in api.FindIterator(&quot;book&quot;, &quot;ORDER BY rating&quot;)) {
+    // do something with bean
+}
+</code></pre>
+
+<h2 id="custom-bean-classes">Custom Bean Classes</h2>
+<p>It is convenient to inherit from the base <code>Bean</code> class:</p>
+<pre><code>public class Book : Bean {
+    public Book()
+        : base(&quot;book&quot;) {
+    }
+
+    public string Title {
+        get { return Get&lt;string&gt;(&quot;title&quot;); }
+        set { Put(&quot;title&quot;, value); }
+    }
+
+    // ...
+}
+</code></pre>
+
+<p>Doing so has several advantages:</p>
+<ul>
+<li>All strings prone to typos (bean kind and field names) are encapsulated inside.</li>
+<li>You get compile-time checks, IDE assistance and <a href="#typed-accessors">typed properties</a>.</li>
+<li>With <a href="#lifecycle-hooks">Lifecycle Hooks</a>, it is easy to implement <a href="#data-validation">data validation</a> and <a href="#relations">relations</a>.</li>
+</ul>
+<p>For <a href="#custom-bean-classes">Custom Beans Classes</a>, use method overloads with a generic parameter:</p>
+<pre><code>api.Dispense&lt;Book&gt;();
+api.Load&lt;Book&gt;(1);
+api.Find&lt;Book&gt;(&quot;WHERE rating &gt; {0}&quot;, 7);
+// and so on
+</code></pre>
+
+<h3>Using <code>nameof()</code></h3>
+<p>With the help of the <a href="https://msdn.microsoft.com/en-us/library/dn986596.aspx">nameof</a> operator
+(introduced in C# 6 / Visual Studio 2015),
+it's possible to define properties without using strings at all:</p>
+<pre><code>public string Title {
+    get { return Get&lt;string&gt;(nameof(Title)); }
+    set { Put(nameof(Title), value); }
+}
+</code></pre>
+
+<h2 id="lifecycle-hooks">Lifecycle Hooks</h2>
+<p><a href="#custom-bean-classes">Custom Bean Classes</a> provide lifecycle hook methods which you can override to receive
+notifications about <a href="#crud">CRUD operations</a> occurring to this bean:</p>
+<pre><code>public class Product : Bean {
+    public Product()
+        : base(&quot;product&quot;) {
+    }
+
+    protected override void AfterDispense() {
+    }
+
+    protected override void BeforeLoad() {
+    }
+
+    protected override void AfterLoad() {
+    }
+
+    protected override void BeforeStore() {
+    }
+
+    protected override void AfterStore() {
+    }
+
+    protected override void BeforeTrash() {
+    }
+
+    protected override void AfterTrash() {
+    }
+}
+</code></pre>
+
+<p>Particularly useful are <code>BeforeStore</code> and <code>BeforeTrash</code> methods.
+They can be used for <a href="#data-validation">validation</a>, implementing <a href="#relations">relations</a>,
+assigning default values, etc.</p>
+<p>See also: <a href="#bean-observers">Bean Observers</a></p>
+<h2 id="primary-keys">Primary Keys</h2>
+<p>By default, all beans have auto-incrementing integer key named <code>&quot;id&quot;</code>.
+Keys are customizable in all aspects:</p>
+<pre><code>// Custom key name for beans of kind &quot;book&quot;
+api.Key(&quot;book&quot;, &quot;book_id&quot;);
+
+// Custom key name for custom bean class Book (see Custom Bean Classes)
+api.Key&lt;Book&gt;(&quot;book_id&quot;);
+
+// Custom non-autoincrement key
+api.Key(&quot;book&quot;, &quot;book_id&quot;, false);
+
+// Compound key (order_id, product_id) for beans of kind &quot;order_item&quot;
+api.Key(&quot;order_item&quot;, &quot;order_id&quot;, &quot;product_id&quot;);
+
+// Change defaults for all beans
+api.DefaultKey(&quot;Oid&quot;, false);
+</code></pre>
+
+<p><strong>NOTE:</strong> non auto-increment keys must be assigned manually prior to saving.</p>
+<p>The <a href="#bean-observers">Bean Observers</a> section contains an example of using GUID keys for all beans.</p>
+<h2 id="generic-sql-queries">Generic SQL Queries</h2>
+<p>Often it's needed to execute queries which don't map to beans:
+aggregates, grouping, joins, selecting single column, etc.</p>
+<p><code>BeanApi</code> provides methods for such tasks:</p>
+<pre><code>// Load multiple rows
+var rows = api.Rows(@&quot;SELECT author, COUNT(*) 
+                      FROM book 
+                      WHERE rating &gt; {0} 
+                      GROUP BY author&quot;, 7);
+
+// Load a single row
+var row = api.Row(@&quot;SELECT author, COUNT(*) 
+                    FROM book 
+                    WHERE rating &gt; {0}
+                    GROUP BY author 
+                    ORDER BY COUNT(*) DESC 
+                    LIMIT 1&quot;, 7);
+
+// Load a column
+var col = api.Col&lt;string&gt;(&quot;SELECT DISTINCT author FROM book ORDER BY author&quot;);
+
+// Load a single value
+var count = api.Cell&lt;int&gt;(&quot;SELECT COUNT(*) FROM book&quot;);
+</code></pre>
+
+<p>For <code>Rows</code> and <code>Col</code>, there are unbuffered (memory-optimized) counterparts:</p>
+<pre><code>foreach(var row in api.RowsIterator(&quot;...&quot;)) {
+    // do something
+}
+
+foreach(var item in api.ColIterator(&quot;...&quot;)) {
+    // do something
+}
+</code></pre>
+
+<p>To execute a non-query SQL command, use the <code>Exec</code> method:</p>
+<pre><code>api.Exec(&quot;SET autocommit = 0&quot;);
+</code></pre>
+
+<p><strong>NOTE:</strong> all described functions accept parameters in the same form as <a href="#finding-beans-with-sql">finder methods</a> do.</p>
+<h2 id="customizing-sql-commands">Customizing SQL Commands</h2>
+<p>In some cases it is necessary to manually adjust parameters of a SQL command which is about to execute.
+This can be done in the <code>QueryExecuting</code> event handler.</p>
+<p><strong>Example 1.</strong>  Force <code>datetime2</code> type for all dates (SQL Server):</p>
+<pre><code>api.QueryExecuting += cmd =&gt; {
+    foreach(SqlParameter p in cmd.Parameters)
+        if(p.Value is DateTime)
+            p.SqlDbType = SqlDbType.DateTime2;
+};
+</code></pre>
+
+<p><strong>Example 2.</strong> Work with <code>MySqlGeometry</code> objects (MySQL/MariaDB):</p>
+<pre><code>api.QueryExecuting += cmd =&gt; {
+    foreach(MySqlParameter p in cmd.Parameters)
+        if(p.Value is MySqlGeometry)
+            p.MySqlDbType = MySqlDbType.Geometry;
+};
+
+bean[&quot;point&quot;] = new MySqlGeometry(34.962, 34.066);
+api.Store(bean);
+</code></pre>
+
+<h2 id="data-validation">Data Validation</h2>
+<p>The <code>BeforeStore</code> <a href="#lifecycle-hooks">hook</a> can be used to prevent bean from storing under certain
+circumstances. For example, let's define a <a href="#custom-bean-classes">custom bean</a> <code>Book</code> which cannot be stored
+unless it has a non-empty title:</p>
+<pre><code>public class Book : Bean {
+    public Book()
+        : base(&quot;book&quot;) {
+    }
+
+    public string Title {
+        get { return Get&lt;string&gt;(&quot;title&quot;); }
+        set { Put(&quot;title&quot;, value); }
+    }
+
+    protected override void BeforeStore() {
+        if(String.IsNullOrWhiteSpace(Title))
+            throw new Exception(&quot;Title must not be empty&quot;);
+    }
+}
+</code></pre>
+
+<p>See also: <a href="#custom-bean-classes">Custom Bean Classes</a>, <a href="#lifecycle-hooks">Lifecycle Hooks</a></p>
+<h2 id="relations">Relations</h2>
+<p>Consider an example of two <a href="#custom-bean-classes">custom beans</a>: <code>Category</code> and <code>Product</code>:</p>
+<pre><code>public partial class Category : Bean {
+    public Category()
+        : base(&quot;category&quot;) {
+    }
+
+}
+
+public partial class Product : Bean {
+    public Product()
+        : base(&quot;product&quot;) {
+    }
+}
+</code></pre>
+
+<p>We are going to link them so that a product knows its category, and a category can list all its products.</p>
+<p>In the <code>Product</code> class, let's declare a method <code>GetCategory()</code>:</p>
+<pre><code>partial class Product {
+    public Category GetCategory() {
+        return GetApi().Load&lt;Category&gt;(this[&quot;category_id&quot;]);
+    }
+}
+</code></pre>
+
+<p>In the <code>Category</code> class, we'll add a method named <code>GetProducts()</code>:</p>
+<pre><code>partial class Category {
+    public Product[] GetProducts() {
+        return GetApi().Find&lt;Product&gt;(&quot;WHERE category_id = {0}&quot;, this[&quot;id&quot;]);
+    }
+}
+</code></pre>
+
+<p><strong>NOTE:</strong> LimeBean uses the <a href="#internal-query-cache">internal query cache</a>, therefore repeated <code>Load</code> and <code>Find</code> calls don't hit the database.</p>
+<p>Now let's add some <a href="#data-validation">validation logic</a> to prevent saving a product without a category and to prevent deletion of
+a non-empty category:</p>
+<pre><code>partial class Product {
+    protected override void BeforeStore() {
+        if(GetCategory() == null)
+            throw new Exception(&quot;Product must belong to an existing category&quot;);
+    }
+}
+
+partial class Category {
+    protected override void BeforeTrash() {
+        if(GetProducts().Any())
+            throw new Exception(&quot;Category still contains products&quot;);
+    }
+}
+</code></pre>
+
+<p>Alternatively, we can implement cascading deletion:</p>
+<pre><code>protected override void BeforeTrash() {
+    foreach(var p in GetProducts())
+        GetApi().Trash(p);
+}
+</code></pre>
+
+<p><strong>NOTE:</strong> <code>Store</code> and <code>Trash</code> always run in a transaction (see <a href="#implicit-transactions">Implicit Transactions</a>),
+therefore even if something goes wrong inside the cascading deletion loop, database will remain in a consistent state!</p>
+<h2 id="transactions">Transactions</h2>
+<p>To execute a block of code in a transaction, wrap it in a delegate and pass to the <code>Transaction</code> method:</p>
+<pre><code>api.Transaction(delegate() { 
+    // do some work
+});
+</code></pre>
+
+<p>Transaction is automatically rolled back if:</p>
+<ul>
+<li>An unhandled exception is thrown during the execution</li>
+<li>The delegate returns <code>false</code></li>
+</ul>
+<p>Otherwise it's committed.</p>
+<p>Transactions can be nested (if the underlying ADO.NET provider allows this):</p>
+<pre><code>api.Transaction(delegate() {
+    // outer transaction
+
+    api.Transaction(delegate() { 
+        // nested transaction
+    });
+});
+</code></pre>
+
+<h2 id="implicit-transactions">Implicit Transactions</h2>
+<p>When you invoke <code>Store</code> or <code>Trash</code> (see <a href="#crud">CRUD</a>) outside a transaction, then an implicit transaction
+is initiated behind the scenes. This is done to enforce database integrity in case of
+additional modifications performed in
+<a href="#lifecycle-hooks">hooks</a> and <a href="#bean-observers">observers</a> (such as cascading delete, etc).</p>
+<p>There are special cases when you may need to turn this behavior off
+(for example when using <a href="https://dev.mysql.com/doc/refman/5.0/en/lock-tables-and-transactions.html">LOCK TABLES with InnoDB</a>):</p>
+<pre><code>api.ImplicitTransactions = false;
+</code></pre>
+
+<h2 id="bean-observers">Bean Observers</h2>
+<p>Bean observers have the same purpose as <a href="#lifecycle-hooks">Lifecycle Hooks</a> with the difference that former
+are invoked for all beans. With observers you can implement plugins and extensions.</p>
+<p>For example, let's make so that all beans have GUID keys insted of integer auto-increments:</p>
+<pre><code>class GuidKeyObserver : BeanObserver {
+    public override void BeforeStore(Bean bean) {
+        if(bean[&quot;id&quot;] == null)
+            bean[&quot;id&quot;] = Guid.NewGuid();
+    }
+}
+
+
+api.DefaultKey(false); // turn off auto-increment keys
+api.AddObserver(new GuidKeyObserver());
+
+// but beware of http://www.informit.com/articles/printerfriendly/25862
+</code></pre>
+
+<p>Another example is adding automatic timestamps:</p>
+<pre><code>class TimestampObserver : BeanObserver {
+    public override void AfterDispense(Bean bean) {
+        bean[&quot;created_at&quot;] = DateTime.Now;
+    }
+    public override void BeforeStore(Bean bean) {
+        bean[&quot;updated_at&quot;] = DateTime.Now;
+    }
+}
+</code></pre>
+
+<h2 id="beanapi-object-lifetime">BeanApi Object Lifetime</h2>
+<p>The <code>BeanApi</code> class is <code>IDisposable</code> (it holds the <code>DbConnection</code>) and is not thread-safe.
+Care should be taken to ensure that the same <code>BeanApi</code> is not used from multiple threads without
+synchronization, and that it is properly disposed. Let's consider some common usage scenarios.</p>
+<h3>Local Usage</h3>
+<p>If LimeBean is used locally, then it should be enclosed in a <code>using</code> block:</p>
+<pre><code>using(var api = new BeanApi(connectionString, connectionType)) {
+    api.EnterFluidMode();
+
+    // work with beans
+}
+</code></pre>
+
+<h3>Global Singleton</h3>
+<p>For simple applications like console tools, you can use a single globally available statiс instance:</p>
+<pre><code>class Globals {
+    public static readonly BeanApi MyBeanApi;
+
+    static Globals() {
+        MyBeanApi = new BeanApi(&quot;connection string&quot;, SQLiteFactory.Instance);
+        MyBeanApi.EnterFluidMode();
+    }
+}
+</code></pre>
+
+<p>In case of multi-threading, synchronize operations with <code>lock</code> or other techniques.</p>
+<h3>Web Applications (classic)</h3>
+<p>In a classic ASP.NET app, create one <code>BeanApi</code> per web request.
+You can use a Dependency Injection framework which supports per-request scoping,
+or do it manually like shown below:</p>
+<pre><code>// This is your Global.asax file
+public class Global : HttpApplication {
+    const string MY_BEAN_API_KEY = &quot;bYeU3kLOQgGiWqUIql7Hqg&quot;; // any unique value
+
+    public static BeanApi MyBeanApi {
+        get { return (BeanApi)HttpContext.Current.Items[MY_BEAN_API_KEY]; }
+        set { HttpContext.Current.Items[MY_BEAN_API_KEY] = value; }
+    }
+
+    protected void Application_BeginRequest(object sender, EventArgs e) {
+        MyBeanApi = new BeanApi(&quot;connection string&quot;, SQLiteFactory.Instance);
+        MyBeanApi.EnterFluidMode();
+    }
+
+    protected void Application_EndRequest(object sender, EventArgs e) {
+        MyBeanApi.Dispose();
+    }
+
+}
+</code></pre>
+
+<h3>ASP.NET Core Applications</h3>
+<p>Subclass <code>BeanApi</code> and register it as a <strong>scoped</strong> service in the Startup.cs file:</p>
+<pre><code>public class MyBeanApi : BeanApi {
+    public MyBeanApi()
+        : base(&quot;data source=data.db&quot;, typeof(SqliteConnection)) {
+        EnterFluidMode();
+    }
+}
+
+public class Startup {
+    public void ConfigureServices(IServiceCollection services) {
+        // . . .
+        services.AddScoped&lt;MyBeanApi&gt;();
+    }
+}
+</code></pre>
+
+<p>Then inject it into any controller:</p>
+<pre><code>public class HomeController : Controller {
+    BeanApi _beans;
+
+    public HomeController(MyBeanApi beans) {
+        _beans = beans;
+    }
+
+    public IActionResult Index() {
+        ViewBag.Books = _beans.Find(&quot;book&quot;, &quot;ORDER BY title&quot;);
+        return new ViewResult();
+    }
+}
+</code></pre>
+
+<h2 id="internal-query-cache">Internal Query Cache</h2>
+<p>Results of all recent read-only SQL queries initiated by
+<a href="#finding-beans-with-sql">finder</a> and <a href="#generic-sql-queries">generic query</a> functions are cached internally
+on the <em>least recently used</em> (LRU) basis. This saves database round trips during repeated reads.</p>
+<p>The number of cached results can be adjusted by setting the <code>CacheCapacity</code> property:</p>
+<pre><code>// increase
+api.CacheCapacity = 500;
+
+// turn off completely
+api.CacheCapacity = 0;
+</code></pre>
+
+<p>Cache is fully invalidated (cleared) on:</p>
+<ul>
+<li>any non-readonly query (UPDATE, etc)</li>
+<li>failed <a href="#transactions">transaction</a></li>
+</ul>
+<p>In rare special cases you may need to <strong>bypass</strong> the cache.
+For this purpose, all query functions provide overloads with the <code>useCache</code> argument:</p>
+<pre><code>var uid = api.Cell&lt;string&gt;(false, &quot;select hex(randomblob(16))&quot;);
+</code></pre>
+
+
+    </div>
+
+    <div class="container lime-footer">
+        <hr />
+        <b>LimeBean</b> is released under the <a href="https://raw.githubusercontent.com/AlekseyMartynov/LimeBean/master/LICENSE.txt">MIT license</a>
+        <br />
+        Updated on Jun 25, 2016
+        <br /><br />
+        <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/languages/cs.min.js"></script>
+
+    <script type="text/javascript" src="https://static.addtoany.com/menu/page.js"></script>
+
+    <script>
+        hljs.configure({ languages: [ "cs", "json" ] });
+        hljs.initHighlightingOnLoad();
+
+        // https://github.com/twbs/bootstrap/issues/1768
+        $(window).on("hashchange", function() {
+            scrollBy(0, -65);
+        });
+    </script>
+
+    <script>
+        (function(i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function() {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-8054885-8', 'auto');
+        ga('send', 'pageview');
+    </script>
+</body>
+</html>
