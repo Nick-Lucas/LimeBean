@@ -44,7 +44,7 @@ test_script:
   - dotnet test LimeBean.NetCore\LimeBean.Tests
 
 after_test:
-  - dotnet pack LimeBean.NetCore\LimeBean --configuration=Release
+  - dotnet pack LimeBean.NetCore\LimeBean --no-build --configuration=Release
 
 artifacts:
   - path: LimeBean.NetCore\LimeBean\bin\Release\*.nupkg
