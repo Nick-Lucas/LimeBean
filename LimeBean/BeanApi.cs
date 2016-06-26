@@ -117,6 +117,10 @@ namespace LimeBean {
 #if !DEBUG
         [Obsolete("Use Fluid Mode in DEBUG mode only!")]
 #endif
+        /// <summary>
+        /// Used LimeBean in 'Fluid Mode' which will auto create missing 
+        /// configuration which you are trying to interact with in the Database
+        /// </summary>
         public void EnterFluidMode() {
             Storage.EnterFluidMode();
         }
@@ -140,34 +144,77 @@ namespace LimeBean {
             Crud.RemoveObserver(observer);
         }
 
+        /// <summary>
+        /// Create a new Bean of a given Kind (table name)
+        /// </summary>
+        /// <param name="kind">The name of a table to create a Bean for</param>
+        /// <returns>A Bean representing the requested Kind (table name)</returns>
         public Bean Dispense(string kind) {
             return Crud.Dispense(kind);
         }
 
+        /// <summary>
+        /// Create a new Bean of a given Bean subclass
+        /// </summary>
+        /// <typeparam name="T">A subclass of Bean representing a Bean Kind (table)</typeparam>
+        /// <returns>A Bean representing the requested Bean Kind (table)</returns>
         public T Dispense<T>() where T : Bean, new() {
             return Crud.Dispense<T>();
         }
 
+        /// <summary>
+        /// Create a new Bean of a given Kind (table) and populate it with a given data set
+        /// </summary>
+        /// <param name="kind">The name of a table to create the Bean for</param>
+        /// <param name="row">The data to populate the Bean with</param>
+        /// <returns>A Bean of the given Kind (table) populated with the given data</returns>
         public Bean RowToBean(string kind, IDictionary<string, object> row) {
             return Crud.RowToBean(kind, row);
         }
 
+        /// <summary>
+        /// Create a new Bean of a given subclass representing a given Kind (table), and populate it with a given data set
+        /// </summary>
+        /// <typeparam name="T">A subclass of Bean representing a Bean Kind (table)</typeparam>
+        /// <param name="row">The data to populate the Bean with</param>
+        /// <returns>A Bean of the given subclass populated with the given data</returns>
         public T RowToBean<T>(IDictionary<string, object> row) where T : Bean, new() {
             return Crud.RowToBean<T>(row);
         }
 
+        /// <summary>
+        /// Query a Bean (row) from the Database
+        /// </summary>
+        /// <param name="kind">The Kind (table) to query</param>
+        /// <param name="key">The value of the primary key on the required row</param>
+        /// <returns>A new Bean representing the requested row from the database</returns>
         public Bean Load(string kind, object key) {
             return Crud.Load(kind, key);
         }
 
+        /// <summary>
+        /// Query a Bean (row) of a given subclass from the Database
+        /// </summary>
+        /// <typeparam name="T">The Bean subclass to query</typeparam>
+        /// <param name="key">The value of the primary key on the required row</param>
+        /// <returns>A new Bean of the given subclass representing the requested row from the database</returns>
         public T Load<T>(object key) where T : Bean, new() {
             return Crud.Load<T>(key);
         }
 
+        /// <summary>
+        /// Save a given Bean to the database. Insert or Update a record as appropriate
+        /// </summary>
+        /// <param name="bean">A Bean or subclass thereof</param>
+        /// <returns>The primary key(s) for the stored Bean</returns>
         public object Store(Bean bean) {
             return Crud.Store(bean);
         }
 
+        /// <summary>
+        /// Delete the underlying record of a Bean (row) from the database
+        /// </summary>
+        /// <param name="bean">A Bean (row) or subclass thereof</param>
         public void Trash(Bean bean) {
             Crud.Trash(bean);
         }
