@@ -246,7 +246,7 @@ namespace LimeBean {
         // IBeanFinder
 
         /// <summary>
-        /// Query the database for one or more Beans (rows) which matches the given filter conditions
+        /// Query the database for one or more Beans (rows) which match the given filter conditions
         /// </summary>
         /// <param name="useCache">When true, Beans will be queried from the cache first 
         /// and stored if not already cached. When false any cached Beans will be removed</param>
@@ -259,7 +259,7 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Query the database for one or more Beans (rows) of the given subclass which matches the given filter conditions
+        /// Query the database for one or more Beans (rows) of the given subclass which match the given filter conditions
         /// </summary>
         /// <param name="useCache">When true, Beans will be queried from the cache first 
         /// and stored if not already cached. When false any cached Beans will be removed</param>
@@ -272,7 +272,7 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Query the database for one or more Beans (rows) which matches the given filter conditions. Uses caching.
+        /// Query the database for one or more Beans (rows) which match the given filter conditions. Uses caching.
         /// </summary>
         /// <param name="kind">The Kind (table) to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
@@ -283,7 +283,7 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Query the database for one or more Beans (rows) of the given subclass which matches the given filter conditions. Uses caching.
+        /// Query the database for one or more Beans (rows) of the given subclass which match the given filter conditions. Uses caching.
         /// </summary>
         /// <param name="kind">The Kind (table) to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
@@ -341,26 +341,74 @@ namespace LimeBean {
             return FindOne<T>(true, expr, parameters);
         }
 
+        /// <summary>
+        /// Query the database for one or more Beans (rows) which match the given filter conditions. No caching.
+        /// </summary>
+        /// <param name="kind">The Kind (table) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>An IEnumerable of Beans which meet the given query conditions</returns>
         public IEnumerable<Bean> FindIterator(string kind, string expr = null, params object[] parameters) {
             return Finder.FindIterator(kind, expr, parameters);
         }
 
+        /// <summary>
+        /// Query the database for one or more Beans (rows) of a given subclass, which match the given filter conditions. No caching.
+        /// </summary>
+        /// <param name="kind">The Kind (table) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>An IEnumerable of the given Bean subclass which meet the given query conditions</returns>
         public IEnumerable<T> FindIterator<T>(string expr = null, params object[] parameters) where T : Bean, new() {
             return Finder.FindIterator<T>(expr, parameters);
         }
 
+        /// <summary>
+        /// Count the number of rows which match the given filter conditions on the given Kind (table)
+        /// </summary>
+        /// <param name="useCache">When true, Beans will be queried from the cache first 
+        /// and stored if not already cached. When false any cached Beans will be removed</param>
+        /// <param name="kind">The Kind (table) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>A count of the number of rows matching the given conditions</returns>
         public long Count(bool useCache, string kind, string expr = null, params object[] parameters) {
             return Finder.Count(useCache, kind, expr, parameters);            
         }
 
+        /// <summary>
+        /// Count the number of rows which match the given filter conditions on the Kind of the given Bean subclass
+        /// </summary>
+        /// <typeparam name="T">The Bean subclass which contains information of what Kind (table) to Count on</typeparam>
+        /// <param name="useCache">When true, Beans will be queried from the cache first 
+        /// and stored if not already cached. When false any cached Beans will be removed</param>
+        /// <param name="kind">The Kind (table) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>A count of the number of rows matching the given conditions</returns>
         public long Count<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new() {
             return Finder.Count<T>(useCache, expr, parameters);
         }
 
+        /// <summary>
+        /// Count the number of rows which match the given filter conditions on the given Kind (table). Uses caching
+        /// </summary>
+        /// <param name="kind">The Kind (table) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>A count of the number of rows matching the given conditions</returns>
         public long Count(string kind, string expr = null, params object[] parameters) {
             return Count(true, kind, expr, parameters);
         }
 
+        /// <summary>
+        /// Count the number of rows which match the given filter conditions on the Kind of the given Bean subclass. Uses caching
+        /// </summary>
+        /// <typeparam name="T">The Bean subclass which contains information of what Kind (table) to Count on</typeparam>
+        /// <param name="kind">The Kind (table) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>A count of the number of rows matching the given conditions</returns>
         public long Count<T>(string expr = null, params object[] parameters) where T : Bean, new() {
             return Count<T>(true, expr, parameters);
         }
