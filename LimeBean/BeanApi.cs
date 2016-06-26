@@ -203,6 +203,26 @@ namespace LimeBean {
         }
 
         /// <summary>
+        /// Query a Bean (row) from the Database
+        /// </summary>
+        /// <param name="kind">The Kind (table) to query</param>
+        /// <param name="key">An array of the multi-column primary key values on the required row</param>
+        /// <returns>A new Bean representing the requested row from the database</returns>
+        public Bean Load(string kind, params object[] compoundKey) {
+            return Load(kind, KeyUtil.PackCompoundKey(kind, compoundKey));
+        }
+
+        /// <summary>
+        /// Query a Bean (row) of a given subclass from the Database
+        /// </summary>
+        /// <typeparam name="T">The Bean subclass to query</typeparam>
+        /// <param name="key">An array of the multi-column primary key values on the required row</param>
+        /// <returns>A new Bean of the given subclass representing the requested row from the database</returns>
+        public T Load<T>(params object[] compoundKey) where T : Bean, new() {
+            return Load<T>(KeyUtil.PackCompoundKey(Bean.GetKind<T>(), compoundKey));
+        }
+
+        /// <summary>
         /// Save a given Bean to the database. Insert or Update a record as appropriate
         /// </summary>
         /// <param name="bean">A Bean or subclass thereof</param>
@@ -331,14 +351,6 @@ namespace LimeBean {
         }
 
         // Shortcuts
-
-        public Bean Load(string kind, params object[] compoundKey) {
-            return Load(kind, KeyUtil.PackCompoundKey(kind, compoundKey));
-        }
-
-        public T Load<T>(params object[] compoundKey) where T : Bean, new() {
-            return Load<T>(KeyUtil.PackCompoundKey(Bean.GetKind<T>(), compoundKey));
-        }
 
         public Bean[] Find(string kind, string expr = null, params object[] parameters) {
             return Find(true, kind, expr, parameters);
