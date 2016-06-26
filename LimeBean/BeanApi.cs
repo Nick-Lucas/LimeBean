@@ -242,7 +242,7 @@ namespace LimeBean {
         // IBeanFinder
 
         /// <summary>
-        /// Query the database for one or more Beans (rows) which match the given filter conditions
+        /// Query the database for one or more Beans (rows) which matches the given filter conditions
         /// </summary>
         /// <param name="useCache">When true, Beans will be queried from the cache first 
         /// and stored if not already cached. When false any cached Beans will be removed</param>
@@ -255,7 +255,7 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Query the database for one or more Beans (rows) of the given subclass which match the given filter conditions
+        /// Query the database for one or more Beans (rows) of the given subclass which matches the given filter conditions
         /// </summary>
         /// <param name="useCache">When true, Beans will be queried from the cache first 
         /// and stored if not already cached. When false any cached Beans will be removed</param>
@@ -268,7 +268,7 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Query the database for one or more Beans (rows) which match the given filter conditions. Uses caching.
+        /// Query the database for one or more Beans (rows) which matches the given filter conditions. Uses caching.
         /// </summary>
         /// <param name="kind">The Kind (table) to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
@@ -279,7 +279,7 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Query the database for one or more Beans (rows) of the given subclass which match the given filter conditions. Uses caching.
+        /// Query the database for one or more Beans (rows) of the given subclass which matches the given filter conditions. Uses caching.
         /// </summary>
         /// <param name="kind">The Kind (table) to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
@@ -290,7 +290,7 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Query the database for the first Bean (row) to matches the given filter conditions
+        /// Query the database for the first Bean (row) which matches the given filter conditions
         /// </summary>
         /// <param name="useCache">When true, Beans will be queried from the cache first 
         /// and stored if not already cached. When false any cached Beans will be removed</param>
@@ -316,7 +316,7 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Query the database for the first Bean (row) to matches the given filter conditions. Uses caching.
+        /// Query the database for the first Bean (row) which matches the given filter conditions. Uses caching.
         /// </summary>
         /// <param name="kind">The Kind (table) to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
