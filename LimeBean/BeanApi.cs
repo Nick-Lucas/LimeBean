@@ -350,7 +350,15 @@ namespace LimeBean {
         }
 
         public long Count<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new() {
-            return Finder.Count<T>(useCache, expr, parameters);            
+            return Finder.Count<T>(useCache, expr, parameters);
+        }
+
+        public long Count(string kind, string expr = null, params object[] parameters) {
+            return Count(true, kind, expr, parameters);
+        }
+
+        public long Count<T>(string expr = null, params object[] parameters) where T : Bean, new() {
+            return Count<T>(true, expr, parameters);
         }
 
         // IDatabaseAccess
@@ -373,6 +381,10 @@ namespace LimeBean {
             return Db.ColIterator<T>(sql, parameters);
         }
 
+        public IEnumerable<object> ColIterator(string sql, params object[] parameters) {
+            return ColIterator<object>(sql, parameters);
+        }
+
         public IEnumerable<IDictionary<string, object>> RowsIterator(string sql, params object[] parameters) {
             return Db.RowsIterator(sql, parameters);
         }
@@ -381,8 +393,24 @@ namespace LimeBean {
             return Db.Cell<T>(useCache, sql, parameters);
         }
 
+        public T Cell<T>(string sql, params object[] parameters) {
+            return Cell<T>(true, sql, parameters);
+        }
+
+        public object Cell(string sql, params object[] parameters) {
+            return Cell<object>(sql, parameters);
+        }
+
         public T[] Col<T>(bool useCache, string sql, params object[] parameters) {
             return Db.Col<T>(useCache, sql, parameters);
+        }
+
+        public T[] Col<T>(string sql, params object[] parameters) {
+            return Col<T>(true, sql, parameters);
+        }
+
+        public object[] Col(string sql, params object[] parameters) {
+            return Col<object>(true, sql, parameters);
         }
 
         public IDictionary<string, object> Row(bool useCache, string sql, params object[] parameters) {
@@ -391,6 +419,14 @@ namespace LimeBean {
 
         public IDictionary<string, object>[] Rows(bool useCache, string sql, params object[] parameters) {
             return Db.Rows(useCache, sql, parameters);
+        }
+
+        public IDictionary<string, object> Row(string sql, params object[] parameters) {
+            return Row(true, sql, parameters);
+        }
+
+        public IDictionary<string, object>[] Rows(string sql, params object[] parameters) {
+            return Rows(true, sql, parameters);
         }
 
         // ITransactionSupport
@@ -413,6 +449,13 @@ namespace LimeBean {
             Db.Transaction(action);
         }
 
+        public void Transaction(Action action) {
+            Transaction(delegate () {
+                action();
+                return true;
+            });
+        }
+
         // IValueRelaxations
 
         public bool TrimStrings {
@@ -428,51 +471,6 @@ namespace LimeBean {
         public bool RecognizeIntegers {
             get { return Storage.RecognizeIntegers; }
             set { Storage.RecognizeIntegers = value; }
-        }
-
-        // Shortcuts
-
-        public long Count(string kind, string expr = null, params object[] parameters) {
-            return Count(true, kind, expr, parameters);
-        }
-
-        public long Count<T>(string expr = null, params object[] parameters) where T : Bean, new() {
-            return Count<T>(true, expr, parameters);
-        }
-
-        public IEnumerable<object> ColIterator(string sql, params object[] parameters) {
-            return ColIterator<object>(sql, parameters);
-        }
-
-        public T Cell<T>(string sql, params object[] parameters) {
-            return Cell<T>(true, sql, parameters);
-        }
-
-        public object Cell(string sql, params object[] parameters) {
-            return Cell<object>(sql, parameters);
-        }
-
-        public T[] Col<T>(string sql, params object[] parameters) {
-            return Col<T>(true, sql, parameters);
-        }
-
-        public object[] Col(string sql, params object[] parameters) {
-            return Col<object>(true, sql, parameters);
-        }
-
-        public IDictionary<string, object> Row(string sql, params object[] parameters) {
-            return Row(true, sql, parameters);
-        }
-
-        public IDictionary<string, object>[] Rows(string sql, params object[] parameters) {
-            return Rows(true, sql, parameters);
-        }
-
-        public void Transaction(Action action) {
-            Transaction(delegate() {
-                action();
-                return true;
-            });
         }
 
         // Custom keys
