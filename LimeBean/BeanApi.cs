@@ -120,8 +120,8 @@ namespace LimeBean {
         [Obsolete("Use Fluid Mode in DEBUG mode only!")]
 #endif
         /// <summary>
-        /// Used LimeBean in 'Fluid Mode' which will auto create missing 
-        /// configuration which you are trying to interact with in the Database
+        /// Use LimeBean in 'Fluid Mode' which will auto create missing 
+        /// configuration (ie. columns) which you are trying to interact with in the Database
         /// </summary>
         public void EnterFluidMode() {
             Storage.EnterFluidMode();
@@ -134,6 +134,10 @@ namespace LimeBean {
 
         // IBeanCrud
 
+        /// <summary>
+        /// Default True. Gets or Sets whether changes to a Bean are tracked per Column.
+        /// When True, only Columns which are changed will be Updated on Store. Otherwise all Columns are updated
+        /// </summary>
         public bool DirtyTracking {
             get { return Crud.DirtyTracking; }
             set { Crud.DirtyTracking = value; }
