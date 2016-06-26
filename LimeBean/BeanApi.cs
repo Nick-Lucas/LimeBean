@@ -495,24 +495,42 @@ namespace LimeBean {
 
         // ITransactionSupport
 
+        /// <summary>
+        /// Gets or Sets whether a transaction will automatically be used on the CUD aspects of Crud a operation
+        /// Implicit Transactions do not occur if a Transaction is currently being handled by this instance of BeanAPI
+        /// </summary>
         public bool ImplicitTransactions {
             get { return Db.ImplicitTransactions; }
             set { Db.ImplicitTransactions = value; }
         }
 
+        /// <summary>
+        /// Gets whether there are any transactions currently being worked on
+        /// </summary>
         public bool InTransaction {
             get { return Db.InTransaction; }
         }
 
+        /// <summary>
+        /// Gets or sets the IsolationLevel of Limebean database transactions
+        /// </summary>
         public IsolationLevel TransactionIsolation {
             get { return Db.TransactionIsolation; }
             set { Db.TransactionIsolation = value; }
         }
 
+        /// <summary>
+        /// Wraps an Action in a database transaction. Anything done here will roll back and throw if any error occurs
+        /// </summary>
+        /// <param name="action">The process to take place</param>
         public void Transaction(Func<bool> action) {
             Db.Transaction(action);
         }
 
+        /// <summary>
+        /// Wraps an Action in a database transaction. Anything done here will roll back and throw if any error occurs
+        /// </summary>
+        /// <param name="action">The process to take place</param>
         public void Transaction(Action action) {
             Transaction(delegate () {
                 action();
