@@ -30,6 +30,7 @@ namespace LimeBean {
             });
         }
 
+
         // Properties
 
         public DbConnection Connection {
@@ -112,6 +113,7 @@ namespace LimeBean {
             throw new NotSupportedException();
         }
 
+
         // Methods
 
 #if !DEBUG
@@ -128,6 +130,7 @@ namespace LimeBean {
         public void Dispose() {
             _connectionContainer.Dispose();
         }
+
 
         // IBeanCrud
 
@@ -238,6 +241,7 @@ namespace LimeBean {
         public void Trash(Bean bean) {
             Crud.Trash(bean);
         }
+
 
         // IBeanFinder
 
@@ -361,6 +365,7 @@ namespace LimeBean {
             return Count<T>(true, expr, parameters);
         }
 
+
         // IDatabaseAccess
 
         public event Action<DbCommand> QueryExecuting {
@@ -429,6 +434,7 @@ namespace LimeBean {
             return Rows(true, sql, parameters);
         }
 
+
         // ITransactionSupport
 
         public bool ImplicitTransactions {
@@ -456,6 +462,7 @@ namespace LimeBean {
             });
         }
 
+
         // IValueRelaxations
 
         public bool TrimStrings {
@@ -472,6 +479,7 @@ namespace LimeBean {
             get { return Storage.RecognizeIntegers; }
             set { Storage.RecognizeIntegers = value; }
         }
+
 
         // Custom keys
 

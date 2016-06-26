@@ -49,6 +49,7 @@ namespace LimeBean {
             return _kind ?? base.ToString();
         }
 
+
         // Accessors
 
         /// <summary>
@@ -83,6 +84,7 @@ namespace LimeBean {
             return this;
         }
 
+
         // Import / Export
 
         internal IDictionary<string, object> Export() {
@@ -93,6 +95,7 @@ namespace LimeBean {
             foreach(var entry in data)
                 this[entry.Key] = entry.Value;
         }
+
 
         // Dirty tracking
 
@@ -125,6 +128,7 @@ namespace LimeBean {
 
             return new HashSet<string>(_dirtyBackup.Keys);
         }
+
 
         // Hooks
 
