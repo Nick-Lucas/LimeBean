@@ -241,20 +241,100 @@ namespace LimeBean {
 
         // IBeanFinder
 
+        /// <summary>
+        /// Query the database for one or more Beans (rows) which match the given filter conditions
+        /// </summary>
+        /// <param name="useCache">When true, Beans will be queried from the cache first 
+        /// and stored if not already cached. When false any cached Beans will be removed</param>
+        /// <param name="kind">The Kind (table) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>An array of Beans which meet the given query conditions</returns>
         public Bean[] Find(bool useCache, string kind, string expr = null, params object[] parameters) {
             return Finder.Find(useCache, kind, expr, parameters);
         }
 
+        /// <summary>
+        /// Query the database for one or more Beans (rows) of the given subclass which match the given filter conditions
+        /// </summary>
+        /// <param name="useCache">When true, Beans will be queried from the cache first 
+        /// and stored if not already cached. When false any cached Beans will be removed</param>
+        /// <param name="kind">The Kind (table) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>An array of Beans of the given subclass which meet the given query conditions</returns>
         public T[] Find<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new() {
             return Finder.Find<T>(useCache, expr, parameters);
         }
 
+        /// <summary>
+        /// Query the database for one or more Beans (rows) which match the given filter conditions. Uses caching.
+        /// </summary>
+        /// <param name="kind">The Kind (table) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>An array of Beans which meet the given query conditions</returns>
+        public Bean[] Find(string kind, string expr = null, params object[] parameters) {
+            return Find(true, kind, expr, parameters);
+        }
+
+        /// <summary>
+        /// Query the database for one or more Beans (rows) of the given subclass which match the given filter conditions. Uses caching.
+        /// </summary>
+        /// <param name="kind">The Kind (table) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>An array of Beans of the given subclass which meet the given query conditions</returns>
+        public T[] Find<T>(string expr = null, params object[] parameters) where T : Bean, new() {
+            return Find<T>(true, expr, parameters);
+        }
+
+        /// <summary>
+        /// Query the database for the first Bean (row) to matches the given filter conditions
+        /// </summary>
+        /// <param name="useCache">When true, Beans will be queried from the cache first 
+        /// and stored if not already cached. When false any cached Beans will be removed</param>
+        /// <param name="kind">The Kind (table) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>An array of Beans which meet the given query conditions</returns>
         public Bean FindOne(bool useCache, string kind, string expr = null, params object[] parameters) {
             return Finder.FindOne(useCache, kind, expr, parameters);
         }
 
+        /// <summary>
+        /// Query the database for the first Bean (rows) of the given subclass which matches the given filter conditions
+        /// </summary>
+        /// <param name="useCache">When true, Beans will be queried from the cache first 
+        /// and stored if not already cached. When false any cached Beans will be removed</param>
+        /// <param name="kind">The Kind (table) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>An array of Beans of the given subclass which meet the given query conditions</returns>
         public T FindOne<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new() {
             return Finder.FindOne<T>(useCache, expr, parameters);
+        }
+
+        /// <summary>
+        /// Query the database for the first Bean (row) to matches the given filter conditions. Uses caching.
+        /// </summary>
+        /// <param name="kind">The Kind (table) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>An array of Beans which meet the given query conditions</returns>
+        public Bean FindOne(string kind, string expr = null, params object[] parameters) {
+            return FindOne(true, kind, expr, parameters);
+        }
+
+        /// <summary>
+        /// Query the database for the first Bean (rows) of the given subclass which matches the given filter conditions. Uses cachine
+        /// </summary>
+        /// <param name="kind">The Kind (table) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>An array of Beans of the given subclass which meet the given query conditions</returns>
+        public T FindOne<T>(string expr = null, params object[] parameters) where T : Bean, new() {
+            return FindOne<T>(true, expr, parameters);
         }
 
         public IEnumerable<Bean> FindIterator(string kind, string expr = null, params object[] parameters) {
@@ -351,22 +431,6 @@ namespace LimeBean {
         }
 
         // Shortcuts
-
-        public Bean[] Find(string kind, string expr = null, params object[] parameters) {
-            return Find(true, kind, expr, parameters);
-        }
-
-        public T[] Find<T>(string expr = null, params object[] parameters) where T : Bean, new() {
-            return Find<T>(true, expr, parameters);
-        }
-
-        public Bean FindOne(string kind, string expr = null, params object[] parameters) {
-            return FindOne(true, kind, expr, parameters);
-        }
-
-        public T FindOne<T>(string expr = null, params object[] parameters) where T : Bean, new() {
-            return FindOne<T>(true, expr, parameters);
-        }
 
         public long Count(string kind, string expr = null, params object[] parameters) {
             return Count(true, kind, expr, parameters);
