@@ -181,8 +181,6 @@ namespace LimeBean {
 
             if(QueryExecuting != null)
                 QueryExecuting(cmd);
-
-            // Console.WriteLine(cmd.CommandText);
         }
 
         T CacheableRead<T>(bool singleCell, bool singleRow, bool useCache, string sql, object[] parameters, Func<DbCommandDescriptor, T> factory) {
