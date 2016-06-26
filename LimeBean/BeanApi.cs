@@ -139,10 +139,20 @@ namespace LimeBean {
             set { Crud.DirtyTracking = value; }
         }
 
+        /// <summary>
+        /// Registers a class implementing BeanObserver to recieve 
+        /// notifications whenever Crud actions are applied to the database
+        /// </summary>
+        /// <param name="observer">A subclass of BeanObserver</param>
         public void AddObserver(BeanObserver observer) {
             Crud.AddObserver(observer);
         }
 
+        /// <summary>
+        /// Deregisters a class implementing BeanObserver from recieving
+        /// notifications whenever Crud actions are applied to the database
+        /// </summary>
+        /// <param name="observer">A subclass of BeanObserver</param>
         public void RemoveObserver(BeanObserver observer) {
             Crud.RemoveObserver(observer);
         }
