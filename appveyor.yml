@@ -21,7 +21,7 @@ services:
 
 before_build:
   # Install dotnet cli
-  - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/Nick-Lucas/cli/4837116903cf24e7ad137f3991e0496b937e8313/scripts/obtain/dotnet-install.ps1'))
+  - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/Nick-Lucas/cli/91a985ebd0a70c5150135db0a15223f229cb1a34/scripts/obtain/dotnet-install.ps1'))
   - set PATH=%PATH%;%LOCALAPPDATA%\Microsoft\dotnet
   - dotnet --version
 
