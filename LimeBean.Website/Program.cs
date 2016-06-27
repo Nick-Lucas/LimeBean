@@ -26,7 +26,7 @@ namespace LimeBean.Website {
 
             layout = layout.Replace("{{body}}", body);
             ValidateHeaderAnchors(headerIdList, layout);
-            File.WriteAllText("../../index.html", layout);
+            File.WriteAllText("../www/index.html", layout);
         }
 
 
