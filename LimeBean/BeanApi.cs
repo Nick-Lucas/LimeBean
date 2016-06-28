@@ -573,6 +573,10 @@ namespace LimeBean {
             set { Storage.ConvertEmptyStringToNull = value; }
         }
 
+        /// <summary>
+        /// Gets or Sets whether integers are detected and extracted if in string type variables, when storing to the database.
+        /// Query paramaterisation and the database still handle storage types
+        /// </summary>
         public bool RecognizeIntegers {
             get { return Storage.RecognizeIntegers; }
             set { Storage.RecognizeIntegers = value; }
