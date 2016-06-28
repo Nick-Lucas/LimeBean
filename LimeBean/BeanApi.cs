@@ -557,11 +557,17 @@ namespace LimeBean {
 
         // IValueRelaxations
 
+        /// <summary>
+        /// Gets or Sets whether string values being stored to the database have any trailing whitspace trimmed
+        /// </summary>
         public bool TrimStrings {
             get { return Storage.TrimStrings; }
             set { Storage.TrimStrings = value; }
         }
 
+        /// <summary>
+        /// Gets or Sets whether string values being stored to the database are converted to nulls if empty
+        /// </summary>
         public bool ConvertEmptyStringToNull {
             get { return Storage.ConvertEmptyStringToNull; }
             set { Storage.ConvertEmptyStringToNull = value; }
