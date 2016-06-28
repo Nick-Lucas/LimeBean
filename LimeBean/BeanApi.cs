@@ -430,16 +430,28 @@ namespace LimeBean {
 
         // IDatabaseAccess
 
+        /// <summary>
+        /// Fires at the point of execution of a database query
+        /// </summary>
         public event Action<DbCommand> QueryExecuting {
             add { Db.QueryExecuting += value; }
             remove { Db.QueryExecuting -= value; }
         }
 
+        /// <summary>
+        /// Gets or sets the number of recent queries which have their results cached
+        /// </summary>
         public int CacheCapacity {
             get { return Db.CacheCapacity; }
             set { Db.CacheCapacity = value; }
         }
 
+        /// <summary>
+        /// Execute a given SQL 'Non Query' on the database
+        /// </summary>
+        /// <param name="sql">The SQL to execute, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>The number of rows affected if applicable, otherwise -1</returns>
         public int Exec(string sql, params object[] parameters) {
             return Db.Exec(sql, parameters);
         }
