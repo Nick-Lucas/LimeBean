@@ -121,7 +121,7 @@ namespace LimeBean {
 #endif
         /// <summary>
         /// Use LimeBean in 'Fluid Mode' which will auto create missing 
-        /// configuration (ie. columns) which you are trying to interact with in the Database
+        /// configuration (ie. columns) which you are trying to interact with on the Database
         /// </summary>
         public void EnterFluidMode() {
             Storage.EnterFluidMode();
@@ -135,8 +135,8 @@ namespace LimeBean {
         // IBeanCrud
 
         /// <summary>
-        /// Default True. Gets or Sets whether changes to a Bean are tracked per Column.
-        /// When True, only Columns which are changed will be Updated on Store. Otherwise all Columns are updated
+        /// Gets or Sets whether changes to a Bean are tracked per column. Default true. 
+        /// When true, only columns which are changed will be updated on Store(). Otherwise all columns are updated
         /// </summary>
         public bool DirtyTracking {
             get { return Crud.DirtyTracking; }
@@ -173,26 +173,26 @@ namespace LimeBean {
         /// <summary>
         /// Create a new Bean of a given Bean subclass
         /// </summary>
-        /// <typeparam name="T">A subclass of Bean representing a Bean Kind (table)</typeparam>
-        /// <returns>A Bean representing the requested Bean Kind (table)</returns>
+        /// <typeparam name="T">A subclass of Bean representing a Bean Kind (table name)</typeparam>
+        /// <returns>A Bean representing the requested Bean Kind (table name)</returns>
         public T Dispense<T>() where T : Bean, new() {
             return Crud.Dispense<T>();
         }
 
         /// <summary>
-        /// Create a new Bean of a given Kind (table) and populate it with a given data set
+        /// Create a new Bean of a given Kind (table name) and populate it with a given data set
         /// </summary>
         /// <param name="kind">The name of a table to create the Bean for</param>
         /// <param name="row">The data to populate the Bean with</param>
-        /// <returns>A Bean of the given Kind (table) populated with the given data</returns>
+        /// <returns>A Bean of the given Kind (table name) populated with the given data</returns>
         public Bean RowToBean(string kind, IDictionary<string, object> row) {
             return Crud.RowToBean(kind, row);
         }
 
         /// <summary>
-        /// Create a new Bean of a given subclass representing a given Kind (table), and populate it with a given data set
+        /// Create a new Bean of a given subclass representing a given Kind (table name), and populate it with a given data set
         /// </summary>
-        /// <typeparam name="T">A subclass of Bean representing a Bean Kind (table)</typeparam>
+        /// <typeparam name="T">A subclass of Bean representing a Bean Kind (table name)</typeparam>
         /// <param name="row">The data to populate the Bean with</param>
         /// <returns>A Bean of the given subclass populated with the given data</returns>
         public T RowToBean<T>(IDictionary<string, object> row) where T : Bean, new() {
@@ -202,7 +202,7 @@ namespace LimeBean {
         /// <summary>
         /// Query a Bean (row) from the Database
         /// </summary>
-        /// <param name="kind">The Kind (table) to query</param>
+        /// <param name="kind">The Kind (table name) to query</param>
         /// <param name="key">The value of the primary key on the required row</param>
         /// <returns>A new Bean representing the requested row from the database</returns>
         public Bean Load(string kind, object key) {
@@ -222,7 +222,7 @@ namespace LimeBean {
         /// <summary>
         /// Query a Bean (row) from the Database
         /// </summary>
-        /// <param name="kind">The Kind (table) to query</param>
+        /// <param name="kind">The Kind (table name) to query</param>
         /// <param name="key">An array of the multi-column primary key values on the required row</param>
         /// <returns>A new Bean representing the requested row from the database</returns>
         public Bean Load(string kind, params object[] compoundKey) {
@@ -262,10 +262,9 @@ namespace LimeBean {
         /// <summary>
         /// Query the database for one or more Beans (rows) which match the given filter conditions
         /// </summary>
-        /// <param name="useCache">When true, Beans will be queried from the cache first 
-        /// and stored if not already cached. When false any cached Beans will be removed</param>
-        /// <param name="kind">The Kind (table) to query</param>
-        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
+        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An array of Beans which meet the given query conditions</returns>
         public Bean[] Find(bool useCache, string kind, string expr = null, params object[] parameters) {
@@ -275,10 +274,9 @@ namespace LimeBean {
         /// <summary>
         /// Query the database for one or more Beans (rows) of the given subclass which match the given filter conditions
         /// </summary>
-        /// <param name="useCache">When true, Beans will be queried from the cache first 
-        /// and stored if not already cached. When false any cached Beans will be removed</param>
-        /// <param name="kind">The Kind (table) to query</param>
-        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
+        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An array of Beans of the given subclass which meet the given query conditions</returns>
         public T[] Find<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new() {
@@ -288,8 +286,8 @@ namespace LimeBean {
         /// <summary>
         /// Query the database for one or more Beans (rows) which match the given filter conditions. Uses caching.
         /// </summary>
-        /// <param name="kind">The Kind (table) to query</param>
-        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An array of Beans which meet the given query conditions</returns>
         public Bean[] Find(string kind, string expr = null, params object[] parameters) {
@@ -299,8 +297,8 @@ namespace LimeBean {
         /// <summary>
         /// Query the database for one or more Beans (rows) of the given subclass which match the given filter conditions. Uses caching.
         /// </summary>
-        /// <param name="kind">The Kind (table) to query</param>
-        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An array of Beans of the given subclass which meet the given query conditions</returns>
         public T[] Find<T>(string expr = null, params object[] parameters) where T : Bean, new() {
@@ -310,10 +308,9 @@ namespace LimeBean {
         /// <summary>
         /// Query the database for the first Bean (row) which matches the given filter conditions
         /// </summary>
-        /// <param name="useCache">When true, Beans will be queried from the cache first 
-        /// and stored if not already cached. When false any cached Beans will be removed</param>
-        /// <param name="kind">The Kind (table) to query</param>
-        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
+        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An array of Beans which meet the given query conditions</returns>
         public Bean FindOne(bool useCache, string kind, string expr = null, params object[] parameters) {
@@ -323,10 +320,9 @@ namespace LimeBean {
         /// <summary>
         /// Query the database for the first Bean (rows) of the given subclass which matches the given filter conditions
         /// </summary>
-        /// <param name="useCache">When true, Beans will be queried from the cache first 
-        /// and stored if not already cached. When false any cached Beans will be removed</param>
-        /// <param name="kind">The Kind (table) to query</param>
-        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
+        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An array of Beans of the given subclass which meet the given query conditions</returns>
         public T FindOne<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new() {
@@ -336,8 +332,8 @@ namespace LimeBean {
         /// <summary>
         /// Query the database for the first Bean (row) which matches the given filter conditions. Uses caching.
         /// </summary>
-        /// <param name="kind">The Kind (table) to query</param>
-        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An array of Beans which meet the given query conditions</returns>
         public Bean FindOne(string kind, string expr = null, params object[] parameters) {
@@ -345,10 +341,10 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Query the database for the first Bean (rows) of the given subclass which matches the given filter conditions. Uses cachine
+        /// Query the database for the first Bean (rows) of the given subclass which matches the given filter conditions. Uses caching
         /// </summary>
-        /// <param name="kind">The Kind (table) to query</param>
-        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An array of Beans of the given subclass which meet the given query conditions</returns>
         public T FindOne<T>(string expr = null, params object[] parameters) where T : Bean, new() {
@@ -356,10 +352,10 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Query the database for one or more Beans (rows) which match the given filter conditions. No caching.
+        /// Query the database for one or more Beans (rows) which match the given filter conditions
         /// </summary>
-        /// <param name="kind">The Kind (table) to query</param>
-        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An IEnumerable of Beans which meet the given query conditions</returns>
         public IEnumerable<Bean> FindIterator(string kind, string expr = null, params object[] parameters) {
@@ -367,10 +363,10 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Query the database for one or more Beans (rows) of a given subclass, which match the given filter conditions. No caching.
+        /// Query the database for one or more Beans (rows) of a given subclass, which match the given filter conditions
         /// </summary>
-        /// <param name="kind">The Kind (table) to query</param>
-        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An IEnumerable of the given Bean subclass which meet the given query conditions</returns>
         public IEnumerable<T> FindIterator<T>(string expr = null, params object[] parameters) where T : Bean, new() {
@@ -378,12 +374,11 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Count the number of rows which match the given filter conditions on the given Kind (table)
+        /// Count the number of rows which match the given expression on the given Kind (table name)
         /// </summary>
-        /// <param name="useCache">When true, Beans will be queried from the cache first 
-        /// and stored if not already cached. When false any cached Beans will be removed</param>
-        /// <param name="kind">The Kind (table) to query</param>
-        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
+        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>A count of the number of rows matching the given conditions</returns>
         public long Count(bool useCache, string kind, string expr = null, params object[] parameters) {
@@ -391,13 +386,12 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Count the number of rows which match the given filter conditions on the Kind of the given Bean subclass
+        /// Count the number of rows which match the given filter conditions on the Kind (table name) of the given Bean subclass
         /// </summary>
-        /// <typeparam name="T">The Bean subclass which contains information of what Kind (table) to Count on</typeparam>
-        /// <param name="useCache">When true, Beans will be queried from the cache first 
-        /// and stored if not already cached. When false any cached Beans will be removed</param>
-        /// <param name="kind">The Kind (table) to query</param>
-        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <typeparam name="T">The Bean subclass which contains information of what Kind (table name) to Count on</typeparam>
+        /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
+        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>A count of the number of rows matching the given conditions</returns>
         public long Count<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new() {
@@ -405,10 +399,10 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Count the number of rows which match the given filter conditions on the given Kind (table). Uses caching
+        /// Count the number of rows which match the given filter conditions on the given Kind (table name). Uses caching
         /// </summary>
-        /// <param name="kind">The Kind (table) to query</param>
-        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>A count of the number of rows matching the given conditions</returns>
         public long Count(string kind, string expr = null, params object[] parameters) {
@@ -416,11 +410,11 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Count the number of rows which match the given filter conditions on the Kind of the given Bean subclass. Uses caching
+        /// Count the number of rows which match the given filter conditions on the Kind (table name) of the given Bean subclass. Uses caching
         /// </summary>
-        /// <typeparam name="T">The Bean subclass which contains information of what Kind (table) to Count on</typeparam>
-        /// <param name="kind">The Kind (table) to query</param>
-        /// <param name="expr">The SQL Expression to run, with any parameters placholdered like in String.Format(...)</param>
+        /// <typeparam name="T">The Bean subclass which contains information of what Kind (table name) to Count on</typeparam>
+        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>A count of the number of rows matching the given conditions</returns>
         public long Count<T>(string expr = null, params object[] parameters) where T : Bean, new() {
@@ -431,7 +425,7 @@ namespace LimeBean {
         // IDatabaseAccess
 
         /// <summary>
-        /// Fires at the point of execution of a database query
+        /// Event which fires at the point of execution of any database query
         /// </summary>
         public event Action<DbCommand> QueryExecuting {
             add { Db.QueryExecuting += value; }
@@ -449,61 +443,150 @@ namespace LimeBean {
         /// <summary>
         /// Execute a given SQL 'Non Query' on the database
         /// </summary>
-        /// <param name="sql">The SQL to execute, with any parameters placholdered like in String.Format(...)</param>
+        /// <param name="sql">The SQL to execute, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>The number of rows affected if applicable, otherwise -1</returns>
         public int Exec(string sql, params object[] parameters) {
             return Db.Exec(sql, parameters);
         }
 
+        /// <summary>
+        /// Execute a SQL Query and return the first column as the specified type. Lazy loads each row when iterated on. 
+        /// </summary>
+        /// <typeparam name="T">The Type to return each value as</typeparam>
+        /// <param name="sql">A SQL Query ideally returning a single column, with any parameters placeholdered with {0}, {1} etc</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>The value in the first returned column, as the specified type</returns>
         public IEnumerable<T> ColIterator<T>(string sql, params object[] parameters) {
             return Db.ColIterator<T>(sql, parameters);
         }
 
+        /// <summary>
+        /// Execute a SQL Query and return the first column as an object. Lazy loads each row when iterated on. 
+        /// </summary>
+        /// <typeparam name="T">The Type to return each value as</typeparam>
+        /// <param name="sql">A SQL Query ideally returning a single column, with any parameters placeholdered with {0}, {1} etc</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>The value in the first returned column, as the specified type</returns>
         public IEnumerable<object> ColIterator(string sql, params object[] parameters) {
             return ColIterator<object>(sql, parameters);
         }
 
+        /// <summary>
+        /// Execute a SQL Query and return each row as a Dictionary. Lazy loads each row when iterated on. 
+        /// </summary>
+        /// <param name="sql">A SQL Query, with any parameters placeholdered with {0}, {1} etc</param>
+        /// <param name="parameters"></param>
+        /// <returns>A Dictionary representing a single row at a time</returns>
         public IEnumerable<IDictionary<string, object>> RowsIterator(string sql, params object[] parameters) {
             return Db.RowsIterator(sql, parameters);
         }
 
+        /// <summary>
+        /// Execute a SQL Query returning a single value, such as a Concat() or Sum(). Uses caching.
+        /// </summary>
+        /// <typeparam name="T">The type of the value to return</typeparam>
+        /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
+        /// <param name="sql">A SQL Query ideally returning a single column/row, with any parameters placeholdered with {0}, {1} etc</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>A single value of the specified type</returns>
         public T Cell<T>(bool useCache, string sql, params object[] parameters) {
             return Db.Cell<T>(useCache, sql, parameters);
         }
 
+        /// <summary>
+        /// Execute a SQL Query returning a single value, such as a Concat() or Sum(). Uses caching
+        /// </summary>
+        /// <typeparam name="T">The type of the value to return</typeparam>
+        /// <param name="sql">A SQL Query ideally returning a single column/row, with any parameters placeholdered with {0}, {1} etc</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>A single value of the specified type</returns>
         public T Cell<T>(string sql, params object[] parameters) {
             return Cell<T>(true, sql, parameters);
         }
 
+        /// <summary>
+        /// Execute a SQL Query returning a single value as an object, such as a Concat() or Sum(). Uses caching
+        /// </summary>
+        /// <param name="sql">A SQL Query ideally returning a single column/row, with any parameters placeholdered with {0}, {1} etc</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>A single value as an object</returns>
         public object Cell(string sql, params object[] parameters) {
             return Cell<object>(sql, parameters);
         }
 
+        /// <summary>
+        /// Execute a SQL Query returning a single column of values as the specified type
+        /// </summary>
+        /// <typeparam name="T">The type to return the column as</typeparam>
+        /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
+        /// <param name="sql">A SQL Query ideally returning a single column, with any parameters placeholdered with {0}, {1} etc</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>An array of values representing a column of the specified type</returns>
         public T[] Col<T>(bool useCache, string sql, params object[] parameters) {
             return Db.Col<T>(useCache, sql, parameters);
         }
 
+        /// <summary>
+        /// Execute a SQL Query returning a single column of values as the specified type. Uses caching
+        /// </summary>
+        /// <typeparam name="T">The type to return the column as</typeparam>
+        /// <param name="sql">A SQL Query ideally returning a single column, with any parameters placeholdered with {0}, {1} etc</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>An array of values representing a column of the specified type</returns>
         public T[] Col<T>(string sql, params object[] parameters) {
             return Col<T>(true, sql, parameters);
         }
 
+        /// <summary>
+        /// Execute a SQL Query returning a single column of values as objects. Uses caching
+        /// </summary>
+        /// <param name="sql">A SQL Query ideally returning a single column, with any parameters placeholdered with {0}, {1} etc</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>An array of values representing a column of the specified type</returns>
         public object[] Col(string sql, params object[] parameters) {
             return Col<object>(true, sql, parameters);
         }
 
+
+        /// <summary>
+        /// Execute a SQL Query returning a single row of values as a Dictionary
+        /// </summary>
+        /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
+        /// <param name="sql">A SQL Query ideally returning a single row, with any parameters placeholdered with {0}, {1} etc</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>An dictionary representing a row of data</returns>
         public IDictionary<string, object> Row(bool useCache, string sql, params object[] parameters) {
             return Db.Row(useCache, sql, parameters);
         }
 
-        public IDictionary<string, object>[] Rows(bool useCache, string sql, params object[] parameters) {
-            return Db.Rows(useCache, sql, parameters);
-        }
-
+        /// <summary>
+        /// Execute a SQL Query returning a single row of values as a Dictionary. Uses cachine
+        /// </summary>
+        /// <param name="sql">A SQL Query ideally returning a single row, with any parameters placeholdered with {0}, {1} etc</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>An dictionary representing a row of data</returns>
         public IDictionary<string, object> Row(string sql, params object[] parameters) {
             return Row(true, sql, parameters);
         }
 
+        /// <summary>
+        /// Execute a SQL Query returning multiple rows of values as Dictionarys
+        /// </summary>
+        /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
+        /// <param name="sql">A SQL Query return multiple rows, with any parameters placeholdered with {0}, {1} etc</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>An array of dictionarys, each representing a row of data</returns>
+        public IDictionary<string, object>[] Rows(bool useCache, string sql, params object[] parameters) {
+            return Db.Rows(useCache, sql, parameters);
+        }
+
+        /// <summary>
+        /// Execute a SQL Query returning multiple rows of values as Dictionarys. Uses caching
+        /// </summary>
+        /// <param name="sql">A SQL Query return multiple rows, with any parameters placeholdered with {0}, {1} etc</param>
+        /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
+        /// <returns>An array of dictionarys, each representing a row of data</returns>
         public IDictionary<string, object>[] Rows(string sql, params object[] parameters) {
             return Rows(true, sql, parameters);
         }
