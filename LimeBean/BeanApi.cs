@@ -558,7 +558,7 @@ namespace LimeBean {
         // IValueRelaxations
 
         /// <summary>
-        /// Gets or Sets whether string values being stored to the database have any trailing whitspace trimmed
+        /// Gets or Sets whether string values being stored to the database have any trailing whitespace trimmed
         /// </summary>
         public bool TrimStrings {
             get { return Storage.TrimStrings; }
@@ -574,8 +574,8 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Gets or Sets whether integers are detected and extracted if in string type variables, when storing to the database.
-        /// Query paramaterisation and the database still handle storage types
+        /// Gets or Sets whether integers are detected and converted from Double/Single/String variables
+        /// when storing to the database. This allows fluid mode to guide your use of the schema
         /// </summary>
         public bool RecognizeIntegers {
             get { return Storage.RecognizeIntegers; }
