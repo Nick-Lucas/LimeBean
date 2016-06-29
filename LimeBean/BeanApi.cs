@@ -668,26 +668,55 @@ namespace LimeBean {
 
         // Custom keys
 
+        /// <summary>
+        /// Registers a new Primary Key on the given Kind (table name)
+        /// </summary>
+        /// <param name="kind">The table name</param>
+        /// <param name="name">The name of the primary key field</param>
+        /// <param name="autoIncrement">Whether the key should auto-increment</param>
         public void Key(string kind, string name, bool autoIncrement) {
             KeyUtil.RegisterKey(kind, new[] { name }, autoIncrement);
         }
 
+        /// <summary>
+        /// Registers a new multi-column Key on the given Kind (table name)
+        /// </summary>
+        /// <param name="kind">The table name</param>
+        /// <param name="name">The names of the primary key fields</param>
         public void Key(string kind, params string[] names) {
             KeyUtil.RegisterKey(kind, names, null);
         }
 
+        /// <summary>
+        /// Registers a new Primary Key on the given Bean subtype's Kind (table name)
+        /// </summary>
+        /// <param name="name">The name of the primary key field</param>
+        /// <param name="autoIncrement">Whether the key should auto-increment</param>
         public void Key<T>(string name, bool autoIncrement) where T : Bean, new() {
             Key(Bean.GetKind<T>(), name, autoIncrement);
         }
 
+        /// <summary>
+        /// Registers a new Primary Key on the given Bean subtype's Kind (table name)
+        /// </summary>
+        /// <param name="name">The names of the primary key fields</param>
         public void Key<T>(params string[] names) where T : Bean, new() {
             Key(Bean.GetKind<T>(), names);
         }
 
+        /// <summary>
+        /// Sets whether default Primary Keys auto-increment
+        /// </summary>
+        /// <param name="autoIncrement">Whether a new Key should auto-increment</param>
         public void DefaultKey(bool autoIncrement) {
             KeyUtil.DefaultAutoIncrement = autoIncrement;
         }
 
+        /// <summary>
+        /// Sets the default field name for a Primary Key, and whether it should auto-increment
+        /// </summary>
+        /// <param name="name">The default field name for a Primary Key</param>
+        /// <param name="autoIncrement">Whether a default Primary Key should auto-increment</param>
         public void DefaultKey(string name, bool autoIncrement = true) {
             KeyUtil.DefaultName = name;
             KeyUtil.DefaultAutoIncrement = autoIncrement;
