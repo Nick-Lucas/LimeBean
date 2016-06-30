@@ -202,7 +202,7 @@ namespace LimeBean {
         /// <summary>
         /// Query a Bean (row) from the Database
         /// </summary>
-        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="kind">Name of the table to query</param>
         /// <param name="key">The value of the primary key on the required row</param>
         /// <returns>A new Bean representing the requested row from the database</returns>
         public Bean Load(string kind, object key) {
@@ -222,7 +222,7 @@ namespace LimeBean {
         /// <summary>
         /// Query a Bean (row) from the Database
         /// </summary>
-        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="kind">Name of the table to query</param>
         /// <param name="key">An array of the multi-column primary key values on the required row</param>
         /// <returns>A new Bean representing the requested row from the database</returns>
         public Bean Load(string kind, params object[] compoundKey) {
@@ -263,7 +263,7 @@ namespace LimeBean {
         /// Query the database for one or more Beans (rows) which match the given filter conditions
         /// </summary>
         /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
-        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An array of Beans which meet the given query conditions</returns>
@@ -275,7 +275,7 @@ namespace LimeBean {
         /// Query the database for one or more Beans (rows) of the given subclass which match the given filter conditions
         /// </summary>
         /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
-        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An array of Beans of the given subclass which meet the given query conditions</returns>
@@ -286,7 +286,7 @@ namespace LimeBean {
         /// <summary>
         /// Query the database for one or more Beans (rows) which match the given filter conditions. Uses caching.
         /// </summary>
-        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An array of Beans which meet the given query conditions</returns>
@@ -297,7 +297,7 @@ namespace LimeBean {
         /// <summary>
         /// Query the database for one or more Beans (rows) of the given subclass which match the given filter conditions. Uses caching.
         /// </summary>
-        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An array of Beans of the given subclass which meet the given query conditions</returns>
@@ -309,7 +309,7 @@ namespace LimeBean {
         /// Query the database for the first Bean (row) which matches the given filter conditions
         /// </summary>
         /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
-        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An array of Beans which meet the given query conditions</returns>
@@ -321,7 +321,7 @@ namespace LimeBean {
         /// Query the database for the first Bean (rows) of the given subclass which matches the given filter conditions
         /// </summary>
         /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
-        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An array of Beans of the given subclass which meet the given query conditions</returns>
@@ -332,7 +332,7 @@ namespace LimeBean {
         /// <summary>
         /// Query the database for the first Bean (row) which matches the given filter conditions. Uses caching.
         /// </summary>
-        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An array of Beans which meet the given query conditions</returns>
@@ -343,7 +343,7 @@ namespace LimeBean {
         /// <summary>
         /// Query the database for the first Bean (rows) of the given subclass which matches the given filter conditions. Uses caching
         /// </summary>
-        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An array of Beans of the given subclass which meet the given query conditions</returns>
@@ -354,7 +354,7 @@ namespace LimeBean {
         /// <summary>
         /// Query the database for one or more Beans (rows) which match the given filter conditions
         /// </summary>
-        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An IEnumerable of Beans which meet the given query conditions</returns>
@@ -365,7 +365,7 @@ namespace LimeBean {
         /// <summary>
         /// Query the database for one or more Beans (rows) of a given subclass, which match the given filter conditions
         /// </summary>
-        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>An IEnumerable of the given Bean subclass which meet the given query conditions</returns>
@@ -377,7 +377,7 @@ namespace LimeBean {
         /// Count the number of rows which match the given expression on the given Kind (table name)
         /// </summary>
         /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
-        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>A count of the number of rows matching the given conditions</returns>
@@ -390,7 +390,7 @@ namespace LimeBean {
         /// </summary>
         /// <typeparam name="T">The Bean subclass which contains information of what Kind (table name) to Count on</typeparam>
         /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
-        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>A count of the number of rows matching the given conditions</returns>
@@ -401,7 +401,7 @@ namespace LimeBean {
         /// <summary>
         /// Count the number of rows which match the given filter conditions on the given Kind (table name). Uses caching
         /// </summary>
-        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>A count of the number of rows matching the given conditions</returns>
@@ -413,7 +413,7 @@ namespace LimeBean {
         /// Count the number of rows which match the given filter conditions on the Kind (table name) of the given Bean subclass. Uses caching
         /// </summary>
         /// <typeparam name="T">The Bean subclass which contains information of what Kind (table name) to Count on</typeparam>
-        /// <param name="kind">The Kind (table name) to query</param>
+        /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
         /// <returns>A count of the number of rows matching the given conditions</returns>
