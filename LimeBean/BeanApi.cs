@@ -162,37 +162,37 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Create a new Bean of a given Kind (table name)
+        /// Create an empty Bean of a given Kind
         /// </summary>
         /// <param name="kind">The name of a table to create a Bean for</param>
-        /// <returns>A Bean representing the requested Kind (table name)</returns>
+        /// <returns>A Bean representing the requested Kind</returns>
         public Bean Dispense(string kind) {
             return Crud.Dispense(kind);
         }
 
         /// <summary>
-        /// Create a new Bean of a given Bean subclass
+        /// Create an empty Bean of a given Bean subclass
         /// </summary>
-        /// <typeparam name="T">A subclass of Bean representing a Bean Kind (table name)</typeparam>
-        /// <returns>A Bean representing the requested Bean Kind (table name)</returns>
+        /// <typeparam name="T">A subclass of Bean representing a Bean Kind</typeparam>
+        /// <returns>A Bean representing the requested Bean Kind</returns>
         public T Dispense<T>() where T : Bean, new() {
             return Crud.Dispense<T>();
         }
 
         /// <summary>
-        /// Create a new Bean of a given Kind (table name) and populate it with a given data set
+        /// Create a new Bean of a given Kind and populate it with a given data set
         /// </summary>
         /// <param name="kind">The name of a table to create the Bean for</param>
         /// <param name="row">The data to populate the Bean with</param>
-        /// <returns>A Bean of the given Kind (table name) populated with the given data</returns>
+        /// <returns>A Bean of the given Kind populated with the given data</returns>
         public Bean RowToBean(string kind, IDictionary<string, object> row) {
             return Crud.RowToBean(kind, row);
         }
 
         /// <summary>
-        /// Create a new Bean of a given subclass representing a given Kind (table name), and populate it with a given data set
+        /// Create a new Bean of a given subclass representing a given Kind, and populate it with a given data set
         /// </summary>
-        /// <typeparam name="T">A subclass of Bean representing a Bean Kind (table name)</typeparam>
+        /// <typeparam name="T">A subclass of Bean representing a Bean Kind</typeparam>
         /// <param name="row">The data to populate the Bean with</param>
         /// <returns>A Bean of the given subclass populated with the given data</returns>
         public T RowToBean<T>(IDictionary<string, object> row) where T : Bean, new() {
@@ -374,7 +374,7 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Count the number of rows which match the given expression on the given Kind (table name)
+        /// Count the number of rows which match the given expression on the given Kind
         /// </summary>
         /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
         /// <param name="kind">Name of the table to query</param>
@@ -386,9 +386,9 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Count the number of rows which match the given filter conditions on the Kind (table name) of the given Bean subclass
+        /// Count the number of rows which match the given filter conditions on the Kind of the given Bean subclass
         /// </summary>
-        /// <typeparam name="T">The Bean subclass which contains information of what Kind (table name) to Count on</typeparam>
+        /// <typeparam name="T">The Bean subclass which contains information of what Kind to Count on</typeparam>
         /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
         /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
@@ -399,7 +399,7 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Count the number of rows which match the given filter conditions on the given Kind (table name). Uses caching
+        /// Count the number of rows which match the given filter conditions on the given Kind. Uses caching
         /// </summary>
         /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
@@ -410,9 +410,9 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Count the number of rows which match the given filter conditions on the Kind (table name) of the given Bean subclass. Uses caching
+        /// Count the number of rows which match the given filter conditions on the Kind of the given Bean subclass. Uses caching
         /// </summary>
-        /// <typeparam name="T">The Bean subclass which contains information of what Kind (table name) to Count on</typeparam>
+        /// <typeparam name="T">The Bean subclass which contains information of what Kind to Count on</typeparam>
         /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
         /// <param name="parameters">An array of parameters to properly parameterise in SQL</param>
@@ -669,7 +669,7 @@ namespace LimeBean {
         // Custom keys
 
         /// <summary>
-        /// Registers a new Primary Key on the given Kind (table name)
+        /// Registers a new Primary Key on the given Kind
         /// </summary>
         /// <param name="kind">The table name</param>
         /// <param name="name">The name of the primary key field</param>
@@ -679,7 +679,7 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Registers a new multi-column Key on the given Kind (table name)
+        /// Registers a new multi-column Key on the given Kind
         /// </summary>
         /// <param name="kind">The table name</param>
         /// <param name="name">The names of the primary key fields</param>
@@ -688,7 +688,7 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Registers a new Primary Key on the given Bean subtype's Kind (table name)
+        /// Registers a new Primary Key on the given Bean subtype's Kind
         /// </summary>
         /// <param name="name">The name of the primary key field</param>
         /// <param name="autoIncrement">Whether the key should auto-increment</param>
@@ -697,7 +697,7 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Registers a new Primary Key on the given Bean subtype's Kind (table name)
+        /// Registers a new Primary Key on the given Bean subtype's Kind
         /// </summary>
         /// <param name="name">The names of the primary key fields</param>
         public void Key<T>(params string[] names) where T : Bean, new() {
