@@ -114,6 +114,17 @@ namespace LimeBean.Tests {
         }
 
         [Fact]
+        public void Columns() {
+            var bean = new Bean();
+            bean["a"] = 1;
+            bean["b"] = 2;
+            bean["c"] = null;
+
+            var expect = new[] { "a", "b", "c" };
+            Assert.Equal(expect, bean.Columns);   
+        }
+
+        [Fact]
         public void Export() {
             var bean = new Bean();
             bean["id"] = 123;
