@@ -121,7 +121,12 @@ namespace LimeBean.Tests {
             bean["c"] = null;
 
             var expect = new[] { "a", "b", "c" };
-            Assert.Equal(expect, bean.Columns);   
+            var columns = bean.Columns.ToArray();
+
+            Assert.Equal(3, columns.Count());
+            Assert.Equal(expect[0], columns[0]);
+            Assert.Equal(expect[1], columns[1]);
+            Assert.Equal(expect[2], columns[2]);
         }
 
         [Fact]

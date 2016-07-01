@@ -68,7 +68,7 @@ namespace LimeBean {
         /// Retrieve the name of each Column held in this Bean
         /// </summary>
         public IEnumerable<string> Columns {
-            get { return ((Dictionary<string, object>)_props).Keys; } 
+            get { return _props.Keys; } 
         }
 
         // Import / Export
