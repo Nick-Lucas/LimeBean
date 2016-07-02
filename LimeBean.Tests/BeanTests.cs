@@ -123,11 +123,11 @@ namespace LimeBean.Tests {
             List<string> expect = new List<string>(new[] { "a", "b", "c" });
             
             Assert.Equal(3, bean.Columns.Count());
-            Assert.True(expect.Contains("a"));
-            expect.Remove("a");
-            Assert.True(expect.Contains("b"));
-            expect.Remove("b");
-            Assert.True(expect.Contains("c"));
+            foreach (string s in bean.Columns) {
+                Assert.True(expect.Contains(s));
+                expect.Remove(s);
+            }
+            Assert.Equal(0, expect.Count);
         }
 
         [Fact]
