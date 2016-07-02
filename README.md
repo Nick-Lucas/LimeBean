@@ -8,14 +8,17 @@
 
 ## Get started in 2 minutes:
 ```c#
+// Make an ADO.Net connection and create a BeanAPI from it.
 var connection = new DbConnection(connectionString);
 var api = new BeanApi(connection);
 
+// Get a row from a known record ID
 int bookId = 7;
 Bean row = api.Load("books", bookId);
 string bookTitle = row.Get<string>("title");
 Console.WriteLine(bookTitle);
 
+// Add a new row to the database
 Bean newRow = api.Dispense("books");
 newRow
     .Put("title", "Cloud Atlas")
