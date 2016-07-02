@@ -13,7 +13,7 @@ namespace LimeBean.Website {
     class Body {
         /// ## About LimeBean
         /// LimeBean provides a simple and concise API for accessing **ADO.NET** data sources.
-        /// It's **Hybrid-ORM**... halfway between a micro-ORM and plain old SQL.
+        /// It's a **Hybrid-ORM**... halfway between a micro-ORM and plain old SQL.
         ///   
         /// Compatible with:
         /// 
