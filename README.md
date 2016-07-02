@@ -6,6 +6,10 @@
 
 [RedBeanPHP](http://redbeanphp.com/)-inspired Hybrid-ORM for .NET. 
 
+## Available on NuGet Gallery
+
+    PM> Install-Package LimeBean
+
 ## Get started in 2 minutes:
 ```c#
 // Make an ADO.Net connection and create a BeanAPI from it.
@@ -27,10 +31,6 @@ bookId = (int)api.Store(newRow);
 Console.WriteLine("New book ID: " + bookId.ToString());
 ```
 
-## Available on NuGet Gallery
-
-    PM> Install-Package LimeBean
-
 ## Supported Frameworks and Databases
 
               | .NET | .NET Core 
@@ -40,6 +40,6 @@ MySQL/MariaDB | +    | -
 PostgreSQL    | +    | + 
 SQL Server    | +    | + 
 
-## Documentation
+## Full Documentation
 
 https://nick-lucas.github.io/LimeBean/
