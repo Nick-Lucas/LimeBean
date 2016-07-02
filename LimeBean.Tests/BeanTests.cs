@@ -128,7 +128,6 @@ namespace LimeBean.Tests {
             Assert.True(expect.Contains("b"));
             expect.Remove("b");
             Assert.True(expect.Contains("c"));
-            expect.Remove("c");
         }
 
         [Fact]
