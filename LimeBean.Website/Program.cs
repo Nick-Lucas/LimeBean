@@ -29,7 +29,6 @@ namespace LimeBean.Website {
             File.WriteAllText("../www/index.html", layout);
         }
 
-
         static string PreprocessBody() {
             var source = File.ReadAllLines("../Body.cs");
             var result = new List<string>();
@@ -89,7 +88,9 @@ namespace LimeBean.Website {
             var refs = Regex.Matches(html, "href=\"#(.+?)\"").Cast<Match>().Select(m => m.Groups[1].Value);
             var wrong = refs.Except(knownIdList);
             if(wrong.Any())
-                throw new Exception("Wrong header refs found: " + String.Join(" ", wrong));
+                // If this throws - Please ensure you've updated any links to page sections after changing header titles.
+                // "Getting Started: CRUD" would become "#getting-started-crud" as a link
+                throw new Exception("Wrong header refs found.  " + String.Join(" ", wrong));
         }
 
     }

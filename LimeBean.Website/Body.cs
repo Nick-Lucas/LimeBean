@@ -299,7 +299,7 @@ namespace LimeBean.Website {
         class LifecycleHooks { 
             /// ## Lifecycle Hooks
             /// [Custom Bean Classes](#custom-bean-classes) provide lifecycle hook methods which you can override to receive 
-            /// notifications about [CRUD operations](#crud) occurring to this bean:
+            /// notifications about [CRUD operations]getting-started-basic-crud-create-read-update-delete occurring to this bean:
             /// 
 #if CODE
             public class Product : Bean {
@@ -566,7 +566,7 @@ namespace LimeBean.Website {
             });
 #endif
             /// ## Implicit Transactions
-            /// When you invoke `Store` or `Trash` (see [CRUD](#crud)) outside a transaction, then an implicit transaction
+            /// When you invoke `Store` or `Trash` (see [CRUD]getting-started-basic-crud-create-read-update-delete) outside a transaction, then an implicit transaction
             /// is initiated behind the scenes. This is done to enforce database integrity in case of 
             /// additional modifications performed in 
             /// [hooks](#lifecycle-hooks) and [observers](#bean-observers) (such as cascading delete, etc).
