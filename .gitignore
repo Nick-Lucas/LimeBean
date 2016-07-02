@@ -1,0 +1,10 @@
+.vs
+*.suo
+*.*proj.user
+*.userprefs
+bin/
+obj/
+packages/
+project.lock.json
+LimeBean.NuGet/*.nupkg
+LimeBean.NuGet/nuget.exe
