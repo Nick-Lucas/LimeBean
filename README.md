@@ -27,7 +27,7 @@ Bean newRow = api.Dispense("books");
 newRow
     .Put("title", "Cloud Atlas")
     .Put("author", "David Mitchell");
-bookId = (int)api.Store(newRow);
+var newBookId = api.Store(newRow);
 Console.WriteLine("New book ID: " + bookId.ToString());
 ```
 
