@@ -120,13 +120,15 @@ namespace LimeBean.Tests {
             bean["b"] = 2;
             bean["c"] = null;
 
-            var expect = new[] { "a", "b", "c" };
-            var columns = bean.Columns.ToArray();
-
-            Assert.Equal(3, columns.Count());
-            Assert.Equal(expect[0], columns[0]);
-            Assert.Equal(expect[1], columns[1]);
-            Assert.Equal(expect[2], columns[2]);
+            List<string> expect = new List<string>(new[] { "a", "b", "c" });
+            
+            Assert.Equal(3, bean.Columns.Count());
+            Assert.True(expect.Contains("a"));
+            expect.Remove("a");
+            Assert.True(expect.Contains("b"));
+            expect.Remove("b");
+            Assert.True(expect.Contains("c"));
+            expect.Remove("c");
         }
 
         [Fact]
