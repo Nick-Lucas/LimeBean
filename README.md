@@ -28,7 +28,7 @@ newRow
     .Put("title", "Cloud Atlas")
     .Put("author", "David Mitchell");
 var newBookId = api.Store(newRow);
-Console.WriteLine("New book ID: " + bookId.ToString());
+Console.WriteLine("New book ID: " + newBookId.ToString());
 ```
 
 ## Supported Frameworks and Databases
