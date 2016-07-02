@@ -260,7 +260,7 @@ namespace LimeBean {
         // IBeanFinder
 
         /// <summary>
-        /// Query the database for one or more Beans (rows) which match the given filter conditions
+        /// Query the database for one or more Beans (rows) which match the given filter conditions. Prefer FindIterator() for large data sets. 
         /// </summary>
         /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
         /// <param name="kind">Name of the table to query</param>
@@ -272,7 +272,7 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Query the database for one or more Beans (rows) of the given subclass which match the given filter conditions
+        /// Query the database for one or more Beans (rows) of the given subclass which match the given filter conditions. Prefer FindIterator() for large data sets. 
         /// </summary>
         /// <param name="useCache">Whether to cache the results of this query, or recall results if already cached</param>
         /// <param name="kind">Name of the table to query</param>
@@ -284,7 +284,7 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Query the database for one or more Beans (rows) which match the given filter conditions. Uses caching.
+        /// Query the database for one or more Beans (rows) which match the given filter conditions. Prefer FindIterator() for large data sets. Uses caching.
         /// </summary>
         /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
@@ -295,7 +295,7 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Query the database for one or more Beans (rows) of the given subclass which match the given filter conditions. Uses caching.
+        /// Query the database for one or more Beans (rows) of the given subclass which match the given filter conditions. Prefer FindIterator() for large data sets. Uses caching.
         /// </summary>
         /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
@@ -352,7 +352,7 @@ namespace LimeBean {
         }
 
         /// <summary>
-        /// Query the database for one or more Beans (rows) which match the given filter conditions
+        /// Query the database for one or more Beans (rows) which match the given filter conditions. Recommended for large data sets
         /// </summary>
         /// <param name="kind">Name of the table to query</param>
         /// <param name="expr">The SQL Expression to run, with any parameters placeholdered with {0}, {1} etc</param>
