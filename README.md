@@ -14,6 +14,7 @@
 ```c#
 // Make an ADO.Net connection and create a BeanAPI from it.
 var connection = new DbConnection(connectionString);
+connection.Open();
 var api = new BeanApi(connection);
 
 // Get a row from a known record ID
