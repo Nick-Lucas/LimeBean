@@ -47,7 +47,7 @@ namespace LimeBean {
         }
 
         public IEnumerable<IDictionary<string, object>> RowsIterator(string sql, params object[] parameters) {
-            return EnumerateRecords(new DbCommandDescriptor(sql, parameters), RecordToDict).ToArray();
+            return EnumerateRecords(new DbCommandDescriptor(sql, parameters), RecordToDict);
         }
 
 
