@@ -17,7 +17,7 @@ namespace LimeBean.Website {
             Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en");
 
             var layout = File.ReadAllText("../layout.html");
-            layout = layout.Replace("{{description}}", "RedBeanPHP-inspired data access layer for .NET");
+            layout = layout.Replace("{{description}}", "Hybrid-ORM for .Net");
             layout = layout.Replace("{{updated_on}}", DateTime.Now.ToString("MMM d, yyyy"));
 
             var headerIdList = new List<string>();
