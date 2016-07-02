@@ -13,9 +13,8 @@ namespace LimeBean.Website {
     class Body {
         /// ## About LimeBean
         /// LimeBean provides a simple and concise API for accessing **ADO.NET** data sources.
-        /// It's halfway between a **micro-ORM** and **direct SQL**.
-        /// With LimeBean, you can treat your data as **objects** or as plain **records**, depending on a situation.
-        /// 
+        /// It's **Hybrid-ORM**... halfway between a micro-ORM and plain old SQL.
+        ///   
         /// Compatible with:
         /// 
         /// * **.NET Framework 4.x**
@@ -29,19 +28,24 @@ namespace LimeBean.Website {
         /// * **PostgreSQL**
         /// * **SQL Server**
         /// 
-        /// The library is inspired by [RedBeanPHP](http://redbeanphp.com).
+        /// Limebean uses synonyms for many things, key examples are:
+        /// 
+        /// * **Bean** - A single row of data
+        /// * **Kind** - The name of a table which a Bean represents
         /// 
         /// ## Installation
         /// LimeBean is available on [NuGet Gallery](https://www.nuget.org/packages/LimeBean):
         /// 
         ///     PM> Install-Package LimeBean
+        ///     
+        ///     
 
         void ConnectToDatabase(DbConnection connection) {
-            /// ## Connect to Database
-            /// LimeBean needs an ADO.NET driver to work with. Use one of the following:
+            /// ## Getting started: Connecting
+            /// LimeBean needs an ADO.NET driver to work with. You can use one of the following:
             /// 
             /// * [System.Data.SQLite.Core](https://www.nuget.org/packages/System.Data.SQLite.Core) for SQLite in .NET
-            /// * [Mono.Data.Sqlite](http://www.mono-project.com/download/) for SQLite in Mono
+            /// * [Mono.Data.Sqlite](http://www.mono-project.com/docs/database-access/providers/sqlite/) for SQLite in Mono
             /// * [Microsoft.Data.SQLite](https://www.nuget.org/packages/Microsoft.Data.SQLite) for SQLite in .NET Core
             /// * [MySql.Data](https://www.nuget.org/packages/MySql.Data/) for MySQL or MariaDB
             /// * [Npgsql](https://www.nuget.org/packages/Npgsql/) for PostgreSQL
@@ -66,73 +70,62 @@ namespace LimeBean.Website {
                 var api = new BeanApi(connection);
 #endif
             }
-            /// **NOTE:** `BeanApi` is `IDisposable`. When created from a connection string (two first cases above), 
+            /// **NOTE:** `BeanApi` implements `IDisposable`. When created from a connection string (two first cases above), 
             /// the underlying connection is initiated on the first usage and closed on dispose.
             /// Shared connections are used as-is, their state is not changed.
             /// 
             /// See also: [BeanApi Object Lifetime](#beanapi-object-lifetime)
         }
 
-        void CRUD() {
-            /// ## CRUD 
-            /// (Create / Read / Update / Delete)
+        void CRUD(BeanApi api) {
+            /// ## Getting Started: Basic CRUD (Create/Read/Update/Delete)
             /// 
-            /// For basic usage, LimeBean requires zero configuration and no additional code!
-            /// Database schema is maintained on-the-fly: 
-            /// no need to create tables and columns (see [Fluid Mode](#fluid-mode)).
+            /// For basic usage, LimeBean requires no configuration or table classes! 
             /// 
-            /// Take a look at the following sample scenario:
+            /// Take a look at some basic CRUD scenarios:
             /// 
-#if CODE
-            // Use a temporary in-memory SQLite database
-            var api = new BeanApi("Data Source=:memory:", SQLiteFactory.Instance);
-
-            // Enter the "Fluid Mode"
-            api.EnterFluidMode();
-#endif
             /// **Create**
 #if CODE
-            // Create a bean. "Bean" means "data record", "dispense" means "instantiate new".
+
+            // Create a Bean. 
+            // "Bean" means row, and "Dispense" makes an empty Bean for a table.
             var bean = api.Dispense("book");
 
-            // Each bean has a kind. "Kind" is a synonym for "table name"
+            // Each bean has a "Kind". Kind is a synonym for "table name"
+            // You give a Bean its Kind when you Dispense it, or query the database
             var kind = bean.GetKind();
             Console.WriteLine(kind);
 
-            // Fill it with some data
+            // Fill the new Bean with some data
             bean["title"] = "Three Comrades";
             bean["rating"] = 10;
 
+            // You can also chain .Put() to do this
+            bean.Put("title", "Three Comrades")
+                .Put("rating", 10);
+
             // Store it
-            // Table "book" with 2 columns, one string and one integer, will be generated automatically
+            // Store() will Create or Update a record intelligently
             var id = api.Store(bean);
 
-            // Each saved bean has an ID, or primary key
+            // Store also returns the Primary Key for the saved Bean, even for [multi-column/compound keys](#primary-keys)
             Console.WriteLine(id);
 #endif
-            /// **Read**
+            /// **Read** and **Update**
 #if CODE
-            // Load by ID
+            // Load a Bean with a known ID
             bean = api.Load("book", id);
-#endif
-            /// **Update**
-#if CODE
-            // Make some edits
-            bean["title"] = "Learn LimeBean";
-            bean["release_date"] = new DateTime(2015, 7, 30);
-            bean["rating"] = "good";
 
-            // Save updated bean
-            // One new column ("release_date") will be added
-            // The type of column "rating" will be expanded from integer to string
+            // Make some edits
+            bean["release_date"] = new DateTime(2015, 7, 30);
+            bean["rating"] = 5;
+
+            // Update database
             api.Store(bean);
 #endif
             /// **Delete**
 #if CODE
             api.Trash(bean);
-
-            // Don't forget to close the connection
-            api.Dispose();
 #endif
         }
 
@@ -155,7 +148,7 @@ namespace LimeBean.Website {
 
         void FluidMode(BeanApi api) { 
             /// ## Fluid Mode
-            /// LimeBean is committed to mitigate the common inconvenience associated with relational databases,
+            /// LimeBean mitigates the common inconvenience associated with relational databases,
             /// namely necessity to manually create tables, columns and adjust their data types. 
             /// In this sense, LimeBean takes SQL databases a little closer to NoSQL ones like MongoDB.
             /// 
@@ -164,18 +157,33 @@ namespace LimeBean.Website {
             /// To enable it, invoke the `EnterFluidMode` method on the `BeanApi` object:
 #if CODE
             api.EnterFluidMode();
+
+            // Make a Bean for a table which doesn't yet exist
+            var bean = api.Dispense("book_types");
+
+            // Fill it with some data
+            // Limebean will automatically detect Types and create columns with the correct Type
+            bean.Put("name", "War")
+                .Put("fiction", true);
+
+            // Store will automatically create any missing tables (with an auto-incrementing 'id' column) and columns, 
+            // then add the Bean as a new row
+            var id = api.Store(bean);
+
+            // The bean is now available in the database
+            var savedBean = api.Load("book_types", id);
+
 #endif
-            /// How does it work? When you save the next bean, LimeBean analyzes its fields and compares 
+            /// How does this work? When you save a Bean while in Fluid Mode, LimeBean analyzes its fields and compares 
             /// their names and types to the database schema. 
             /// If new data cannot be stored to an existing table, schema alteration occurs.
             /// LimeBean can create new tables, add missing columns, and widen data types.
             /// It will never truncate data or delete unused columns.
             /// 
-            /// **NOTE:** LimeBean doesn't detect renamings.
+            /// **NOTE:** LimeBean will not detect renamings.
             /// 
             /// **CAUTION:** Automatically generated schema is usually sub-optimal and lacks indexes which are essential
             /// for performance. When most of planned tables are already in place, 
-            /// and only minor changes are expected, 
             /// it is recommended to turn the Fluid Mode off, audit the database structure, add indexes, and make further schema
             /// changes with a dedicated database management tool (like HeidiSQL, SSMS, pgAdmin, etc).
             /// 
@@ -184,7 +192,7 @@ namespace LimeBean.Website {
         void FindingBeansWithSql(BeanApi api) {
             /// ## Finding Beans with SQL
             /// LimeBean doesn't introduce any custom query language, nor does it implement a LINQ provider. 
-            /// To find beans matching a criteria, use snippets of plain SQL:
+            /// To find beans matching a criteria, use fragments of plain SQL:
             /// 
             {
 #if CODE
@@ -198,7 +206,7 @@ namespace LimeBean.Website {
 #endif
             }
             /// Usage of parameters looks similar to `String.Format`, but instead of direct interpolation,
-            /// they are transformed into fair ADO.NET command parameters to protect your queries from injection-attacks.
+            /// they are transformed into fair ADO.NET command parameters to protect your queries from SQL-injection attacks.
             /// 
             {
 #if CODE
@@ -221,9 +229,11 @@ namespace LimeBean.Website {
 #if CODE
             var count = api.Count("book", "WHERE rating > {0}", 7);
 #endif
-            /// It is also possible to perform unbuffered (memory-optimized) load for processing in a `foreach` loop:
+            /// It is also possible to perform unbuffered (memory-optimized) load for processing in a `foreach` loop.
+            /// 
+            /// Data is 'Lazy Loaded' on each iteration using [C-sharp's IEnumerable Yield](http://programmers.stackexchange.com/a/97350)
 #if CODE
-            foreach(var bean in api.FindIterator("book", "ORDER BY rating")) {
+            foreach (var bean in api.FindIterator("book", "ORDER BY rating")) {
                 // do something with bean
             }
 #endif
@@ -231,7 +241,7 @@ namespace LimeBean.Website {
 
         class CustomBeanClasses {
             /// ## Custom Bean Classes
-            /// It is convenient to inherit from the base `Bean` class:
+            /// You can create Table classes like in a full ORM: It's convenient to inherit from the base `Bean` class:
             /// 
 #if CODE
             public class Book : Bean {
@@ -289,7 +299,7 @@ namespace LimeBean.Website {
         class LifecycleHooks { 
             /// ## Lifecycle Hooks
             /// [Custom Bean Classes](#custom-bean-classes) provide lifecycle hook methods which you can override to receive 
-            /// notifications about [CRUD operations](#crud) occurring to this bean:
+            /// notifications about [CRUD operations]getting-started-basic-crud-create-read-update-delete occurring to this bean:
             /// 
 #if CODE
             public class Product : Bean {
@@ -393,11 +403,11 @@ namespace LimeBean.Website {
             /// For `Rows` and `Col`, there are unbuffered (memory-optimized) counterparts:
             {
 #if CODE
-                foreach(var row in api.RowsIterator("...")) {
+                foreach(var row in api.RowsIterator("SELECT...")) {
                     // do something
                 }
 
-                foreach(var item in api.ColIterator("...")) {
+                foreach(var item in api.ColIterator("SELECT...")) {
                     // do something
                 }
 #endif
@@ -556,7 +566,7 @@ namespace LimeBean.Website {
             });
 #endif
             /// ## Implicit Transactions
-            /// When you invoke `Store` or `Trash` (see [CRUD](#crud)) outside a transaction, then an implicit transaction
+            /// When you invoke `Store` or `Trash` (see [CRUD]getting-started-basic-crud-create-read-update-delete) outside a transaction, then an implicit transaction
             /// is initiated behind the scenes. This is done to enforce database integrity in case of 
             /// additional modifications performed in 
             /// [hooks](#lifecycle-hooks) and [observers](#bean-observers) (such as cascading delete, etc).
@@ -605,8 +615,8 @@ namespace LimeBean.Website {
 
         class BeanApiObjectLifetime { 
             /// ## BeanApi Object Lifetime
-            /// The `BeanApi` class is `IDisposable` (it holds the `DbConnection`) and is not thread-safe.
-            /// Care should be taken to ensure that the same `BeanApi` is not used from multiple threads without
+            /// The `BeanApi` class implements `IDisposable` (it holds the `DbConnection`) and is not thread-safe.
+            /// Care should be taken to ensure that the same `BeanApi` and `DbConnection` instance is not used from multiple threads without
             /// synchronization, and that it is properly disposed. Let's consider some common usage scenarios.
             /// 
             /// ### Local Usage

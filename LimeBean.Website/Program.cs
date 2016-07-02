@@ -17,7 +17,7 @@ namespace LimeBean.Website {
             Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en");
 
             var layout = File.ReadAllText("../layout.html");
-            layout = layout.Replace("{{description}}", "RedBeanPHP-inspired data access layer for .NET");
+            layout = layout.Replace("{{description}}", "Hybrid-ORM for .Net");
             layout = layout.Replace("{{updated_on}}", DateTime.Now.ToString("MMM d, yyyy"));
 
             var headerIdList = new List<string>();
@@ -28,7 +28,6 @@ namespace LimeBean.Website {
             ValidateHeaderAnchors(headerIdList, layout);
             File.WriteAllText("../www/index.html", layout);
         }
-
 
         static string PreprocessBody() {
             var source = File.ReadAllLines("../Body.cs");
@@ -89,7 +88,9 @@ namespace LimeBean.Website {
             var refs = Regex.Matches(html, "href=\"#(.+?)\"").Cast<Match>().Select(m => m.Groups[1].Value);
             var wrong = refs.Except(knownIdList);
             if(wrong.Any())
-                throw new Exception("Wrong header refs found: " + String.Join(" ", wrong));
+                // If this throws - Please ensure you've updated any links to page sections after changing header titles.
+                // "Getting Started: CRUD" would become "#getting-started-crud" as a link
+                throw new Exception("Wrong header refs found.  " + String.Join(" ", wrong));
         }
 
     }

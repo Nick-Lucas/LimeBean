@@ -26,7 +26,7 @@ pre code.hljs {
 }
 
 .starter-template {
-    padding: 20px 15px;
+    padding: 20px 15px 30px;
     text-align: center;
 }
 
@@ -50,11 +50,6 @@ pre code.hljs {
   color: #ffffff; 
   background-color: #F09D18; 
   border-color: #FB9902; 
-}
-
-.lime-social-buttons {
-    display: inline-block;
-    margin-top: 20px;
 }
 
 .lime-footer {
