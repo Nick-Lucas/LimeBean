@@ -29,6 +29,10 @@ namespace LimeBean {
             _kind = kind;
         }
 
+        /// <summary>
+        /// Get the Kind (Table Name) of the Bean
+        /// </summary>
+        /// <returns>Table name</returns>
         public string GetKind() {
             return _kind;
         }
@@ -45,8 +49,13 @@ namespace LimeBean {
             return _kind ?? base.ToString();
         }
 
+
         // Accessors
 
+        /// <summary>
+        /// Get or Set the value of a Column
+        /// </summary>
+        /// <param name="name">Name of the Column to Get or Set</param>
         public object this[string name] {
             get { return _props.GetSafe(name); }
             set {
@@ -55,10 +64,21 @@ namespace LimeBean {
             }
         }
 
+        /// <summary>
+        /// Get the value of a Column in a given Type
+        /// </summary>
+        /// <typeparam name="T">Type of the return value</typeparam>
+        /// <param name="name">Name of the Column to Get</param>
+        /// <returns>Value of the requested Column as type T</returns>
         public T Get<T>(string name) {
             return this[name].ConvertSafe<T>();
         }
 
+        /// <summary>
+        /// Set the value of a Column
+        /// </summary>
+        /// <param name="name">Name of the Column to Set</param>
+        /// <param name="value">Value to Set the Column to</param>
         public Bean Put(string name, object value) {
             this[name] = value;
             return this;
@@ -71,6 +91,7 @@ namespace LimeBean {
             get { return _props.Keys; } 
         }
 
+
         // Import / Export
 
         internal IDictionary<string, object> Export() {
@@ -81,6 +102,7 @@ namespace LimeBean {
             foreach(var entry in data)
                 this[entry.Key] = entry.Value;
         }
+
 
         // Dirty tracking
 
@@ -113,6 +135,7 @@ namespace LimeBean {
 
             return new HashSet<string>(_dirtyBackup.Keys);
         }
+
 
         // Hooks
 

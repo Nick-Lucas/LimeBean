@@ -39,6 +39,7 @@ namespace LimeBean {
             }
         }
 
+
         // Iterators
 
         public IEnumerable<T> ColIterator<T>(string sql, params object[] parameters) {
@@ -48,6 +49,7 @@ namespace LimeBean {
         public IEnumerable<IDictionary<string, object>> RowsIterator(string sql, params object[] parameters) {
             return EnumerateRecords(new DbCommandDescriptor(sql, parameters), RecordToDict);
         }
+
 
         // Cell
 
@@ -70,6 +72,7 @@ namespace LimeBean {
             return EnumerateRecords(descriptor, GetFirstCellValue<T>).ToArray();
         }
 
+
         // Row
 
         public IDictionary<string, object> Row(bool useCache, string sql, params object[] parameters) {
@@ -80,6 +83,7 @@ namespace LimeBean {
             return EnumerateRecords(descriptor, RecordToDict).FirstOrDefault();
         }
 
+
         // Rows
 
         public IDictionary<string, object>[] Rows(bool useCache, string sql, params object[] parameters) {
@@ -89,6 +93,7 @@ namespace LimeBean {
         IDictionary<string, object>[] Rows(DbCommandDescriptor descriptor) {
             return EnumerateRecords(descriptor, RecordToDict).ToArray();
         }
+
 
         // Transactions
 
@@ -181,8 +186,6 @@ namespace LimeBean {
 
             if(QueryExecuting != null)
                 QueryExecuting(cmd);
-
-            // Console.WriteLine(cmd.CommandText);
         }
 
         T CacheableRead<T>(bool singleCell, bool singleRow, bool useCache, string sql, object[] parameters, Func<DbCommandDescriptor, T> factory) {
