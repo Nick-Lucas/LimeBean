@@ -228,8 +228,8 @@ LimeBean can create new tables, add missing columns, and widen data types.
 It will never truncate data or delete unused columns.</p>
 <p><strong>NOTE:</strong> LimeBean will not detect renamings.</p>
 <p><strong>CAUTION:</strong> Automatically generated schema is usually sub-optimal and lacks indexes which are essential
-for performance. When most of planned tables are already in place,
-it is recommended to turn the Fluid Mode off, audit the database structure, add indexes, and make further schema
+for performance. When most planned tables are already in place,
+it is recommended you turn Fluid Mode off, audit the database structure, add indexes, and make further schema
 changes with a dedicated database management tool (like HeidiSQL, SSMS, pgAdmin, etc).</p>
 <h2 id="finding-beans-with-sql">Finding Beans with SQL</h2>
 <p>LimeBean doesn't introduce any custom query language, nor does it implement a LINQ provider.
@@ -308,7 +308,7 @@ it's possible to define properties without using strings at all:</p>
 
 <h2 id="lifecycle-hooks">Lifecycle Hooks</h2>
 <p><a href="#custom-bean-classes">Custom Bean Classes</a> provide lifecycle hook methods which you can override to receive
-notifications about [CRUD operations]getting-started-basic-crud-create-read-update-delete occurring to this bean:</p>
+notifications about <a href="#getting-started-basic-crud-create-read-update-delete">CRUD operations</a> occurring to this bean:</p>
 <pre><code>public class Product : Bean {
     public Product()
         : base(&quot;product&quot;) {
@@ -680,7 +680,7 @@ For this purpose, all query functions provide overloads with the <code>useCache<
         <hr />
         <b>LimeBean</b> is released under the <a href="https://raw.githubusercontent.com/Nick-Lucas/LimeBean/master/LICENSE.txt">MIT license</a>
         <br />
-        Updated on Jul 2, 2016
+        Updated on Jul 3, 2016
         <br /><br />
         <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
     </div>
