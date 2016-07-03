@@ -183,8 +183,8 @@ namespace LimeBean.Website {
             /// **NOTE:** LimeBean will not detect renamings.
             /// 
             /// **CAUTION:** Automatically generated schema is usually sub-optimal and lacks indexes which are essential
-            /// for performance. When most of planned tables are already in place, 
-            /// it is recommended to turn the Fluid Mode off, audit the database structure, add indexes, and make further schema
+            /// for performance. When most planned tables are already in place, 
+            /// it is recommended you turn Fluid Mode off, audit the database structure, add indexes, and make further schema
             /// changes with a dedicated database management tool (like HeidiSQL, SSMS, pgAdmin, etc).
             /// 
         }
@@ -299,7 +299,7 @@ namespace LimeBean.Website {
         class LifecycleHooks { 
             /// ## Lifecycle Hooks
             /// [Custom Bean Classes](#custom-bean-classes) provide lifecycle hook methods which you can override to receive 
-            /// notifications about [CRUD operations]getting-started-basic-crud-create-read-update-delete occurring to this bean:
+            /// notifications about [CRUD operations](#getting-started-basic-crud-create-read-update-delete) occurring to this bean:
             /// 
 #if CODE
             public class Product : Bean {
