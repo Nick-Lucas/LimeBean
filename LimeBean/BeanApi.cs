@@ -127,6 +127,10 @@ namespace LimeBean {
             Storage.EnterFluidMode();
         }
 
+        /// <summary>
+        /// Dispose of any fully managed Database Connections. 
+        /// Connections created outside of BeanAPI and passed in need to be manually disposed
+        /// </summary>
         public void Dispose() {
             _connectionContainer.Dispose();
         }
