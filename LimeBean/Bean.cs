@@ -10,7 +10,7 @@ using LimeBean.Interfaces;
 
 namespace LimeBean {
 
-    public partial class Bean {
+    public partial class Bean : IBean {
         static readonly ConcurrentDictionary<Type, string> _kindCache = new ConcurrentDictionary<Type, string>();
 
         internal static string GetKind<T>() where T : Bean, new() {
