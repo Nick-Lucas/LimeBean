@@ -5,6 +5,8 @@ using System.Data.Common;
 using System.Linq;
 using System.Text;
 
+using LimeBean.Interfaces;
+
 namespace LimeBean {
 
     public partial class BeanApi : IDisposable, IBeanCrud, IBeanFinder, IDatabaseAccess, IValueRelaxations {

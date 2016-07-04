@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using LimeBean.Interfaces;
+
 namespace LimeBean {
 
     class SQLiteDetails : IDatabaseDetails {

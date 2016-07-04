@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace LimeBean {
+namespace LimeBean.Interfaces {
 
     interface IBeanFinder {
         Bean[] Find(bool useCache, string kind, string expr = null, params object[] parameters);

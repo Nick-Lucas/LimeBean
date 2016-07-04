@@ -54,17 +54,17 @@
     <Compile Include="PgSqlDetails.cs" />
     <Compile Include="Portability.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="IBeanCrud.cs" />
-    <Compile Include="IBeanFinder.cs">
+    <Compile Include="Interfaces\IBeanCrud.cs" />
+    <Compile Include="Interfaces\IBeanFinder.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="IDatabaseDetails.cs" />
-    <Compile Include="IKeyAccess.cs" />
-    <Compile Include="IStorage.cs" />
+    <Compile Include="Interfaces\IDatabaseDetails.cs" />
+    <Compile Include="Interfaces\IKeyAccess.cs" />
+    <Compile Include="Interfaces\IStorage.cs" />
     <Compile Include="BeanCrud.cs" />
-    <Compile Include="IDatabaseAccess.cs" />
-    <Compile Include="ITransactionSupport.cs" />
-    <Compile Include="IValueRelaxations.cs" />
+    <Compile Include="Interfaces\IDatabaseAccess.cs" />
+    <Compile Include="Interfaces\ITransactionSupport.cs" />
+    <Compile Include="Interfaces\IValueRelaxations.cs" />
     <Compile Include="KeyUtil.cs" />
     <Compile Include="MariaDbDetails.cs" />
     <Compile Include="MsSqlDetails.cs" />

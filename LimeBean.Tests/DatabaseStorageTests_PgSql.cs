@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
+using LimeBean.Interfaces;
+
 // NOTE http://www.roryhart.net/code/slow-create-database-with-postgresql/
 
 namespace LimeBean.Tests {

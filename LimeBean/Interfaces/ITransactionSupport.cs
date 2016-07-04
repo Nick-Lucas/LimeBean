@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 
-namespace LimeBean {
+namespace LimeBean.Interfaces {
 
     interface ITransactionSupport {
         bool ImplicitTransactions { get; set; }

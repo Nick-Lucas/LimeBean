@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace LimeBean {
+namespace LimeBean.Interfaces {
 
     interface IStorage {
         object Store(string kind, IDictionary<string, object> data, ICollection<string> dirtyNames);

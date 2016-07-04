@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LimeBean {
+namespace LimeBean.Interfaces {
 
     interface IBeanCrud {
         bool DirtyTracking { get; set; }

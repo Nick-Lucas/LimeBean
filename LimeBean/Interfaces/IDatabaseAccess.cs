@@ -4,7 +4,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Text;
 
-namespace LimeBean {
+namespace LimeBean.Interfaces {
     using Row = IDictionary<string, object>;
 
     interface IDatabaseAccess : ITransactionSupport {

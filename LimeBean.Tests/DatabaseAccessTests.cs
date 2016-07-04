@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using Xunit;
 
+using LimeBean.Interfaces;
+
 namespace LimeBean.Tests {
 
     public class DatabaseAccessTests : IDisposable {
