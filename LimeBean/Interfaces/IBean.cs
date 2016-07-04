@@ -5,10 +5,9 @@ using System.Text;
 
 namespace LimeBean.Interfaces {
 
-    interface IBean {
+    public interface IBean {
         string GetKind();
-        string ToString();
-
+        
 
         // Accessors
 
