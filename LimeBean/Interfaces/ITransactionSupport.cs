@@ -6,7 +6,7 @@ using System.Text;
 
 namespace LimeBean.Interfaces {
 
-    interface ITransactionSupport {
+    public interface ITransactionSupport {
         bool ImplicitTransactions { get; set; }
         bool InTransaction { get; }
         IsolationLevel TransactionIsolation { get; set; }
