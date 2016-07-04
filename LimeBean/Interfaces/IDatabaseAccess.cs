@@ -7,7 +7,7 @@ using System.Text;
 namespace LimeBean.Interfaces {
     using Row = IDictionary<string, object>;
 
-    interface IDatabaseAccess : ITransactionSupport {
+    public interface IDatabaseAccess : ITransactionSupport {
         event Action<DbCommand> QueryExecuting;
         int CacheCapacity { get; set; }        
 

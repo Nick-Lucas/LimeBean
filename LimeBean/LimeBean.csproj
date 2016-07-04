@@ -52,6 +52,7 @@
     <Compile Include="BeanObserver.cs" />
     <Compile Include="Cache.cs" />
     <Compile Include="Interfaces\IBean.cs" />
+    <Compile Include="Interfaces\IBeanAPI.cs" />
     <Compile Include="PgSqlDetails.cs" />
     <Compile Include="Portability.cs" />
     <Compile Include="Extensions.cs" />
