@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using LimeBean.Interfaces;
+
 namespace LimeBean {
     class KeyUtil : IKeyAccess {
         IDictionary<string, ICollection<string>> _names = new Dictionary<string, ICollection<string>>();

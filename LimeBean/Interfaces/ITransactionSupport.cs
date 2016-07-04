@@ -4,9 +4,9 @@ using System.Data;
 using System.Linq;
 using System.Text;
 
-namespace LimeBean {
+namespace LimeBean.Interfaces {
 
-    interface ITransactionSupport {
+    public interface ITransactionSupport {
         bool ImplicitTransactions { get; set; }
         bool InTransaction { get; }
         IsolationLevel TransactionIsolation { get; set; }

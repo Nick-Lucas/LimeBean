@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
+using LimeBean.Interfaces;
+
 namespace LimeBean {
     
     static partial class Extensions {

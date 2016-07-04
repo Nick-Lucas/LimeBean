@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace LimeBean {
+namespace LimeBean.Interfaces {
 
-    interface IBeanFinder {
+    public interface IBeanFinder {
         Bean[] Find(bool useCache, string kind, string expr = null, params object[] parameters);
         T[] Find<T>(bool useCache, string expr = null, params object[] parameters) where T : Bean, new();
 

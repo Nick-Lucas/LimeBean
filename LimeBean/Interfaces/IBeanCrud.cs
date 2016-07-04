@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LimeBean {
+namespace LimeBean.Interfaces {
 
-    interface IBeanCrud {
+    public interface IBeanCrud {
         bool DirtyTracking { get; set; }
 
         void AddObserver(BeanObserver observer);

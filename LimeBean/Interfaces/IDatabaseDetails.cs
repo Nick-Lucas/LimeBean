@@ -4,7 +4,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Text;
 
-namespace LimeBean {
+namespace LimeBean.Interfaces {
 
     interface IDatabaseDetails {
         string DbName { get; }
