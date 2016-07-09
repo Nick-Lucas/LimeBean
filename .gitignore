@@ -9,3 +9,4 @@ project.lock.json
 LimeBean.NuGet/*.nupkg
 LimeBean.NuGet/nuget.exe
 index.html
+*.stackdump

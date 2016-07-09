@@ -19,7 +19,8 @@ namespace LimeBean.Tests {
                 IDatabaseAccess db = new DatabaseAccess(conn, details);
                 IKeyAccess keys = new KeyUtil();
                 DatabaseStorage storage = new DatabaseStorage(details, db, keys);
-                IBeanCrud crud = new BeanCrud(storage, db, keys);
+                IBeanFactory factory = new BeanFactory();
+                IBeanCrud crud = new BeanCrud(storage, db, keys, factory);
 
                 storage.EnterFluidMode();
 
