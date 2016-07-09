@@ -82,20 +82,12 @@ namespace LimeBean {
             }
         }
 
-        /// <summary>
-        /// Provides configuration of default Bean 
-        /// options, for Beans created by Limebean
-        /// </summary>
         IBeanFactory Factory {
             get {
                 if (_factory == null)
                     _factory = new BeanFactory();
                 return _factory;
             }
-        }
-
-        public IBeanConfiguration BeanConfiguration {
-            get { return Factory.Config; }
         }
 
         IBeanFinder Finder {
@@ -154,6 +146,13 @@ namespace LimeBean {
             _connectionContainer.Dispose();
         }
 
+        /// <summary>
+        /// Provides configuration of default Bean 
+        /// options, for Beans created by Limebean
+        /// </summary>
+        public IBeanConfiguration BeanConfiguration {
+            get { return Factory.Config; }
+        }
 
         // IBeanCrud
 
