@@ -16,6 +16,7 @@ namespace LimeBean {
         KeyUtil _keyUtil;
         DatabaseStorage _storage;
         IBeanCrud _crud;
+        IBeanFactory _factory;
         IBeanFinder _finder;
 
         public BeanApi(string connectionString, DbProviderFactory factory) {
@@ -74,11 +75,27 @@ namespace LimeBean {
         IBeanCrud Crud {
             get {
                 if(_crud == null) {
-                    _crud = new BeanCrud(Storage, Db, KeyUtil);
+                    _crud = new BeanCrud(Storage, Db, KeyUtil, Factory);
                     _crud.AddObserver(new BeanApiLinker(this));
                 }
                 return _crud;
             }
+        }
+
+        /// <summary>
+        /// Provides configuration of default Bean 
+        /// options, for Beans created by Limebean
+        /// </summary>
+        IBeanFactory Factory {
+            get {
+                if (_factory == null)
+                    _factory = new BeanFactory();
+                return _factory;
+            }
+        }
+
+        public IBeanConfiguration BeanConfiguration {
+            get { return Factory.Config; }
         }
 
         IBeanFinder Finder {

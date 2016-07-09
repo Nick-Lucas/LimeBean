@@ -41,6 +41,8 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="BeanApi.cs" />
     <Compile Include="BeanApiLinker.cs" />
+    <Compile Include="BeanConfiguration.cs" />
+    <Compile Include="BeanFactory.cs" />
     <Compile Include="CommonDatabaseDetails.cs" />
     <Compile Include="CompoundKey.cs" />
     <Compile Include="ConnectionContainer.cs" />
@@ -54,6 +56,9 @@
     <Compile Include="Exceptions\ColumnNotFoundException.cs" />
     <Compile Include="Interfaces\IBean.cs" />
     <Compile Include="Interfaces\IBeanApi.cs" />
+    <Compile Include="Interfaces\IBeanConfiguration.cs" />
+    <Compile Include="Interfaces\IBeanDispenser.cs" />
+    <Compile Include="Interfaces\IBeanFactory.cs" />
     <Compile Include="PgSqlDetails.cs" />
     <Compile Include="Portability.cs" />
     <Compile Include="Extensions.cs" />

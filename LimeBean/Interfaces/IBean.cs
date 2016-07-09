@@ -18,11 +18,6 @@ namespace LimeBean.Interfaces {
         Bean Put(string name, object value);
 
         IEnumerable<string> Columns { get; }
-
-
-        // Flags
-
-        bool ValidateGetColumns { get; set; }
     }
 
 }

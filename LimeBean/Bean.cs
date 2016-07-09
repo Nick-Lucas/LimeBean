@@ -100,15 +100,11 @@ namespace LimeBean {
             get { return _props.Keys; } 
         }
 
-        /// <summary>
-        /// Specifies whether each Bean[column] or Bean.Get<T>(column) call 
-        /// will throw ColumnNotFoundException if the column does not exist. Default False
-        /// </summary>
-        public bool ValidateGetColumns {
-            get { return _ValidateGetColumns; }
-            set { _ValidateGetColumns = value; }
+
+        internal bool ValidateGetColumns {
+            get;
+            set;
         }
-        private bool _ValidateGetColumns = false;
 
         private void ValidateColumnExists(string name) {
             if (_props.ContainsKey(name) == false)
@@ -130,7 +126,7 @@ namespace LimeBean {
         // Dirty tracking
 
         void SaveDirtyBackup(string name, object newValue) {
-            var currentValue = this[name];
+            var currentValue = _props.GetSafe(name);
             if(Equals(newValue, currentValue))
                 return;
 
