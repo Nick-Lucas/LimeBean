@@ -51,6 +51,7 @@
     <Compile Include="Bean.cs" />
     <Compile Include="BeanObserver.cs" />
     <Compile Include="Cache.cs" />
+    <Compile Include="Exceptions\ColumnNotFoundException.cs" />
     <Compile Include="Interfaces\IBean.cs" />
     <Compile Include="Interfaces\IBeanApi.cs" />
     <Compile Include="PgSqlDetails.cs" />

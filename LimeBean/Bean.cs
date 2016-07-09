@@ -59,7 +59,11 @@ namespace LimeBean {
         /// </summary>
         /// <param name="name">Name of the Column to Get or Set</param>
         public object this[string name] {
-            get { return _props.GetSafe(name); }
+            get {
+                if (ValidateGetColumns)
+                    ValidateColumnExists(name);
+
+                return _props.GetSafe(name); }
             set {
                 SaveDirtyBackup(name, value);
                 _props[name] = value;
@@ -73,6 +77,9 @@ namespace LimeBean {
         /// <param name="name">Name of the Column to Get</param>
         /// <returns>Value of the requested Column as type T</returns>
         public T Get<T>(string name) {
+            if (ValidateGetColumns)
+                ValidateColumnExists(name);
+
             return this[name].ConvertSafe<T>();
         }
 
@@ -93,6 +100,20 @@ namespace LimeBean {
             get { return _props.Keys; } 
         }
 
+        /// <summary>
+        /// Specifies whether each Bean[column] or Bean.Get<T>(column) call 
+        /// will throw ColumnNotFoundException if the column does not exist. Default False
+        /// </summary>
+        public bool ValidateGetColumns {
+            get { return _ValidateGetColumns; }
+            set { _ValidateGetColumns = value; }
+        }
+        private bool _ValidateGetColumns = false;
+
+        private void ValidateColumnExists(string name) {
+            if (_props.ContainsKey(name) == false)
+                throw Exceptions.ColumnNotFoundException.New(this, name);
+        }
 
         // Import / Export
 
