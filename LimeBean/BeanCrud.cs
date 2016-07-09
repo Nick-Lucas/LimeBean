@@ -113,8 +113,6 @@ namespace LimeBean {
         }
 
         T ContinueDispense<T>(T bean) where T : Bean {
-            bean.Dispensed = true;
-
             bean.AfterDispense();
             foreach(var observer in _observers)
                 observer.AfterDispense(bean);

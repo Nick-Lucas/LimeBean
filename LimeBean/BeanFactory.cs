@@ -30,6 +30,7 @@ namespace LimeBean {
         }
 
         private T ConfigureBean<T>(T bean) where T : Bean {
+            bean.Dispensed = true;
             bean.ValidateGetColumns = Config.ValidateGetColumns;
             return bean;
         }
