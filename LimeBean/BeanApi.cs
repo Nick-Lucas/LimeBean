@@ -9,7 +9,7 @@ using LimeBean.Interfaces;
 
 namespace LimeBean {
 
-    public partial class BeanApi : IBeanAPI {
+    public partial class BeanApi : IBeanApi {
         ConnectionContainer _connectionContainer;
         IDatabaseDetails _details;
         IDatabaseAccess _db;

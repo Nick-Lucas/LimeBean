@@ -6,7 +6,7 @@ using System.Text;
 
 namespace LimeBean.Interfaces {
 
-    public interface IBeanAPI : IDisposable, IBeanCrud, IBeanFinder, IDatabaseAccess, IValueRelaxations {
+    public interface IBeanApi : IDisposable, IBeanCrud, IBeanFinder, IDatabaseAccess, IValueRelaxations {
         // Properties
 
         DbConnection Connection { get; }
