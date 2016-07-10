@@ -150,7 +150,7 @@ namespace LimeBean {
         /// Provides configuration of default Bean 
         /// options, for Beans created by Limebean
         /// </summary>
-        public IBeanConfiguration BeanConfiguration {
+        public IBeanConfiguration BeanOptions {
             get { return Factory.Config; }
         }
 
