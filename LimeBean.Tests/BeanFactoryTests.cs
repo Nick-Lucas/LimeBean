@@ -19,12 +19,12 @@ namespace LimeBean.Tests {
             Bean bean;
 
             Func<bool, Bean> make = validateColumns => {
-                factory.Config.ValidateGetColumns = false;
-                var bean = factory.Dispense("test");
-                Assert.Equal(typeof(Bean), bean.GetType());
-                Assert.Equal(false, bean.ValidateGetColumns);
-                bean.Put("one", 1);
-                return bean;
+                factory.Options.ValidateGetColumns = false;
+                Bean b = factory.Dispense("test");
+                Assert.Equal(typeof(Bean), b.GetType());
+                Assert.Equal(false, b.ValidateGetColumns);
+                b.Put("one", 1);
+                return b;
             };
 
             // With ValidateGetColumns switched off
