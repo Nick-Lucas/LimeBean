@@ -6,7 +6,7 @@ using System.Text;
 namespace LimeBean.Interfaces {
 
     public interface IBeanFactory : IBeanDispenser {
-        IBeanConfiguration Config { get; }
+        IBeanOptions Options { get; }
     }
 
 }

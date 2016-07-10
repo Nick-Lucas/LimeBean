@@ -22,7 +22,7 @@ namespace LimeBean.Tests {
         [Fact]
         public void Dispense_Hooks() {
             IBeanFactory factory = new BeanFactory();
-            factory.Config.ValidateGetColumns = false;
+            factory.Options.ValidateGetColumns = false;
             var crud = new BeanCrud(null, null, null, factory);
             var observer = new TracingObserver();
             crud.AddObserver(observer);
@@ -38,7 +38,7 @@ namespace LimeBean.Tests {
         [Fact]
         public void Store() {
             IBeanFactory factory = new BeanFactory();
-            factory.Config.ValidateGetColumns = false;
+            factory.Options.ValidateGetColumns = false;
             var crud = new BeanCrud(new InMemoryStorage(), null, new KeyUtil(), factory);
             var observer = new TracingObserver();
             crud.AddObserver(observer);
@@ -56,7 +56,7 @@ namespace LimeBean.Tests {
         [Fact]
         public void Load() {
             IBeanFactory factory = new BeanFactory();
-            factory.Config.ValidateGetColumns = false;
+            factory.Options.ValidateGetColumns = false;
             var crud = new BeanCrud(new InMemoryStorage(), null, new KeyUtil(), factory);
             var observer = new TracingObserver();
             crud.AddObserver(observer);
@@ -82,7 +82,7 @@ namespace LimeBean.Tests {
         [Fact]
         public void Trash() {
             IBeanFactory factory = new BeanFactory();
-            factory.Config.ValidateGetColumns = false;
+            factory.Options.ValidateGetColumns = false;
             var crud = new BeanCrud(new InMemoryStorage(), null, new KeyUtil(), factory);
             var observer = new TracingObserver();
             crud.AddObserver(observer);
@@ -108,7 +108,7 @@ namespace LimeBean.Tests {
         [Fact]
         public void RowToBean() {
             IBeanFactory factory = new BeanFactory();
-            factory.Config.ValidateGetColumns = false;
+            factory.Options.ValidateGetColumns = false;
             var crud = new BeanCrud(new InMemoryStorage(), null, null, factory);
             var observer = new TracingObserver();
             crud.AddObserver(observer);

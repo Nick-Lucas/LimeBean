@@ -6,7 +6,7 @@ using System.Text;
 using LimeBean.Interfaces;
 
 namespace LimeBean {
-    class BeanConfiguration : IBeanConfiguration {
+    class BeanOptions : IBeanOptions {
 
         /// <summary>
         /// Specifies whether each Bean[column] or Bean.Get<T>(column) call 

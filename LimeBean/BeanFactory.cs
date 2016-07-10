@@ -10,11 +10,11 @@ namespace LimeBean {
     internal class BeanFactory : IBeanFactory {
         internal BeanFactory() { }
 
-        IBeanConfiguration _config;
-        public IBeanConfiguration Config {
+        IBeanOptions _config;
+        public IBeanOptions Options {
             get {
                 if (_config == null) 
-                    _config = new BeanConfiguration();
+                    _config = new BeanOptions();
                 return _config;
             }
         }
@@ -31,7 +31,7 @@ namespace LimeBean {
 
         private T ConfigureBean<T>(T bean) where T : Bean {
             bean.Dispensed = true;
-            bean.ValidateGetColumns = Config.ValidateGetColumns;
+            bean.ValidateGetColumns = Options.ValidateGetColumns;
             return bean;
         }
 

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace LimeBean.Interfaces {
 
-    public interface IBeanConfiguration {
+    public interface IBeanOptions {
         bool ValidateGetColumns { get; set; }
     }
 
