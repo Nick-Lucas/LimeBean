@@ -108,7 +108,7 @@ namespace LimeBean.Website {
             // Store() will Create or Update a record intelligently
             var id = api.Store(bean);
 
-            // Store also returns the Primary Key for the saved Bean, even for [multi-column/compound keys](#primary-keys)
+            // Store also returns the Primary Key for the saved Bean, even for multi-column/compound keys
             Console.WriteLine(id);
 #endif
             /// **Read** and **Update**
