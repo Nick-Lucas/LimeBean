@@ -101,6 +101,8 @@ namespace LimeBean {
         }
 
 
+        // Bean Options
+
         internal bool ValidateGetColumns {
             get;
             set;
@@ -110,6 +112,7 @@ namespace LimeBean {
             if (_props.ContainsKey(name) == false)
                 throw Exceptions.ColumnNotFoundException.New(this, name);
         }
+
 
         // Import / Export
 
