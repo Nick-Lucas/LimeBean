@@ -12,12 +12,14 @@ namespace LimeBean {
         ITransactionSupport _transactionSupport;
         IKeyAccess _keyAccess;
         IList<BeanObserver> _observers;
+        IBeanFactory _factory;
 
-        public BeanCrud(IStorage storage, ITransactionSupport transactionSupport, IKeyAccess keys) {
+        public BeanCrud(IStorage storage, ITransactionSupport transactionSupport, IKeyAccess keys, IBeanFactory factory) {
             _storage = storage;
             _transactionSupport = transactionSupport;
             _keyAccess = keys;
             _observers = new List<BeanObserver>();
+            _factory = factory;
             DirtyTracking = true;
         }
 
@@ -32,11 +34,13 @@ namespace LimeBean {
         }
 
         public Bean Dispense(string kind) {
-            return ContinueDispense(new Bean(kind));
+            Bean bean = _factory.Dispense(kind);
+            return ContinueDispense(bean);
         }
 
         public T Dispense<T>() where T : Bean, new() {
-            return ContinueDispense(new T());
+            T bean = _factory.Dispense<T>();
+            return ContinueDispense(bean);
         }
 
         public Bean RowToBean(string kind, IDictionary<string, object> row) {
@@ -109,8 +113,6 @@ namespace LimeBean {
         }
 
         T ContinueDispense<T>(T bean) where T : Bean {
-            bean.Dispensed = true;
-
             bean.AfterDispense();
             foreach(var observer in _observers)
                 observer.AfterDispense(bean);

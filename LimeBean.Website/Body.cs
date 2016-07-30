@@ -108,7 +108,7 @@ namespace LimeBean.Website {
             // Store() will Create or Update a record intelligently
             var id = api.Store(bean);
 
-            // Store also returns the Primary Key for the saved Bean, even for [multi-column/compound keys](#primary-keys)
+            // Store also returns the Primary Key for the saved Bean, even for multi-column/compound keys
             Console.WriteLine(id);
 #endif
             /// **Read** and **Update**
@@ -144,6 +144,23 @@ namespace LimeBean.Website {
                 .Put("comment", null);
 #endif
             /// See also: [Custom Bean Classes](#custom-bean-classes)
+        }
+
+        void BeanOptions(BeanApi api) {
+            /// ## Bean Options
+            /// You can configure the BeanAPI to dispense new Beans with some default options
+            ///
+            /// **.ValidateGetColumns** 
+#if CODE
+            // Sets whether a Bean throws `ColumnNotFoundException` if 
+            // you request a column which isn't stored in the Bean. True by default
+            api.BeanOptions.ValidateGetColumns = true;
+
+            Bean bean = api.Dispense("books");
+            bean.Put("ColumnOne", 1); // Add a single column
+            int one = bean.Get<int>("ColumnOne"); // OK
+            int two = bean.Get<int>("ColumnTwo"); // throws ColumnNotFoundException
+#endif
         }
 
         void FluidMode(BeanApi api) { 

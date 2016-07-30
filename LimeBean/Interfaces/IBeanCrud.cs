@@ -3,14 +3,11 @@ using System.Collections.Generic;
 
 namespace LimeBean.Interfaces {
 
-    public interface IBeanCrud {
+    public interface IBeanCrud : IBeanDispenser {
         bool DirtyTracking { get; set; }
 
         void AddObserver(BeanObserver observer);
         void RemoveObserver(BeanObserver observer);
-
-        Bean Dispense(string kind);
-        T Dispense<T>() where T : Bean, new();
 
         Bean RowToBean(string kind, IDictionary<string, object> row);
         T RowToBean<T>(IDictionary<string, object> row) where T : Bean, new();

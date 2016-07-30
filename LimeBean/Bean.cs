@@ -59,7 +59,11 @@ namespace LimeBean {
         /// </summary>
         /// <param name="name">Name of the Column to Get or Set</param>
         public object this[string name] {
-            get { return _props.GetSafe(name); }
+            get {
+                if (ValidateGetColumns)
+                    ValidateColumnExists(name);
+
+                return _props.GetSafe(name); }
             set {
                 SaveDirtyBackup(name, value);
                 _props[name] = value;
@@ -94,6 +98,19 @@ namespace LimeBean {
         }
 
 
+        // Bean Options
+
+        internal bool ValidateGetColumns {
+            get;
+            set;
+        }
+
+        private void ValidateColumnExists(string name) {
+            if (_props.ContainsKey(name) == false)
+                throw Exceptions.ColumnNotFoundException.New(this, name);
+        }
+
+
         // Import / Export
 
         internal IDictionary<string, object> Export() {
@@ -109,7 +126,7 @@ namespace LimeBean {
         // Dirty tracking
 
         void SaveDirtyBackup(string name, object newValue) {
-            var currentValue = this[name];
+            var currentValue = _props.GetSafe(name);
             if(Equals(newValue, currentValue))
                 return;
 

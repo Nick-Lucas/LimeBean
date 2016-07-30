@@ -4,13 +4,16 @@ using System.Linq;
 using System.Text;
 using Xunit;
 
+using LimeBean.Interfaces;
+
 namespace LimeBean.Tests {
 
     public class BeanCrudTests {
 
         [Fact]
         public void Dispense_Default() {
-            var crud = new BeanCrud(null, null, null);
+            IBeanFactory factory = new BeanFactory();
+            var crud = new BeanCrud(null, null, null, factory);
             var bean = crud.Dispense("test");
             Assert.Equal("test", bean.GetKind());
             Assert.Equal(typeof(Bean), bean.GetType());
@@ -18,7 +21,9 @@ namespace LimeBean.Tests {
 
         [Fact]
         public void Dispense_Hooks() {
-            var crud = new BeanCrud(null, null, null);
+            IBeanFactory factory = new BeanFactory();
+            factory.Options.ValidateGetColumns = false;
+            var crud = new BeanCrud(null, null, null, factory);
             var observer = new TracingObserver();
             crud.AddObserver(observer);
 
@@ -32,7 +37,9 @@ namespace LimeBean.Tests {
 
         [Fact]
         public void Store() {
-            var crud = new BeanCrud(new InMemoryStorage(), null, new KeyUtil());
+            IBeanFactory factory = new BeanFactory();
+            factory.Options.ValidateGetColumns = false;
+            var crud = new BeanCrud(new InMemoryStorage(), null, new KeyUtil(), factory);
             var observer = new TracingObserver();
             crud.AddObserver(observer);
 
@@ -48,7 +55,9 @@ namespace LimeBean.Tests {
 
         [Fact]
         public void Load() {
-            var crud = new BeanCrud(new InMemoryStorage(), null, new KeyUtil());
+            IBeanFactory factory = new BeanFactory();
+            factory.Options.ValidateGetColumns = false;
+            var crud = new BeanCrud(new InMemoryStorage(), null, new KeyUtil(), factory);
             var observer = new TracingObserver();
             crud.AddObserver(observer);
 
@@ -72,7 +81,9 @@ namespace LimeBean.Tests {
 
         [Fact]
         public void Trash() {
-            var crud = new BeanCrud(new InMemoryStorage(), null, new KeyUtil());
+            IBeanFactory factory = new BeanFactory();
+            factory.Options.ValidateGetColumns = false;
+            var crud = new BeanCrud(new InMemoryStorage(), null, new KeyUtil(), factory);
             var observer = new TracingObserver();
             crud.AddObserver(observer);
 
@@ -96,7 +107,9 @@ namespace LimeBean.Tests {
 
         [Fact]
         public void RowToBean() {
-            var crud = new BeanCrud(new InMemoryStorage(), null, null);
+            IBeanFactory factory = new BeanFactory();
+            factory.Options.ValidateGetColumns = false;
+            var crud = new BeanCrud(new InMemoryStorage(), null, null, factory);
             var observer = new TracingObserver();
             crud.AddObserver(observer);
 
@@ -126,7 +139,8 @@ namespace LimeBean.Tests {
 
         [Fact]
         public void PreventDirectInstantiation() {
-            var crud = new BeanCrud(null, null, null);
+            IBeanFactory factory = new BeanFactory();
+            var crud = new BeanCrud(null, null, null, factory);
             
             Assert.Throws<InvalidOperationException>(delegate() {
                 crud.Store(new Tracer());    
