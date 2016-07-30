@@ -77,9 +77,6 @@ namespace LimeBean {
         /// <param name="name">Name of the Column to Get</param>
         /// <returns>Value of the requested Column as type T</returns>
         public T Get<T>(string name) {
-            if (ValidateGetColumns)
-                ValidateColumnExists(name);
-
             return this[name].ConvertSafe<T>();
         }
 
