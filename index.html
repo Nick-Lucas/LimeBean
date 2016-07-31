@@ -116,7 +116,8 @@ It's a <strong>Hybrid-ORM</strong>... halfway between a micro-ORM and plain old 
 <li><a href="https://www.nuget.org/packages/System.Data.SQLite.Core">System.Data.SQLite.Core</a> for SQLite in .NET</li>
 <li><a href="http://www.mono-project.com/docs/database-access/providers/sqlite/">Mono.Data.Sqlite</a> for SQLite in Mono</li>
 <li><a href="https://www.nuget.org/packages/Microsoft.Data.SQLite">Microsoft.Data.SQLite</a> for SQLite in .NET Core</li>
-<li><a href="https://www.nuget.org/packages/MySql.Data/">MySql.Data</a> for MySQL or MariaDB</li>
+<li><a href="https://www.nuget.org/packages/MySql.Data/">MySql.Data</a> official connector for MySQL or MariaDB</li>
+<li><a href="https://github.com/SapientGuardian/mysql-connector-net-netstandard">MySql.Data</a> fork with .Net Core support</li>
 <li><a href="https://www.nuget.org/packages/Npgsql/">Npgsql</a> for PostgreSQL</li>
 <li><a href="https://msdn.microsoft.com/en-us/library/System.Data.SqlClient.aspx">System.Data.SqlClient</a> for SQL Server</li>
 </ul>
@@ -162,7 +163,7 @@ bean.Put(&quot;title&quot;, &quot;Three Comrades&quot;)
 // Store() will Create or Update a record intelligently
 var id = api.Store(bean);
 
-// Store also returns the Primary Key for the saved Bean, even for [multi-column/compound keys](#primary-keys)
+// Store also returns the Primary Key for the saved Bean, even for multi-column/compound keys
 Console.WriteLine(id);
 </code></pre>
 
@@ -196,6 +197,19 @@ bean.Get&lt;bool?&gt;(&quot;someFlag&quot;);
 </code></pre>
 
 <p>See also: <a href="#custom-bean-classes">Custom Bean Classes</a></p>
+<h2 id="bean-options">Bean Options</h2>
+<p>You can configure the BeanAPI to dispense new Beans with some default options</p>
+<p><strong>.ValidateGetColumns</strong></p>
+<pre><code>// Sets whether a Bean throws `ColumnNotFoundException` if 
+// you request a column which isn't stored in the Bean. True by default
+api.BeanOptions.ValidateGetColumns = true;
+
+Bean bean = api.Dispense(&quot;books&quot;);
+bean.Put(&quot;ColumnOne&quot;, 1); // Add a single column
+int one = bean.Get&lt;int&gt;(&quot;ColumnOne&quot;); // OK
+int two = bean.Get&lt;int&gt;(&quot;ColumnTwo&quot;); // throws ColumnNotFoundException
+</code></pre>
+
 <h2 id="fluid-mode">Fluid Mode</h2>
 <p>LimeBean mitigates the common inconvenience associated with relational databases,
 namely necessity to manually create tables, columns and adjust their data types.
@@ -680,7 +694,7 @@ For this purpose, all query functions provide overloads with the <code>useCache<
         <hr />
         <b>LimeBean</b> is released under the <a href="https://raw.githubusercontent.com/Nick-Lucas/LimeBean/master/LICENSE.txt">MIT license</a>
         <br />
-        Updated on Jul 3, 2016
+        Updated on Jul 31, 2016
         <br /><br />
         <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
     </div>
