@@ -37,7 +37,7 @@ Console.WriteLine("New book ID: " + newBookId.ToString());
               | .NET | .NET Core 
 --------------|------|-----------
 SQLite        | +    | + 
-MySQL/MariaDB | +    | - 
+MySQL/MariaDB | +    | + 
 PostgreSQL    | +    | + 
 SQL Server    | +    | + 
 

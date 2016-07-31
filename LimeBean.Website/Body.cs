@@ -47,7 +47,8 @@ namespace LimeBean.Website {
             /// * [System.Data.SQLite.Core](https://www.nuget.org/packages/System.Data.SQLite.Core) for SQLite in .NET
             /// * [Mono.Data.Sqlite](http://www.mono-project.com/docs/database-access/providers/sqlite/) for SQLite in Mono
             /// * [Microsoft.Data.SQLite](https://www.nuget.org/packages/Microsoft.Data.SQLite) for SQLite in .NET Core
-            /// * [MySql.Data](https://www.nuget.org/packages/MySql.Data/) for MySQL or MariaDB
+            /// * [MySql.Data](https://www.nuget.org/packages/MySql.Data/) official connector for MySQL or MariaDB
+            /// * [MySql.Data](https://github.com/SapientGuardian/mysql-connector-net-netstandard) fork with .Net Core support 
             /// * [Npgsql](https://www.nuget.org/packages/Npgsql/) for PostgreSQL
             /// * [System.Data.SqlClient](https://msdn.microsoft.com/en-us/library/System.Data.SqlClient.aspx) for SQL Server
             /// 
