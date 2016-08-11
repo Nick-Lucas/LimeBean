@@ -162,25 +162,25 @@ namespace LimeBean {
             return Api;
         }
 
-        protected internal virtual void AfterDispense() {
+        protected virtual void AfterDispense() {
         }
 
-        protected internal virtual void BeforeLoad() {
+        protected virtual void BeforeLoad() {
         }
 
-        protected internal virtual void AfterLoad() {
+        protected virtual void AfterLoad() {
         }
 
-        protected internal virtual void BeforeStore() {
+        protected virtual void BeforeStore() {
         }
 
-        protected internal virtual void AfterStore() {
+        protected virtual void AfterStore() {
         }
 
-        protected internal virtual void BeforeTrash() {
+        protected virtual void BeforeTrash() {
         }
 
-        protected internal virtual void AfterTrash() {
+        protected virtual void AfterTrash() {
         }
 
     }
