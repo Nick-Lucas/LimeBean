@@ -34,7 +34,7 @@ Console.WriteLine("New book ID: " + newBookId.ToString());
 
 ## Supported Frameworks and Databases
 
-              | .NET | .NET Core 
+ Database     | .NET | .NET Core 
 --------------|------|-----------
 SQLite        | +    | + 
 MySQL/MariaDB | +    | + 
