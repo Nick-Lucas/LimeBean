@@ -20,10 +20,6 @@ services:
   - postgresql
 
 before_build:
-  # Install dotnet cli
-  - appveyor DownloadFile https://raw.githubusercontent.com/dotnet/cli/v1.0.0-preview2/scripts/obtain/dotnet-install.ps1
-  - powershell -File dotnet-install.ps1
-  - set PATH=%PATH%;%LOCALAPPDATA%\Microsoft\dotnet
   - dotnet --version
 
   # Restore packages
